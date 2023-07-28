@@ -1,9 +1,10 @@
 import { PermissionsBoundaryAspect } from '@gemeentenijmegen/aws-constructs';
-import { Aspects, Stack, Stage, StageProps, Tags } from 'aws-cdk-lib';
-import { MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { Aspects, Stage, StageProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { ApiStack } from './ApiStack';
 import { Configurable, Configuration } from './Configuration';
 import { Statics } from './statics';
+import { StorageStack } from './StorageStack';
 
 interface ApiStageProps extends StageProps, Configurable { }
 
@@ -22,30 +23,7 @@ export class ApiStage extends Stage {
     Aspects.of(this).add(new PermissionsBoundaryAspect());
 
     this.configuration = props.configuration;
+    new StorageStack(this, 'storage');
     new ApiStack(this, 'api');
-  }
-}
-
-/**
- * Contains all API-related resources.
- */
-class ApiStack extends Stack {
-  constructor(scope: Construct, id: string) {
-    super(scope, id);
-
-    const api = new RestApi(this, 'gateway');
-    api.root.addMethod('ANY', new MockIntegration({
-      integrationResponses: [
-        { statusCode: '200' },
-      ],
-      passthroughBehavior: PassthroughBehavior.NEVER,
-      requestTemplates: {
-        'application/json': '{ "statusCode": 200 }',
-      },
-    }), {
-      methodResponses: [
-        { statusCode: '200' },
-      ],
-    });
   }
 }

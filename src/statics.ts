@@ -16,4 +16,7 @@ export abstract class Statics {
     region: 'eu-central-1',
   };
 
+  static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
+  static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;
+  static ssmSubmissionTableArn: string = `/${this.projectName}/submissionTableArn`;
 }

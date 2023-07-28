@@ -23,17 +23,8 @@ export class PipelineStack extends Stack {
     const connectionArn = new CfnParameter(this, 'connectionArn');
     const source = this.connectionSource(connectionArn);
     const pipeline = this.pipeline(source);
-
-    pipeline.addStage(new ApiStage(this, 'api', { env: this.configuration.deployToEnvironment, configuration: this.configuration }));
-
-    // const apiStage = pipeline.addStage(new ApiStage(this, 'yivi-issue-api', {
-    //   env: this.configuration.deployToEnvironment,
-    //   configuration: this.configuration,
-    // }));
-
-    if (this.configuration.includePipelineValidationChecks) {
-      // this.runValidationChecks(apiStage, source);
-    }
+    const apiStage = new ApiStage(this, 'api', { env: this.configuration.deployToEnvironment, configuration: this.configuration });
+    pipeline.addStage(apiStage);
 
   }
 
