@@ -3,12 +3,12 @@ import { Construct } from 'constructs';
 import { Statics } from './statics';
 
 /**
- * This stack creates a KMS key for encrypting 
- * user data. For storage a table is created in 
+ * This stack creates a KMS key for encrypting
+ * user data. For storage a table is created in
  * dynamoDB and a bucket in S3. The data in these
  * stores should be encrypted using this key.
- * 
- * The key (arn) is available via the parameter store 
+ *
+ * The key (arn) is available via the parameter store
  * parameter `Statics.ssmDataKeyArn`.
  */
 export class KeyStack extends Stack {

@@ -5,9 +5,11 @@ const project = new GemeenteNijmegenCdkApp({
   defaultReleaseBranch: 'main',
   devDeps: [
     '@gemeentenijmegen/projen-project-type',
+    '@types/aws-lambda',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
+    '@gemeentenijmegen/apigateway-http',
   ],
 
   // deps: [],                /* Runtime dependencies of this module. */
