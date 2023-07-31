@@ -3,19 +3,20 @@ import { Construct } from 'constructs';
 import { Statics } from './statics';
 
 /**
- * For session storage a sessions-table is created in dynamoDB. Session
- * state is maintained by relating an opaque session cookie value to this table.
+ * This stack creates a KMS key for encrypting 
+ * user data. For storage a table is created in 
+ * dynamoDB and a bucket in S3. The data in these
+ * stores should be encrypted using this key.
+ * 
+ * The key (arn) is available via the parameter store 
+ * parameter `Statics.ssmDataKeyArn`.
  */
 export class KeyStack extends Stack {
   /**
-     * key for encrypting user data
-     */
+   * key for encrypting user data
+   */
   key: KMS.Key;
 
-  /**
-     * key for encrypting logging data
-     */
-  // logKey: KMS.Key;
   constructor(scope: Construct, id: string) {
     super(scope, id);
     this.key = new KMS.Key(this, 'kmskey', {
