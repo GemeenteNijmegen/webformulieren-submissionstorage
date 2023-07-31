@@ -23,7 +23,7 @@ export class ApiStage extends Stage {
     Aspects.of(this).add(new PermissionsBoundaryAspect());
 
     this.configuration = props.configuration;
-    new StorageStack(this, 'storage');
-    new ApiStack(this, 'api');
+    const storageStack = new StorageStack(this, 'storage');
+    new ApiStack(this, 'api').addDependency(storageStack);
   }
 }
