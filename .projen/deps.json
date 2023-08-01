@@ -18,6 +18,10 @@
       "type": "build"
     },
     {
+      "name": "@types/sns-validator",
+      "type": "build"
+    },
+    {
       "name": "@typescript-eslint/eslint-plugin",
       "version": "^5",
       "type": "build"
@@ -104,6 +108,10 @@
     {
       "name": "constructs",
       "version": "^10.0.5",
+      "type": "runtime"
+    },
+    {
+      "name": "sns-validator",
       "type": "runtime"
     }
   ],

@@ -1132,6 +1132,11 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.0.tgz#591c1ce3a702c45ee15f47a42ade72c2fd78978a"
   integrity sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==
 
+"@types/sns-validator@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@types/sns-validator/-/sns-validator-0.3.1.tgz#76d13a495cdfcd565d2df98c4a0bf065aca2d741"
+  integrity sha512-td9FL/N5jpS1P7y41Bmj/jN0F295DAQ4If4OgIxtl/eoob+i6hciBueYD8EUSAwMpWf42JeNsGO2FglrjMC0Mg==
+
 "@types/stack-utils@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
@@ -5545,6 +5550,11 @@ smart-buffer@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
+
+sns-validator@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/sns-validator/-/sns-validator-0.3.5.tgz#4f6283734e65e493f0f32265c225c4dce87d53e3"
+  integrity sha512-lapYNmezLsltnt2fcQyhmYnC41mYZ7EjU7f2oR/hrhpbD/LemryclRpApwxO84gOyDIQ7MWe/h4HvkdunFzSKg==
 
 socks-proxy-agent@^7.0.0:
   version "7.0.0"
