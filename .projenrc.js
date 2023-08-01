@@ -11,7 +11,7 @@ const project = new GemeenteNijmegenCdkApp({
   deps: [
     '@gemeentenijmegen/aws-constructs',
     '@gemeentenijmegen/apigateway-http',
-    'sns-validator'
+    'sns-validator',
   ],
 
   // deps: [],                /* Runtime dependencies of this module. */

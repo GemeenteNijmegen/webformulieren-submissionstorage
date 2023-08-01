@@ -1,6 +1,6 @@
+import * as https from 'https';
 import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
 import MessageValidator from 'sns-validator';
-import * as https from 'https';
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
@@ -8,26 +8,26 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // Validate SNS message
     try {
-      if(event.body) {
+      if (event.body) {
         const messageBodyJson = JSON.parse(event.body);
         await validateMessage(messageBodyJson);
         let returnMessage;
-        if(messageBodyJson?.['Type'] == 'SubscriptionConfirmation') {
+        if (messageBodyJson?.Type == 'SubscriptionConfirmation') {
           returnMessage = 'subscribed';
         } else {
           returnMessage = 'message received';
         }
         return {
           statusCode: 200,
-          body: returnMessage
-        }
+          body: returnMessage,
+        };
       }
     } catch (error: any) {
       console.error(error);
       return {
         statusCode: 500,
         body: '',
-      }; 
+      };
     }
     // Extract userid (bsn/kvk) from message and use as key for dynamodb
 
@@ -48,19 +48,19 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 }
 
-function validateMessage(message: any): Promise<any> {
+export async function validateMessage(message: any): Promise<any> {
   const validator = new MessageValidator();
   return new Promise((resolve, reject) => {
-    validator.validate(message, (err, message) => {
-      if(err) {
+    validator.validate(message, (err, aMessage) => {
+      if (err) {
         return reject(err);
       }
-      if (message?.['Type'] === 'SubscriptionConfirmation' && message['SubscribeURL']) {
-        https.get(message['SubscribeURL'], function (_res) {
+      if (aMessage?.Type === 'SubscriptionConfirmation' && aMessage.SubscribeURL) {
+        https.get(aMessage.SubscribeURL, function (_res) {
           // You have confirmed your endpoint subscription
         });
       }
-      resolve(message);
+      resolve(aMessage);
     });
   });
 }
