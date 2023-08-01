@@ -1,6 +1,6 @@
 import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
 import MessageValidator from 'sns-validator';
-import https from 'https';
+import * as https from 'https';
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
@@ -10,16 +10,17 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     try {
       if(event.body) {
         const messageBodyJson = JSON.parse(event.body);
-        validateMessage(messageBodyJson);
+        await validateMessage(messageBodyJson);
+        let returnMessage;
+        if(messageBodyJson?.['Type'] == 'SubscriptionConfirmation') {
+          returnMessage = 'subscribed';
+        } else {
+          returnMessage = 'message received';
+        }
         return {
           statusCode: 200,
-          body: messageBodyJson
+          body: returnMessage
         }
-      } else {
-        return {
-          statusCode: 400,
-          body: 'No message body',
-        }; 
       }
     } catch (error: any) {
       console.error(error);
@@ -47,39 +48,19 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   }
 }
 
-/**
- * Validates the SNS message signature
- * 
- * Guarantees the message source is the
- * SNS topic it claims it was sent from.
- * 
- * This method also handles confirming
- * topic subscription as a convenience.
- * 
- * @param message a message from SNS
- * @returns {true|any} true to confirm subscription, the actual message otherwise.
- */
-export function validateMessage(jsonMessage: any) {
+function validateMessage(message: any): Promise<any> {
   const validator = new MessageValidator();
-  console.debug('validating');
-  return validator.validate(jsonMessage, function (err: Error|null, message) {
-    console.debug('starting', message);
-    if (err) {
-        console.error(err);
-        throw err;
-    }
-    if (message?.['Type'] === 'SubscriptionConfirmation' && message['SubscribeURL']) {
-      console.debug('subscribing');
-      https.get(message['SubscribeURL'], function (_res) {
-        // You have confirmed your endpoint subscription
-      });
-      return true;
-    }
-    if (message?.['Type'] === 'Notification') {
-      console.debug('returning message');
-      return message;
-    }
-    console.error('Unhandled valid message');
-    throw Error('Couldn\'t handle message');
+  return new Promise((resolve, reject) => {
+    validator.validate(message, (err, message) => {
+      if(err) {
+        return reject(err);
+      }
+      if (message?.['Type'] === 'SubscriptionConfirmation' && message['SubscribeURL']) {
+        https.get(message['SubscribeURL'], function (_res) {
+          // You have confirmed your endpoint subscription
+        });
+      }
+      resolve(message);
+    });
   });
 }
