@@ -26,11 +26,7 @@ export class ApiStack extends Stack {
     });
 
     const submissionResource = api.root.addResource('submission');
-    submissionResource.addMethod('POST', new LambdaIntegration(new SubmissionFunction(this, 'submission')), {
-      apiKeyRequired: true,
-      requestParameters: {
-        'method.request.querystring.formname': true,
-      },
+    submissionResource.addMethod('POST', new LambdaIntegration(new SubmissionFunction(this, 'submission')), { 
     });
   }
 }
