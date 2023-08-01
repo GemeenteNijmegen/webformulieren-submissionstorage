@@ -5,13 +5,14 @@ const project = new GemeenteNijmegenCdkApp({
   defaultReleaseBranch: 'main',
   devDeps: [
     '@gemeentenijmegen/projen-project-type',
-    '@types/aws-lambda',
     '@types/sns-validator',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
     '@gemeentenijmegen/apigateway-http',
+    '@types/aws-lambda',
     'sns-validator',
+    'zod',
   ],
 
   // deps: [],                /* Runtime dependencies of this module. */

@@ -1,6 +1,9 @@
 import * as https from 'https';
 import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
 import MessageValidator from 'sns-validator';
+import { SubmissionHandler } from './SubmissionHandler';
+
+const submissionHandler = new SubmissionHandler();
 
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
@@ -10,17 +13,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     try {
       if (event.body) {
         const messageBodyJson = JSON.parse(event.body);
-        await validateMessage(messageBodyJson);
-        let returnMessage;
-        if (messageBodyJson?.Type == 'SubscriptionConfirmation') {
-          returnMessage = 'subscribed';
-        } else {
-          returnMessage = 'message received';
-        }
-        return {
-          statusCode: 200,
-          body: returnMessage,
-        };
+        return await submissionHandler.handleRequest(messageBodyJson);
       }
     } catch (error: any) {
       console.error(error);

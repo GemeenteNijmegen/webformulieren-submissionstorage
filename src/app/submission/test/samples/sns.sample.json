@@ -1,0 +1,25 @@
+{
+  "Type": "Notification",
+  "MessageId": "538c926d-27a7-567b-b314-cf7e54168743",
+  "TopicArn": "arn:aws:sns:eu-west-1:315037222840:eform-submissions",
+  "Message": "{\"formId\":\"31pMt7nOOCsmqDOZbSqs5-VYeLU\",\"formTypeId\":\"evenementmeldenofvergunningaanvragen\",\"appId\":\"APV\",\"reference\":\"APV17.563\",\"data\":{\"kenmerk\":\"APV-17.563\",\"naamIngelogdeGebruiker\":\"A.deSmit\",\"totaalbedrag\":\"\",\"volgende\":true,\"soortEvenement\":\"autoMotorsport\",\"vorige1\":false,\"volgende1\":true,\"naamEvenement\":\"test\",\"beschrijfHetEvenementKort\":\"test\",\"regelsEvenement\":\"ja\",\"vorige5\":true,\"volgende4\":true,\"geefAanWanneerHetEvenementIs\":[{\"container\":{\"datum\":\"28-06-2023\",\"welkeActiviteitVindenOpDezeDagPlaatsMeerdereAntwoordenMogelijk\":{\"opbouwEvenement\":false,\"evenement\":false,\"afbrekenEvenement\":false},\"welkeActiviteitVindenOpDezeDagPlaats\":\"opbouwEvenement\",\"tijdenOpbouwEvenement\":{\"starttijdOpbouw\":\"10:00\",\"eindtijdOpbouwEvenement\":\"11:00\"}}},{\"container\":{\"datum\":\"28-06-2023\",\"welkeActiviteitVindenOpDezeDagPlaats\":\"evenement\",\"tijdenEvenement\":{\"starttijdEvenement\":\"11:00\",\"eindtijdEvenement\":\"15:00\",\"eindtijdEvenementTerreinLeeg\":\"18:00\"}}},{\"container\":{\"datum\":\"28-06-2023\",\"welkeActiviteitVindenOpDezeDagPlaats\":\"afbrekenEvenement\",\"tijdenAfbrekenEvenement\":{\"starttijdEvenementAfbreken\":\"15:00\",\"eindtijdEvenementAfbreken\":\"18:00\"}}}],\"vorige7\":true,\"vipZaaktype\":\"707d70e2-5a4c-4e8d-9930-0562ade8cf80\",\"ikHebAlleVragenNaarWaarheidBeantwoord\":true,\"vorige3\":false,\"verzenden\":true,\"form\":{\"data\":{\"inlogmiddel\":\"digid\",\"eMailadres\":\"me@example.com\",\"deGemeenteMagDitEMailadresGebruikenOmTeReagerenOpMijnAanvraag\":\"ja\",\"telefoonnummer\":\"0612345\",\"namensWieVraagtUEenOntheffingAan\":\"mijzelf\",\"contactpersoon\":\"ja\"},\"metadata\":{}},\"openbareRuimte\":\"nee\",\"openbareRuimteIsNeeOfRegelsOpenbareRuimteIsJa\":{\"datumEvenement\":\"30-06-2023\",\"starttijd\":\"10:00:00\",\"eindtijd\":\"15:00:00\",\"eindtijdTerreinLeeg\":\"18:00:00\",\"waarIsHetEvenement\":\"daar\",\"omschrijfDePlaatsVanHetEvenement\":\"sdf\",\"verwachtAantalBezoekersDeelnemers\":\"123\"},\"volgende6\":true},\"metadata\":{\"timezone\":\"Europe/Amsterdam\",\"offset\":120,\"origin\":\"https://app6-accp.nijmegen.nl\",\"referrer\":\"\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0(Macintosh;IntelMacOSX10_15_7)AppleWebKit/537.36(KHTML,likeGecko)Chrome/114.0.0.0Safari/537.36\",\"pathName\":\"/\",\"onLine\":true},\"employeeData\":{},\"pdf\":{\"reference\":\"ref1234\",\"location\":\"mylocation/pdf/APV17.563\",\"bucketName\":\"randombucket\"},\"brpData\":{\"Persoon\":{\"BSN\":{\"BSN\":\"900222670\"},\"Persoonsgegevens\":{\"Voorletters\":\"A.\",\"Voornamen\":\"Arnoud\",\"Voorvoegsel\":\"de\",\"Geslachtsnaam\":\"Smit\",\"Achternaam\":\"deSmit\",\"Naam\":\"A.deSmit\",\"Geboortedatum\":\"01-01-1937\",\"Geslacht\":\"M\",\"NederlandseNationaliteit\":\"Ja\",\"Geboorteplaats\":\"Hilversum\",\"Geboorteland\":\"Nederland\"},\"Adres\":{\"Straat\":\"Langnekstraat\",\"Huisnummer\":\"159\",\"Gemeente\":\"'s-Gravenhage\",\"Postcode\":\"2572JN\",\"Woonplaats\":\"'s-Gravenhage\"},\"Reisdocument\":{\"Documentsoort\":\"\",\"Documentnummer\":\"\",\"Uitgiftedatum\":\"\",\"Verloopdatum\":\"\"},\"ageLimits\":{\"over12\":\"Yes\",\"over16\":\"Yes\",\"over18\":\"Yes\",\"over21\":\"Yes\",\"over65\":\"Yes\"}}},\"bsn\":\"900222670\"}",
+  "Timestamp": "2023-06-26T11:07:29.154Z",
+  "SignatureVersion": "1",
+  "Signature": "MP6SMqgHFUA3eWuR/PkRLKW/eLzsbGa81a7NVN7/8Fq94K9X9DgaiqMmWq1CwWNpR5K8ISd5lwE+MIBK1h19lFVhYa/QgbIWsys8G9pCvfHdI1s+xzEAfVxgrRPa71QHkGNrrxqJN5c78ahChN9IG/XRPddYqltei5ZX6BRdFwTc0pGLkCy0hNj6kqJ30VGT8jpJoo/+PFt0PXTs+NCaOSfUo+kxO2VKtgXmHElPzfb7VAV2QFGtVkcGBgnxA5o0eEwepjf844L/BC3YsHxqHLVeg9rreMtkvoAsETRo9Qy8anYC1TcQ4rkmyWaKp4QlSllidzZxjKtbgvuC5ZPHRQ==",
+  "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem",
+  "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:315037222840:eform-submissions:bb9d78bf-834b-4146-898c-ff3456b26f9e",
+  "MessageAttributes": {
+    "BRP_data": {
+      "Type": "String",
+      "Value": "true"
+    },
+    "AppId": {
+      "Type": "String",
+      "Value": "APV"
+    },
+    "KVK_data": {
+      "Type": "String",
+      "Value": "false"
+    }
+  }
+}
