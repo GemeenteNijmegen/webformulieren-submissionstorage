@@ -1,9 +1,11 @@
 import { Stack } from 'aws-cdk-lib';
 import { MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { Topic } from 'aws-cdk-lib/aws-sns';
+import { LambdaSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
-import { LambdaSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
-import { Topic } from 'aws-cdk-lib/aws-sns';
+import { Statics } from './statics';
 
 /**
  * Contains all API-related resources.
@@ -26,15 +28,15 @@ export class ApiStack extends Stack {
         { statusCode: '200' },
       ],
     });
-    
-    new SubmissionSnsEventHandler(this, 'submissionhandler', { 
-      topicArn: 
+
+    new SubmissionSnsEventHandler(this, 'submissionhandler', {
+      topicArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTopicArn),
     });
   }
 }
 
 interface SubmissionSnsEventHandlerProps {
-  topicArn: string
+  topicArn: string;
 }
 
 class SubmissionSnsEventHandler extends Construct {
