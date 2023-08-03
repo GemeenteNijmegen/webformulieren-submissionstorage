@@ -6,4 +6,5 @@ export class SubmissionHandler {
   async handleRequest(message: SNSMessage) {
     const submission = new Submission(message);
     console.debug(submission);
+  }
 }
