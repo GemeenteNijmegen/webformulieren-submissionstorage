@@ -1,6 +1,6 @@
 export abstract class Statics {
   static readonly projectName: string = 'webformulieren-submissionstorage';
-  static readonly repositoryOwner: string = 'gemeenteNijmegen';
+  static readonly repositoryOwner: string = 'GemeenteNijmegen';
   static readonly repository: string = 'webformulieren-submissionstorage';
 
   /**
