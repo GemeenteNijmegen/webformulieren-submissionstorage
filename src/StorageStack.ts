@@ -40,6 +40,8 @@ export class StorageStack extends Stack {
       encryption: TableEncryption.CUSTOMER_MANAGED,
     });
     this.addArnToParameterStore('tableParam', table.tableArn, Statics.ssmSubmissionTableArn);
+
+    this.addParameters();
   }
 
   private addArnToParameterStore(id: string, arn: string, name: string) {
@@ -53,5 +55,15 @@ export class StorageStack extends Stack {
     const keyArn = StringParameter.valueForStringParameter(this, parameterName);
     const key = Key.fromKeyArn(this, 'key', keyArn);
     return key;
+  }
+
+  /**
+   * Add general parameters, the values of which should be added later
+   */
+  private addParameters() {
+    new StringParameter(this, 'submissionTopicArn', {
+      stringValue: '-',
+      parameterName: Statics.ssmSubmissionTopicArn,
+    });
   }
 }

@@ -1,7 +1,9 @@
 import { Stack } from 'aws-cdk-lib';
-import { LambdaIntegration, MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
+import { LambdaSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
+import { Topic } from 'aws-cdk-lib/aws-sns';
 
 /**
  * Contains all API-related resources.
@@ -24,9 +26,21 @@ export class ApiStack extends Stack {
         { statusCode: '200' },
       ],
     });
-
-    const submissionResource = api.root.addResource('submission');
-    submissionResource.addMethod('POST', new LambdaIntegration(new SubmissionFunction(this, 'submission')), {
+    
+    new SubmissionSnsEventHandler(this, 'submissionhandler', { 
+      topicArn: 
     });
+  }
+}
+
+interface SubmissionSnsEventHandlerProps {
+  topicArn: string
+}
+
+class SubmissionSnsEventHandler extends Construct {
+  constructor(scope: Construct, id: string, props: SubmissionSnsEventHandlerProps) {
+    super(scope, id);
+    const topic = Topic.fromTopicArn(this, 'submission-topic', props.topicArn);
+    topic.addSubscription(new LambdaSubscription(new SubmissionFunction(this, 'submission')));
   }
 }
