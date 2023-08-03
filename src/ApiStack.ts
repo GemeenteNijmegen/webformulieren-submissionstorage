@@ -6,6 +6,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 
 /**
  * Contains all API-related resources.
@@ -43,6 +44,9 @@ class SubmissionSnsEventHandler extends Construct {
   constructor(scope: Construct, id: string, props: SubmissionSnsEventHandlerProps) {
     super(scope, id);
     const topic = Topic.fromTopicArn(this, 'submission-topic', props.topicArn);
-    topic.addSubscription(new LambdaSubscription(new SubmissionFunction(this, 'submission')));
+    const submissionLambda = new SubmissionFunction(this, 'submission', {
+      logRetention: RetentionDays.SIX_MONTHS,
+    });
+    topic.addSubscription(new LambdaSubscription(submissionLambda));
   }
 }
