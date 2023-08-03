@@ -1,0 +1,123 @@
+{
+  "formId": "68c11b91-d127-414f-89cc-c6ef7ab3e1bf",
+  "formTypeId": "test",
+  "appId": "TDL",
+  "reference": "TDL17.957",
+  "data": {
+    "bsn": "900026236",
+    "kvk": "",
+    "achternaam": "",
+    "betrouwbaarheidsniveau": "digid",
+    "familienaam": "",
+    "geboortedatum": "01-01-1956",
+    "gemeente": "",
+    "geslacht": "",
+    "huisnummer": "",
+    "initialen": "",
+    "inlogmiddel": "digid",
+    "kenmerk": "TDL-17.957",
+    "naamIngelogdeGebruiker": "H. de Jong",
+    "nationaliteit": "",
+    "postcode": "",
+    "straatnaam": "",
+    "totaalbedrag": "",
+    "tussenvoegsel": "",
+    "vipZaakType": "",
+    "volledigeNaam": "H. de Jong",
+    "voornaam": "",
+    "woonplaats": "Nijmegen",
+    "adres_nijmegen": {
+      "adres_nijmegen-postalcode": "6511 pp",
+      "adres_nijmegen-housenr": "6",
+      "adres_nijmegen-streetname": "Korte Nieuwstraat",
+      "adres_nijmegen-city": "Nijmegen"
+    },
+    "select_nijmegen": "",
+    "eMailadres": "",
+    "selectBoxesNijmegen": {
+      "test": true,
+      "tweede": false,
+      "derde": false
+    },
+    "test": false,
+    "dataGrid": [
+      {
+        "textareaNijmegen": ""
+      }
+    ],
+    "fileNijmegen": [
+      {
+        "storage": "url",
+        "name": "test-1m-14cfa303-e58a-42dc-bd47-1299a789a627.pdf",
+        "url": "https://app6-accp.nijmegen.nl/form/cloud/s3/upload/68c11b91-d127-414f-89cc-c6ef7ab3e1bf?baseUrl=https%3A%2F%2Fapp6-accp.nijmegen.nl&project=&form=/test-1m-14cfa303-e58a-42dc-bd47-1299a789a627.pdf",
+        "size": "1048576",
+        "type": "application/pdf",
+        "reference": "360fa9d4e798e8902d19e9757eef63ad",
+        "originalName": "test-1m.pdf",
+        "location": "68c11b91-d127-414f-89cc-c6ef7ab3e1bf/files/test-1m.pdf",
+        "bucketName": "acceptance-eformgenericse-eformattuploads951db329-1s58estbegn6m"
+      }
+    ],
+    "opslaan": false,
+    "volgende": true,
+    "submit1": false,
+    "submit": true
+  },
+  "metadata": {
+    "timezone": "Europe/Amsterdam",
+    "offset": 120,
+    "origin": "https://app6-accp.nijmegen.nl",
+    "referrer": "",
+    "browserName": "Netscape",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5.2 Safari/605.1.15",
+    "pathName": "/",
+    "onLine": true
+  },
+  "employeeData": {},
+  "pdf": {
+    "reference": "c07e4f3b36955bb31565fb1ef7bdefaf",
+    "location": "68c11b91-d127-414f-89cc-c6ef7ab3e1bf/pdf/TDL17.957",
+    "bucketName": "acceptance-eformgenericse-eformattuploads951db329-1s58estbegn6m"
+  },
+  "brpData": {
+    "Persoon": {
+      "BSN": {
+        "BSN": "900026236"
+      },
+      "Persoonsgegevens": {
+        "Voorletters": "H.",
+        "Voornamen": "Hans",
+        "Voorvoegsel": "de",
+        "Geslachtsnaam": "Jong",
+        "Achternaam": "de Jong",
+        "Naam": "H. de Jong",
+        "Geboortedatum": "01-01-1956",
+        "Geslacht": "M",
+        "NederlandseNationaliteit": "Ja",
+        "Geboorteplaats": "Nijmegen",
+        "Geboorteland": "Nederland"
+      },
+      "Adres": {
+        "Straat": "Kelfkensbos",
+        "Huisnummer": "80-A-1",
+        "Gemeente": "Nijmegen",
+        "Postcode": "6511 RN",
+        "Woonplaats": "Nijmegen"
+      },
+      "Reisdocument": {
+        "Documentsoort": "",
+        "Documentnummer": "",
+        "Uitgiftedatum": "",
+        "Verloopdatum": ""
+      },
+      "ageLimits": {
+        "over12": "Yes",
+        "over16": "Yes",
+        "over18": "Yes",
+        "over21": "Yes",
+        "over65": "Yes"
+      }
+    }
+  },
+  "bsn": "900026236"
+}

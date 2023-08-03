@@ -111,6 +111,10 @@
       "type": "runtime"
     },
     {
+      "name": "node-jq",
+      "type": "runtime"
+    },
+    {
       "name": "sns-validator",
       "type": "runtime"
     },

@@ -4,7 +4,8 @@ import { Submission } from './Submission';
 
 export class SubmissionHandler {
   async handleRequest(message: SNSMessage) {
-    const submission = new Submission(message);
+    const submission = new Submission();
+    await submission.parse(message);
     console.debug(submission);
   }
 }

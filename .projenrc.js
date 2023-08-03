@@ -13,6 +13,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/aws-lambda',
     'sns-validator',
     'zod',
+    'node-jq',
   ],
 
   // deps: [],                /* Runtime dependencies of this module. */
