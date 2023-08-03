@@ -1,4 +1,5 @@
 const { GemeenteNijmegenCdkApp } = require('@gemeentenijmegen/projen-project-type');
+const { LambdaRuntime } = require('projen/lib/awscdk');
 const project = new GemeenteNijmegenCdkApp({
   name: 'webformulieren-submissionstorage',
   cdkVersion: '2.1.0',
@@ -15,6 +16,13 @@ const project = new GemeenteNijmegenCdkApp({
     'zod',
     'node-jq',
   ],
+
+  lambdaOptions: {
+    bundlingOptions: {
+      externals: ['@aws-sdk/*', 'node-jq'],
+    },
+    runtime: LambdaRuntime.NODEJS_18_X,
+  },
 
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
