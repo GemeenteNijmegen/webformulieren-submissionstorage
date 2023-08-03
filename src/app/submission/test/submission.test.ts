@@ -22,13 +22,13 @@ describe('Submission parsing', () => {
     const anonMessage = JSON.parse(JSON.stringify(message));
     anonMessage.Message = anonMessage.Message.replace(',\"bsn\":\"900222670\"', '');
     const anonSubmission = new Submission();
-    submission.parse(anonMessage);
+    await submission.parse(anonMessage);
     expect(anonSubmission.isAnonymous()).toBe(true);
   });
 
   test('Invalid message throws', async () => {
     const invalidSubmission = new Submission();
-    expect(async () => {
+    await expect(async () => {
       await invalidSubmission.parse({ 'invalid SNS message': 'value', 'Message': 'messageTest' });
     }).rejects.toThrow();
   });
@@ -39,9 +39,9 @@ describe('Submission s3 locations', () => {
     expect(submission.pdf?.bucket).toBeTruthy();
     expect(submission.pdf?.key).toBeTruthy();
   });
-  
+
   test('retrieve all attachments', async () => {
     expect(submission.attachments).toHaveLength(2);
-    expect(submission.attachments?.[0]).toMatchObject(({ bucket: expect.anything(), key: expect.anything() }))
+    expect(submission.attachments?.[0]).toMatchObject(({ bucket: expect.anything(), key: expect.anything() }));
   });
 });
