@@ -1,7 +1,8 @@
 import * as snsSample from './samples/sns.sample.json';
 import { Submission } from '../Submission';
 
-const message = snsSample;
+const messages = snsSample.Records.map(record => record.Sns);
+const message = messages.pop();
 
 describe('Submission class', () => {
   test('parsing an SNS message to submission', async () => {
