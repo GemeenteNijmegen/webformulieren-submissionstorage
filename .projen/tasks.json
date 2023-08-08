@@ -55,7 +55,7 @@
       "description": "Create a JavaScript bundle from src/app/submission/submission.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --external:node-jq"
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -64,7 +64,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/submission/submission.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --external:node-jq --watch"
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },

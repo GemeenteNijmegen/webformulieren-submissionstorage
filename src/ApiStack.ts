@@ -44,9 +44,11 @@ class SubmissionSnsEventHandler extends Construct {
   constructor(scope: Construct, id: string, props: SubmissionSnsEventHandlerProps) {
     super(scope, id);
     const topic = Topic.fromTopicArn(this, 'submission-topic', props.topicArn);
+
     const submissionLambda = new SubmissionFunction(this, 'submission', {
       logRetention: RetentionDays.SIX_MONTHS,
     });
     topic.addSubscription(new LambdaSubscription(submissionLambda));
+
   }
 }
