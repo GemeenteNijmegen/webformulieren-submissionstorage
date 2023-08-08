@@ -40,6 +40,7 @@ export class StorageStack extends Stack {
       encryption: TableEncryption.CUSTOMER_MANAGED,
     });
     this.addArnToParameterStore('tableParam', table.tableArn, Statics.ssmSubmissionTableArn);
+    this.addArnToParameterStore('tableNameParam', table.tableName, Statics.ssmSubmissionTableName);
 
     this.addParameters();
   }
