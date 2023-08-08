@@ -31,21 +31,13 @@ export class Submission {
   }
 
   /**
-   * Retrieve all attachments from the submission. We recognize upload fields
+   * Retrieve all attachment locations from the submission. We recognize upload fields
    * by the fact they contain a 'bucketName' field, and search the message for
-   * these fields, using `jq`.
+   * these fields
    *
    * @returns `[s3Object]`
    */
   async getAttachments(): Promise<{ bucket: string; key: string; originalName?: string | undefined }[]> {
-    /**
-     * This [jq](https://jqlang.github.io/jq/) filter retrieves from the `data` subobject ALL fields that
-     * have `bucketName` as one of their keys, and returns an array containing objects of the form {
-     *  key: string,
-     *  bucket: string,
-     *  originalName: string
-     * }
-     */
     const filesObjects = getSubObjectsWithKey(this.parsedSubmission.data, 'bucketName');
     return filesObjects.map((file: any) => {
       const result = {
