@@ -69,7 +69,7 @@ class SubmissionSnsEventHandler extends Construct {
     const submissionLambda = new SubmissionFunction(this, 'submission', {
       logRetention: RetentionDays.SIX_MONTHS,
       environment: {
-        BUCKET_ARN: bucket.bucketArn,
+        BUCKET_NAME: bucket.bucketName,
         TABLE_NAME: table.tableName,
       },
     });

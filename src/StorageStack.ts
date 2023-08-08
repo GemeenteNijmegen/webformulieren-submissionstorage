@@ -31,6 +31,7 @@ export class StorageStack extends Stack {
       encryptionKey: key,
     });
     this.addArnToParameterStore('bucketParam', bucket.bucketArn, Statics.ssmSubmissionBucketArn);
+    this.addArnToParameterStore('bucketNameParam', bucket.bucketName, Statics.ssmSubmissionBucketName);
 
     const table = new Table(this, 'submissions', {
       partitionKey: { name: 'sessionid', type: AttributeType.STRING },
