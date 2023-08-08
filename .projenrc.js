@@ -14,6 +14,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/aws-lambda',
     'sns-validator',
     'zod',
+    '@aws-sdk/client-s3',
   ],
 
   // deps: [],                /* Runtime dependencies of this module. */

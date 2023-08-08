@@ -1,5 +1,9 @@
 import { z } from 'zod';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
+import { Storage } from './Storage';
+import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
+
+type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
 interface s3Object {
   /** Name of an S3 bucket */
@@ -10,15 +14,26 @@ interface s3Object {
   originalName?: string;
 }
 
+/**
+ * Handle a submission message from SNS
+ */
 export class Submission {
-  private parsedSubmission: any;
+  private rawSubmission: any;
+  private parsedSubmission?: ParsedSubmission;
+
+  private storage: Storage;
 
   public bsn?: string;
   public kvk?: string;
   public pdf?: s3Object;
   public attachments?: s3Object[];
 
+  constructor(storage: Storage) {
+    this.storage = storage;
+  }
+
   async parse(message: any) {
+    this.rawSubmission = message;
     const contents = JSON.parse(message.Message);
     this.parsedSubmission = SubmissionSchema.passthrough().parse(contents);
     this.bsn = this.parsedSubmission.bsn;
@@ -38,7 +53,7 @@ export class Submission {
    * @returns `[s3Object]`
    */
   async getAttachments(): Promise<{ bucket: string; key: string; originalName?: string | undefined }[]> {
-    const filesObjects = getSubObjectsWithKey(this.parsedSubmission.data, 'bucketName');
+    const filesObjects = getSubObjectsWithKey(this.parsedSubmission!.data, 'bucketName');
     return filesObjects.map((file: any) => {
       const result = {
         bucket: file.bucketName,
@@ -51,29 +66,22 @@ export class Submission {
   isAnonymous() {
     return (this.bsn || this.kvk) ? false : true;
   }
+
+  /**
+   * Save the submission
+   * 
+   * Currently this will use the provided storage class
+   * to save only the raw submission message.
+   * 
+   * TODO: Save attachments, PDF and form definition
+   * 
+   * @returns Results of the save operation
+   */
+  async save(): Promise<boolean> {
+    if (!this.parsedSubmission) {
+      throw Error('parse submission before attempting to save');
+    }
+    const baseKey = this.parsedSubmission.reference;
+    return this.storage.store(`${baseKey}/submission.json`, this.rawSubmission);
+  }
 }
-
-const s3ObjectSchema = z.object({
-  bucket: z.string(),
-  key: z.string(),
-  originalName: z.string().optional(),
-});
-
-const SubmissionSchema = z.object({
-  formId: z.string(),
-  formTypeId: z.string(),
-  appId: z.string(),
-  reference: z.string(),
-  data: z.object({
-    kenmerk: z.string(),
-    naamIngelogdeGebruiker: z.string(),
-  }).passthrough(),
-  employeeData: z.any(),
-  pdf: z.object({
-    reference: z.string(),
-    location: z.string(),
-    bucketName: z.string(),
-  }),
-  bsn: z.string().optional(),
-  kvk: z.string().optional(),
-});
