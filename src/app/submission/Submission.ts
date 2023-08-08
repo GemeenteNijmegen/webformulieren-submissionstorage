@@ -1,5 +1,5 @@
-import * as jq from 'node-jq';
 import { z } from 'zod';
+import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 
 interface s3Object {
   /** Name of an S3 bucket */
@@ -46,9 +46,15 @@ export class Submission {
      *  originalName: string
      * }
      */
-    const filter = '[.data | .. | select(.bucketName?) | {key: .location, bucket: .bucketName, originalName: .originalName}]';
-    const files = await jq.run(filter, this.parsedSubmission, { input: 'json', output: 'json' }) as [s3Object];
-    return files.map((file) => s3ObjectSchema.parse(file)) ?? undefined;
+    const filesObjects = getSubObjectsWithKey(this.parsedSubmission.data, 'bucketName');
+    return filesObjects.map((file: any) => {
+      const result = {
+        bucket: file.bucketName, 
+        key: file.location, 
+        originalName: file.originalName 
+      };
+      return result;
+    }).map((file: any) => s3ObjectSchema.parse(file)) ?? undefined;
   }
   isAnonymous() {
     return (this.bsn || this.kvk) ? false : true;

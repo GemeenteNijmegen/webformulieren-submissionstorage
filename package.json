@@ -1,5 +1,8 @@
 {
   "name": "webformulieren-submissionstorage",
+  "bin": {
+    "jq": "bin/jq"
+  },
   "scripts": {
     "build": "npx projen build",
     "bump": "npx projen bump",

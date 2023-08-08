@@ -7,6 +7,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
+import { Code, LayerVersion, Runtime } from 'aws-cdk-lib/aws-lambda';
 
 /**
  * Contains all API-related resources.
@@ -44,9 +45,20 @@ class SubmissionSnsEventHandler extends Construct {
   constructor(scope: Construct, id: string, props: SubmissionSnsEventHandlerProps) {
     super(scope, id);
     const topic = Topic.fromTopicArn(this, 'submission-topic', props.topicArn);
+    
+    const jqLayer = new LayerVersion(this, 'calc-layer', {
+      compatibleRuntimes: [
+        Runtime.NODEJS_18_X,
+      ],
+      code: Code.fromAsset('node_modules/node-jq'),
+      description: 'add node-jq as lambda layer',
+    });
+
     const submissionLambda = new SubmissionFunction(this, 'submission', {
       logRetention: RetentionDays.SIX_MONTHS,
+      layers: [jqLayer]
     });
     topic.addSubscription(new LambdaSubscription(submissionLambda));
+
   }
 }

@@ -14,15 +14,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/aws-lambda',
     'sns-validator',
     'zod',
-    'node-jq',
   ],
-
-  lambdaOptions: {
-    bundlingOptions: {
-      externals: ['@aws-sdk/*', 'node-jq'],
-    },
-    runtime: LambdaRuntime.NODEJS_18_X,
-  },
 
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
