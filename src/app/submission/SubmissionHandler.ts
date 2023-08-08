@@ -3,10 +3,10 @@ import { S3Storage, Storage } from './Storage';
 import { Submission } from './Submission';
 
 let storage: Storage;
-if (process.env.BUCKET_ARN == undefined) {
-  console.error('No bucket ARN provided, storing submissions will fail.');
+if (process.env.BUCKET_NAME == undefined) {
+  console.error('No bucket NAME provided, storing submissions will fail.');
 } else {
-  storage = new S3Storage(process.env.BUCKET_ARN);
+  storage = new S3Storage(process.env.BUCKET_NAME);
 }
 
 export class SubmissionHandler {
