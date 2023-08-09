@@ -82,6 +82,6 @@ export class Submission {
       throw Error('parse submission before attempting to save');
     }
     const baseKey = this.parsedSubmission.reference;
-    return this.storage.store(`${baseKey}/submission.json`, this.rawSubmission);
+    return this.storage.store(`${baseKey}/submission.json`, JSON.stringify(this.rawSubmission));
   }
 }
