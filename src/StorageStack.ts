@@ -22,7 +22,7 @@ export class StorageStack extends Stack {
       eventBridgeEnabled: true,
       enforceSSL: true,
       encryption: BucketEncryption.KMS,
-      objectOwnership: ObjectOwnership.OBJECT_WRITER,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED,
       lifecycleRules: [
         {
           expiration: Duration.days(365),
