@@ -9,6 +9,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
+import { Key } from 'aws-cdk-lib/aws-kms';
 
 /**
  * Contains all API-related resources.
@@ -48,7 +49,12 @@ class SubmissionSnsEventHandler extends Construct {
 
     const topic = Topic.fromTopicArn(this, 'submission-topic', props.topicArn);
     const table = Table.fromTableName(this, 'table', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName));
-    const bucket = Bucket.fromBucketArn(this, 'bucket', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn));
+    const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
+    // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
+    const bucket = Bucket.fromBucketAttributes(this, 'bucket', {
+      bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
+      encryptionKey: key
+    });
 
     this.submissionHandlerLambda(bucket, table, topic);
   }
@@ -78,4 +84,5 @@ class SubmissionSnsEventHandler extends Construct {
 
     topic.addSubscription(new LambdaSubscription(submissionLambda));
   }
+
 }
