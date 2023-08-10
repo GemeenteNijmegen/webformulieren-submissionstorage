@@ -6,15 +6,19 @@ const project = new GemeenteNijmegenCdkApp({
   defaultReleaseBranch: 'main',
   devDeps: [
     '@gemeentenijmegen/projen-project-type',
+    '@aws-sdk/client-secrets-manager',
     '@types/sns-validator',
+    'aws-sdk-client-mock',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
+    '@gemeentenijmegen/utils',
     '@gemeentenijmegen/apigateway-http',
     '@types/aws-lambda',
     'sns-validator',
     'zod',
     '@aws-sdk/client-s3',
+    'axios',
   ],
 
   // deps: [],                /* Runtime dependencies of this module. */

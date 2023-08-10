@@ -2,6 +2,7 @@ import { Duration, Stack } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { Statics } from './statics';
@@ -34,7 +35,7 @@ export class StorageStack extends Stack {
     this.addArnToParameterStore('bucketNameParam', bucket.bucketName, Statics.ssmSubmissionBucketName);
 
     const table = new Table(this, 'submissions', {
-      partitionKey: { name: 'sessionid', type: AttributeType.STRING },
+      partitionKey: { name: 'submissionid', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
       timeToLiveAttribute: 'ttl',
       encryptionKey: key,
@@ -66,6 +67,17 @@ export class StorageStack extends Stack {
     new StringParameter(this, 'submissionTopicArn', {
       stringValue: '-',
       parameterName: Statics.ssmSubmissionTopicArn,
+    });
+
+    new StringParameter(this, 'formIoBaseUrl', {
+      stringValue: '-',
+      parameterName: Statics.ssmFormIoBaseUrl,
+      description: 'Base url for retrieving form config. Includes stage path.',
+    });
+
+    new Secret(this, 'formIoApiKey', {
+      secretName: Statics.secretFormIoApiKey,
+      description: 'FormIO Api token for retrieving form config',
     });
   }
 }

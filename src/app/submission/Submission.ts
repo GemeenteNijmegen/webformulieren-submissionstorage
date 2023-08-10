@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 import { Storage } from './Storage';
 import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
@@ -12,6 +13,12 @@ interface s3Object {
   key: string;
   /** The filename this file was uploaded as */
   originalName?: string;
+
+}
+
+interface SubmissionProps {
+  storage: Storage;
+  formConnector: FormConnector;
 }
 
 /**
@@ -22,14 +29,16 @@ export class Submission {
   private parsedSubmission?: ParsedSubmission;
 
   private storage: Storage;
+  private formConnector: FormConnector;
 
   public bsn?: string;
   public kvk?: string;
   public pdf?: s3Object;
   public attachments?: s3Object[];
 
-  constructor(storage: Storage) {
-    this.storage = storage;
+  constructor(props: SubmissionProps) {
+    this.storage = props.storage;
+    this.formConnector = props.formConnector;
   }
 
   async parse(message: any) {
@@ -81,7 +90,29 @@ export class Submission {
     if (!this.parsedSubmission) {
       throw Error('parse submission before attempting to save');
     }
+    // Save submission, but only if an identifiable user submitted
+    const userId = this.bsn ? this.bsn : this.kvk;
+    if (!userId) {
+      return false;
+    }
     const baseKey = this.parsedSubmission.reference;
-    return this.storage.store(`${baseKey}/submission.json`, JSON.stringify(this.rawSubmission));
+
+    const [formDefinition, submissionStoreResult] = await Promise.all([
+      this.formConnector.definition(this.parsedSubmission.formTypeId),
+      this.storage.store(`${baseKey}/submission.json`, JSON.stringify(this.rawSubmission)),
+    ]);
+    if (!submissionStoreResult) {
+      throw Error('Failed storing raw submission');
+    }
+    await this.storage.store(`${baseKey}/formdefinition.json`, JSON.stringify(formDefinition));
+
+    // Store in dynamodb
+    // const hashedId = hashString(userId);
+    // this.database.save({
+    //   pk: `SUBMISSION#${hashedId}#${baseKey}`
+
+    // });
+
+    return true;
   }
 }

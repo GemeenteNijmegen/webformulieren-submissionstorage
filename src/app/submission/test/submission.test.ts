@@ -1,11 +1,13 @@
 import * as snsSample from './samples/sns.sample.json';
+import { MockFormConnector } from '../FormConnector';
 import { MockStorage } from '../Storage';
 import { Submission } from '../Submission';
 
 const messages = snsSample.Records.map(record => record.Sns);
 const message = messages.pop();
 const storage = new MockStorage('mockBucket');
-const submission = new Submission(storage);
+const formConnector = new MockFormConnector();
+const submission = new Submission({ storage, formConnector });
 
 beforeAll(async () => {
   await submission.parse(message);
@@ -23,13 +25,13 @@ describe('Submission parsing', () => {
   test('Message without kvk or bsn key is anonymous', async () => {
     const anonMessage = JSON.parse(JSON.stringify(message));
     anonMessage.Message = anonMessage.Message.replace(',\"bsn\":\"900222670\"', '');
-    const anonSubmission = new Submission(storage);
+    const anonSubmission = new Submission({ storage, formConnector });
     await submission.parse(anonMessage);
     expect(anonSubmission.isAnonymous()).toBe(true);
   });
 
   test('Invalid message throws', async () => {
-    const invalidSubmission = new Submission(storage);
+    const invalidSubmission = new Submission({ storage, formConnector });
     await expect(async () => {
       await invalidSubmission.parse({ 'invalid SNS message': 'value', 'Message': 'messageTest' });
     }).rejects.toThrow();

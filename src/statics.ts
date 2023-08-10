@@ -22,4 +22,7 @@ export abstract class Statics {
   static ssmSubmissionTableArn: string = `/${this.projectName}/submissionTableArn`;
   static ssmSubmissionTableName: string = `/${this.projectName}/submissionTableName`;
   static ssmSubmissionTopicArn: string = `/${this.projectName}/ssmSubmissionTopicArn`;
+  static ssmFormIoBaseUrl: string = `/${this.projectName}/formIoBaseUrl`;
+
+  static secretFormIoApiKey: string = `/${this.projectName}/FormIoAPIKey`;
 }

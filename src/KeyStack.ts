@@ -1,4 +1,4 @@
-import { aws_kms as KMS, Stack, aws_ssm as SSM } from 'aws-cdk-lib';
+import { aws_kms as KMS, aws_ssm as SSM, Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Statics } from './statics';
 
