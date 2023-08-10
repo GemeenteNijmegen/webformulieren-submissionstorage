@@ -38,7 +38,7 @@ export class S3Storage implements Storage {
       Bucket: this.bucket,
       Key: key,
       Body: contents,
-      ServerSideEncryption: 'aws:kms'
+      ServerSideEncryption: 'aws:kms',
     });
     try {
       await this.s3Client.send(command);

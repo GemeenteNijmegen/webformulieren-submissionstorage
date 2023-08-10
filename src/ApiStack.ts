@@ -1,6 +1,7 @@
 import { Stack } from 'aws-cdk-lib';
 import { MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Key } from 'aws-cdk-lib/aws-kms';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { ITopic, Topic } from 'aws-cdk-lib/aws-sns';
@@ -9,7 +10,6 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
-import { Key } from 'aws-cdk-lib/aws-kms';
 
 /**
  * Contains all API-related resources.
@@ -53,7 +53,7 @@ class SubmissionSnsEventHandler extends Construct {
     // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
     const bucket = Bucket.fromBucketAttributes(this, 'bucket', {
       bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
-      encryptionKey: key
+      encryptionKey: key,
     });
 
     this.submissionHandlerLambda(bucket, table, topic);

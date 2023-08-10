@@ -1,7 +1,6 @@
-import { aws_kms as KMS, Stack, aws_iam as IAM, aws_ssm as SSM } from 'aws-cdk-lib';
+import { aws_kms as KMS, Stack, aws_ssm as SSM } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Statics } from './statics';
-import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 /**
  * This stack creates a KMS key for encrypting
