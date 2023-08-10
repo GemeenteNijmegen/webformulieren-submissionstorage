@@ -35,7 +35,7 @@ export class FormIoFormConnector implements FormConnector {
         {
           baseURL: config.baseUrl.toString(),
           headers: {
-            Authorization: 'x-token ' + config.apiKey,
+            'x-token': config.apiKey,
           },
         },
       );
