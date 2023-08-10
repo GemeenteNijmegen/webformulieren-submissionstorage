@@ -69,12 +69,12 @@ export class Submission {
 
   /**
    * Save the submission
-   * 
+   *
    * Currently this will use the provided storage class
    * to save only the raw submission message.
-   * 
+   *
    * TODO: Save attachments, PDF and form definition
-   * 
+   *
    * @returns Results of the save operation
    */
   async save(): Promise<boolean> {
