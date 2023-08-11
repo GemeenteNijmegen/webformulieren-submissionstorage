@@ -9,6 +9,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
+import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 interface SubmissionSnsEventHandlerProps {
   topicArn: string;
@@ -44,6 +45,7 @@ export class SubmissionSnsEventHandler extends Construct {
    */
   private submissionHandlerLambda(bucket: IBucket, table: ITable, topic: ITopic, secret: ISecret) {
     const submissionLambda = new SubmissionFunction(this, 'submission', {
+      role: this.lambdaRole(),
       logRetention: RetentionDays.SIX_MONTHS,
       environment: {
         BUCKET_NAME: bucket.bucketName,
@@ -57,6 +59,22 @@ export class SubmissionSnsEventHandler extends Construct {
     secret.grantRead(submissionLambda);
 
     topic.addSubscription(new LambdaSubscription(submissionLambda));
+  }
+
+  /**
+   * We use a custom service role, because this role needs to 
+   * assume a role in a different account. This way, the other
+   * account can add this role arn to its relevant policy.
+   */
+  lambdaRole() {
+    return new Role(this, 'role', {
+      roleName: `submissionhandler-lambda-role`,
+      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      description: `Role for submission handler lambda, custom role so role name is predictable`,
+      managedPolicies: [{
+        managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+      }],
+    });
   }
 
 }
