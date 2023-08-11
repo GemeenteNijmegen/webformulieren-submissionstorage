@@ -54,7 +54,7 @@ export class S3Storage implements Storage {
     const command = new CopyObjectCommand({
       Bucket: this.bucket,
       Key: destinationKey,
-      CopySource: source
+      CopySource: source,
     });
     try {
       await this.s3Client.send(command);
