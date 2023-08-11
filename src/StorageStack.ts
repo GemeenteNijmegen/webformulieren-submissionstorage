@@ -69,6 +69,12 @@ export class StorageStack extends Stack {
       parameterName: Statics.ssmSubmissionTopicArn,
     });
 
+    new StringParameter(this, 'sourceBucketArn', {
+      stringValue: '-',
+      parameterName: Statics.ssmSourceBucketArn,
+      description: 'ARN for the source bucket, to allow copying submission files',
+    });
+
     new StringParameter(this, 'formIoBaseUrl', {
       stringValue: '-',
       parameterName: Statics.ssmFormIoBaseUrl,

@@ -18,6 +18,7 @@ export abstract class Statics {
 
   static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
   static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;
+  static ssmSourceBucketArn: string = `/${this.projectName}/sourceBucketArn`;
   static ssmSubmissionBucketName: string = `/${this.projectName}/submissionBucketName`;
   static ssmSubmissionTableArn: string = `/${this.projectName}/submissionTableArn`;
   static ssmSubmissionTableName: string = `/${this.projectName}/submissionTableName`;
