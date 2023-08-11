@@ -26,7 +26,7 @@ export class SubmissionSnsEventHandler extends Construct {
       bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
       encryptionKey: key,
     });
-    const sourceBucket = Bucket.fromBucketArn(this, 'sourceBucket', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn));
+    const sourceBucket = Bucket.fromBucketArn(this, 'sourceBucket', StringParameter.valueForStringParameter(this, Statics.ssmSourceBucketArn));
     const secret = Secret.fromSecretNameV2(this, 'apikey', Statics.secretFormIoApiKey);
 
     this.submissionHandlerLambda(storageBucket, sourceBucket, table, topic, secret);
