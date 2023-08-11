@@ -87,7 +87,7 @@ export class Submission {
    * @returns Results of the save operation
    */
   async save(): Promise<boolean> {
-    if (!this.parsedSubmission) {
+    if (!this.parsedSubmission || !this.pdf) {
       throw Error('parse submission before attempting to save');
     }
     // Save submission, but only if an identifiable user submitted
@@ -105,6 +105,15 @@ export class Submission {
       throw Error('Failed storing raw submission');
     }
     await this.storage.store(`${baseKey}/formdefinition.json`, JSON.stringify(formDefinition));
+
+    const copyPromises: Promise<any>[] = [];
+    copyPromises.push(this.storage.copy(`${this.pdf.bucket}/${this.pdf.key}`, `${baseKey}/${this.pdf.key}`));
+    if(this.attachments) {
+      for(let attachment of this.attachments) {
+        copyPromises.push(this.storage.copy(`${attachment.bucket}/${attachment.key}`, `${baseKey}/attachments/${attachment.originalName}`));
+      }
+    }
+    await Promise.all(copyPromises);
 
     // Store in dynamodb
     // const hashedId = hashString(userId);

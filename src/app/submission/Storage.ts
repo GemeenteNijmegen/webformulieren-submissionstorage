@@ -1,8 +1,8 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { CopyObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
-  copy(source: string, destination: string): Promise<boolean>;
+  copy(source: string, destinationKey: string): Promise<boolean>;
 }
 
 export class MockStorage implements Storage {
@@ -17,8 +17,8 @@ export class MockStorage implements Storage {
     return true;
   }
 
-  public async copy(source: string, destination: string) {
-    console.debug(`would copy ${source} to ${destination}`);
+  public async copy(source: string, destinationKey: string) {
+    console.debug(`would copy ${source} to ${destinationKey}`);
     return true;
   }
 }
@@ -42,14 +42,26 @@ export class S3Storage implements Storage {
     });
     try {
       await this.s3Client.send(command);
+      console.debug(`successfully stored ${key}`);
     } catch (err) {
       console.error(err);
     }
     return true;
   }
 
-  public async copy(source: string, destination: string) {
-    console.debug(`would copy ${source} to ${destination}`);
-    return false;
+  public async copy(source: string, destinationKey: string) {
+    console.debug(`copying ${source} to ${destinationKey}`);
+    const command = new CopyObjectCommand({
+      Bucket: this.bucket,
+      Key: destinationKey,
+      CopySource: source
+    });
+    try {
+      await this.s3Client.send(command);
+    } catch (err) {
+      console.error(err);
+    }
+    console.debug(`successfully copied ${source} to ${destinationKey}`);
+    return true;
   }
 }
