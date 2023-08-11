@@ -1,4 +1,5 @@
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
@@ -9,7 +10,6 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
-import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 interface SubmissionSnsEventHandlerProps {
   topicArn: string;
@@ -62,15 +62,15 @@ export class SubmissionSnsEventHandler extends Construct {
   }
 
   /**
-   * We use a custom service role, because this role needs to 
+   * We use a custom service role, because this role needs to
    * assume a role in a different account. This way, the other
    * account can add this role arn to its relevant policy.
    */
   lambdaRole() {
     return new Role(this, 'role', {
-      roleName: `submissionhandler-lambda-role`,
+      roleName: 'submissionhandler-lambda-role',
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
-      description: `Role for submission handler lambda, custom role so role name is predictable`,
+      description: 'Role for submission handler lambda, custom role so role name is predictable',
       managedPolicies: [{
         managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
       }],
