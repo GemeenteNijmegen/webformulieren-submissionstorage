@@ -59,6 +59,8 @@ export class SubmissionSnsEventHandler extends Construct {
     sourceBucket.grantRead(submissionLambda);
     table.grantReadWriteData(submissionLambda);
     secret.grantRead(submissionLambda);
+    const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
+    key.grantDecrypt(submissionLambda);
 
     topic.addSubscription(new LambdaSubscription(submissionLambda));
   }
