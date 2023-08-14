@@ -108,8 +108,8 @@ export class Submission {
 
     const copyPromises: Promise<any>[] = [];
     copyPromises.push(this.storage.copy(`${this.pdf.bucket}/${this.pdf.key}`, `${baseKey}/${this.pdf.key}`));
-    if(this.attachments) {
-      for(let attachment of this.attachments) {
+    if (this.attachments) {
+      for (let attachment of this.attachments) {
         // copyPromises.push(this.storage.copy(`${attachment.bucket}/${attachment.key}`, `${baseKey}/attachments/${attachment.originalName}`));
         copyPromises.push(this.storage.get(attachment.bucket, attachment.key));
       }

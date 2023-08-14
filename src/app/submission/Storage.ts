@@ -57,7 +57,7 @@ export class S3Storage implements Storage {
   public async get(bucket: string, key: string) {
     const command = new GetObjectCommand({
       Bucket: bucket,
-      Key: key
+      Key: key,
     });
     try {
       const object = await this.s3Client.send(command);
@@ -74,7 +74,7 @@ export class S3Storage implements Storage {
     const command = new CopyObjectCommand({
       Bucket: this.bucket,
       Key: destinationKey,
-      CopySource: source
+      CopySource: source,
     });
     try {
       await this.s3Client.send(command);

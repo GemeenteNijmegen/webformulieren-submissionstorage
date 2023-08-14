@@ -75,6 +75,12 @@ export class StorageStack extends Stack {
       description: 'ARN for the source bucket, to allow copying submission files',
     });
 
+    new StringParameter(this, 'sourceKeyArn', {
+      stringValue: '-',
+      parameterName: Statics.ssmSourceKeyArn,
+      description: 'ARN for the source bucket encryption key, to allow copying submission files',
+    });
+
     new StringParameter(this, 'formIoBaseUrl', {
       stringValue: '-',
       parameterName: Statics.ssmFormIoBaseUrl,
