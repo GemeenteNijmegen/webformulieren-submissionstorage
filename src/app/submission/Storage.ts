@@ -1,8 +1,9 @@
-import { CopyObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { CopyObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
   copy(source: string, destinationKey: string): Promise<boolean>;
+  get(bucket: string, key: string): Promise<boolean>;
 }
 
 export class MockStorage implements Storage {
@@ -10,6 +11,10 @@ export class MockStorage implements Storage {
 
   constructor(bucket?: string) {
     this.bucket = bucket;
+  }
+  public async get(bucket: string, key: string) {
+    console.debug(`would get ${key} from ${bucket}`);
+    return true;
   }
 
   public async store(key: string, contents: string) {
@@ -47,6 +52,21 @@ export class S3Storage implements Storage {
       console.error(err);
     }
     return true;
+  }
+
+  public async get(bucket: string, key: string) {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key
+    });
+    try {
+      const object = await this.s3Client.send(command);
+      console.debug(`successfully got ${object} of size ${object.Body?.transformToByteArray.length}`);
+      return true;
+    } catch (err) {
+      console.error(err);
+    }
+    return false;
   }
 
   public async copy(source: string, destinationKey: string) {
