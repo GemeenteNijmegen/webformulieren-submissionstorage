@@ -1,24 +1,18 @@
 import { z } from 'zod';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
+import { s3Object } from './s3Object';
 import { Storage } from './Storage';
 import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
+import { hashString } from './hash';
+import { Database } from './Database';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
-
-interface s3Object {
-  /** Name of an S3 bucket */
-  bucket: string;
-  /** the key (entire path) to the file in S3 */
-  key: string;
-  /** The filename this file was uploaded as */
-  originalName?: string;
-
-}
 
 interface SubmissionProps {
   storage: Storage;
   formConnector: FormConnector;
+  database: Database;
 }
 
 /**
@@ -30,15 +24,18 @@ export class Submission {
 
   private storage: Storage;
   private formConnector: FormConnector;
+  private database: Database;
 
   public bsn?: string;
   public kvk?: string;
   public pdf?: s3Object;
   public attachments?: s3Object[];
+  public key?: string;
 
   constructor(props: SubmissionProps) {
     this.storage = props.storage;
     this.formConnector = props.formConnector;
+    this.database = props.database;
   }
 
   async parse(message: any) {
@@ -51,6 +48,7 @@ export class Submission {
       bucket: this.parsedSubmission.pdf.bucketName,
       key: this.parsedSubmission.pdf.location,
     };
+    this.key = this.parsedSubmission.reference;
     this.attachments = await this.getAttachments();
   }
 
@@ -72,6 +70,7 @@ export class Submission {
       return result;
     }).map((file: any) => s3ObjectSchema.parse(file)) ?? undefined;
   }
+
   isAnonymous() {
     return (this.bsn || this.kvk) ? false : true;
   }
@@ -82,47 +81,72 @@ export class Submission {
    * Currently this will use the provided storage class
    * to save only the raw submission message.
    *
-   * TODO: Save attachments, PDF and form definition
-   *
-   * @returns Results of the save operation
+   * TODO: Save attachments, PDF
    */
   async save(): Promise<boolean> {
-    if (!this.parsedSubmission || !this.pdf) {
+    if (!this.parsedSubmission || !this.pdf || !this.key) {
       throw Error('parse submission before attempting to save');
     }
-    // Save submission, but only if an identifiable user submitted
-    const userId = this.bsn ? this.bsn : this.kvk;
-    if (!userId) {
-      return false;
-    }
-    const baseKey = this.parsedSubmission.reference;
 
-    const [formDefinition, submissionStoreResult] = await Promise.all([
-      this.formConnector.definition(this.parsedSubmission.formTypeId),
-      this.storage.store(`${baseKey}/submission.json`, JSON.stringify(this.rawSubmission)),
-    ]);
-    if (!submissionStoreResult) {
-      throw Error('Failed storing raw submission');
-    }
-    await this.storage.store(`${baseKey}/formdefinition.json`, JSON.stringify(formDefinition));
+    const formDefinition = this.formConnector.definition(this.parsedSubmission.formTypeId);
 
+    // Prepare and do all independent requests in parallel
     const copyPromises: Promise<any>[] = [];
-    copyPromises.push(this.storage.copy(`${this.pdf.bucket}/${this.pdf.key}`, `${baseKey}/${this.pdf.key}`));
-    if (this.attachments) {
-      for (let attachment of this.attachments) {
-        copyPromises.push(this.storage.copy(`${attachment.bucket}/${attachment.key}`, `${baseKey}/attachments/${attachment.originalName}`));
-        // copyPromises.push(this.storage.get(attachment.bucket, attachment.key));
-      }
+    copyPromises.push(this.storage.store(`${this.key}/submission.json`, JSON.stringify(this.rawSubmission))); // Submission
+    copyPromises.push(this.storage.store(`${this.key}/formdefinition.json`, JSON.stringify(formDefinition))); // Form def
+    copyPromises.push(this.storage.copy(`${this.pdf.bucket}/${this.pdf.key}`, `${this.key}/${this.pdf.key}`)); // PDF
+    copyPromises.push(...this.attachmentPromises());
+    try {
+      await Promise.all(copyPromises); 
     }
-    await Promise.all(copyPromises);
+    catch (error: any) {
+      console.error(error);
+    }
 
     // Store in dynamodb
-    // const hashedId = hashString(userId);
-    // this.database.save({
-    //   pk: `SUBMISSION#${hashedId}#${baseKey}`
-
-    // });
+    const hashedId = hashString(this.userId());
+    this.database.storeSubmission(`SUBMISSION#${hashedId}#${this.key}`, {
+      key: this.key,
+      pdf: this.pdf,
+      attachments: this.attachments
+    });
 
     return true;
+  }
+
+  /**
+   * Get the userid for this submission. 
+   * 
+   * Submissions can be done with bsn, kvk
+   * or anonymous (we ignore other logins for now).
+   * We store all submissions, but won't be able
+   * to retrieve anonymous submissions for regular
+   * users.
+   * 
+   * @returns bsn or kvk or 'anonymous'
+   */
+  private userId() {
+    if (this.bsn) {
+      return this.bsn;
+    } else if(this.kvk) {
+      return this.kvk;
+    } else {
+      return 'anonymous';
+    }
+  }
+
+  /**
+   * Create promises for storing attachments
+   * 
+   * @returns promises[]
+   */
+  private attachmentPromises() {
+    const promises = [];
+    if (this.attachments) {
+      for (let attachment of this.attachments) {
+        promises.push(this.storage.copy(`${attachment.bucket}/${attachment.key}`, `${this.key}/attachments/${attachment.originalName}`));
+      }
+    }
+    return promises;
   }
 }

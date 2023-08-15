@@ -18,6 +18,7 @@ const project = new GemeenteNijmegenCdkApp({
     'sns-validator',
     'zod',
     '@aws-sdk/client-s3',
+    '@aws-sdk/client-dynamodb',
     'axios',
   ],
 
