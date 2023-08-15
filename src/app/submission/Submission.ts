@@ -1,11 +1,11 @@
 import { z } from 'zod';
+import { Database } from './Database';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
+import { hashString } from './hash';
 import { s3Object } from './s3Object';
 import { Storage } from './Storage';
 import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
-import { hashString } from './hash';
-import { Database } from './Database';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
@@ -97,38 +97,37 @@ export class Submission {
     copyPromises.push(this.storage.copy(`${this.pdf.bucket}/${this.pdf.key}`, `${this.key}/${this.pdf.key}`)); // PDF
     copyPromises.push(...this.attachmentPromises());
     try {
-      await Promise.all(copyPromises); 
-    }
-    catch (error: any) {
+      await Promise.all(copyPromises);
+    } catch (error: any) {
       console.error(error);
     }
 
     // Store in dynamodb
     const hashedId = hashString(this.userId());
-    this.database.storeSubmission(`SUBMISSION#${hashedId}#${this.key}`, {
+    await this.database.storeSubmission(`SUBMISSION#${hashedId}#${this.key}`, {
       key: this.key,
       pdf: this.pdf,
-      attachments: this.attachments
+      attachments: this.attachments,
     });
 
     return true;
   }
 
   /**
-   * Get the userid for this submission. 
-   * 
+   * Get the userid for this submission.
+   *
    * Submissions can be done with bsn, kvk
    * or anonymous (we ignore other logins for now).
    * We store all submissions, but won't be able
    * to retrieve anonymous submissions for regular
    * users.
-   * 
+   *
    * @returns bsn or kvk or 'anonymous'
    */
   private userId() {
     if (this.bsn) {
       return this.bsn;
-    } else if(this.kvk) {
+    } else if (this.kvk) {
       return this.kvk;
     } else {
       return 'anonymous';
@@ -137,7 +136,7 @@ export class Submission {
 
   /**
    * Create promises for storing attachments
-   * 
+   *
    * @returns promises[]
    */
   private attachmentPromises() {
