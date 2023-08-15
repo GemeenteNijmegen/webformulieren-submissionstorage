@@ -58,15 +58,17 @@ function dynamoDBItem(pk: string, submission: SubmissionData) {
     pdfKey: { S: submission.pdf?.key },
   };
   if (submission.attachments) {
-    item.attachments = submission.attachments?.map((attachment) => {
-      return {
-        M: {
-          key: { S: attachment.key },
-          originalName: { S: attachment.originalName },
-          bucket: { S: attachment.bucket },
-        },
-      };
-    });
+    item.attachments = { 
+      L: submission.attachments?.map((attachment) => {
+        return {
+          M: {
+            key: { S: attachment.key },
+            originalName: { S: attachment.originalName },
+            bucket: { S: attachment.bucket },
+          },
+        };
+      })
+    }
   };
   return item;
 }
