@@ -35,7 +35,8 @@ export class StorageStack extends Stack {
     this.addArnToParameterStore('bucketNameParam', bucket.bucketName, Statics.ssmSubmissionBucketName);
 
     const table = new Table(this, 'submissions', {
-      partitionKey: { name: 'submissionid', type: AttributeType.STRING },
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
       timeToLiveAttribute: 'ttl',
       encryptionKey: key,

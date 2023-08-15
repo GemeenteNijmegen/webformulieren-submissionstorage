@@ -7,6 +7,21 @@ describe('Save object', () => {
 
   test('Storing a new submission', async () => {
     const db = new MockDatabase('mockTable');
-    expect(await db.storeSubmission('user1#submission1', { key: 'TDL.1234', pdf: { bucket: 'testbucket', key: 'test.pdf', originalName: 'test.pdf' }, attachments: [{ bucket: 'testbucket', key: 'testattachment.pdf', originalName: 'testattachment2.pdf' }] })).toBeTruthy();
+    expect(await db.storeSubmission({
+      userId: 'testuser',
+      key: 'TDL.1234',
+      pdf: {
+        bucket: 'testbucket',
+        key: 'test.pdf',
+        originalName: 'test.pdf',
+      },
+      attachments: [
+        {
+          bucket: 'testbucket',
+          key: 'testattachment.pdf',
+          originalName: 'testattachment2.pdf',
+        },
+      ],
+    })).toBeTruthy();
   });
 });

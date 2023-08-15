@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { Database } from './Database';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
-import { hashString } from './hash';
 import { s3Object } from './s3Object';
 import { Storage } from './Storage';
 import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
@@ -103,8 +102,8 @@ export class Submission {
     }
 
     // Store in dynamodb
-    const hashedId = hashString(this.userId());
-    await this.database.storeSubmission(`SUBMISSION#${hashedId}#${this.key}`, {
+    await this.database.storeSubmission({
+      userId: this.userId(),
       key: this.key,
       pdf: this.pdf,
       attachments: this.attachments,
