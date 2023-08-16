@@ -9,12 +9,10 @@ export async function handler(event: any) {
       Bucket: process.env.BUCKET,
       Key: '_e2OZxavlUk8TxtAoYnq7OGwgO4/pdf/TDL17.218',
     });
-    try {
-      const result = await s3Client.send(command);
-      console.debug('result length', result.Body?.transformToByteArray.length);
-      console.debug(result);
-    } catch (err) {
-      console.error(err);
-    } 
+    const result = await s3Client.send(command);
+    console.debug('result length', result.Body?.transformToByteArray.length);
+    console.debug(result);
+  } catch (err) {
+    console.error(err);
   }
 }
