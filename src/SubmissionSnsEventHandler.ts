@@ -8,14 +8,15 @@ import { ITopic, Topic } from 'aws-cdk-lib/aws-sns';
 import { LambdaSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
+import { GetobjectFunction } from './app/submission/getobject-function';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
-import { GetobjectFunction } from './app/submission/getobject-function';
 
 interface SubmissionSnsEventHandlerProps {
   topicArn: string;
 }
 export class SubmissionSnsEventHandler extends Construct {
+  private role?: Role;
   constructor(scope: Construct, id: string, props: SubmissionSnsEventHandlerProps) {
     super(scope, id);
 
@@ -73,7 +74,7 @@ export class SubmissionSnsEventHandler extends Construct {
       logRetention: RetentionDays.SIX_MONTHS,
       environment: {
         BUCKET: bucket.bucketName,
-      }
+      },
     });
     bucket.grantRead(lambda);
     const key = Key.fromKeyArn(this, 'sourceBucketKeyGet', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
@@ -86,14 +87,17 @@ export class SubmissionSnsEventHandler extends Construct {
    * account can add this role arn to its relevant policy.
    */
   lambdaRole() {
-    return new Role(this, 'role', {
-      roleName: 'submissionhandler-lambda-role',
-      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
-      description: 'Role for submission handler lambda, custom role so role name is predictable',
-      managedPolicies: [{
-        managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
-      }],
-    });
+    if (!this.role) {
+      this.role = new Role(this, 'role', {
+        roleName: 'submissionhandler-lambda-role',
+        assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+        description: 'Role for submission handler lambda, custom role so role name is predictable',
+        managedPolicies: [{
+          managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+        }],
+      });
+    }
+    return this.role;
   }
 
 }
