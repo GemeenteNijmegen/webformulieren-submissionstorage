@@ -1,8 +1,8 @@
-import { CopyObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
-  copy(source: string, destinationKey: string): Promise<boolean>;
+  copy(sourceBucket: string, sourceKey: string, sourceRegion: string, destinationKey: string): Promise<boolean>;
   get(bucket: string, key: string): Promise<boolean>;
 }
 
@@ -22,8 +22,8 @@ export class MockStorage implements Storage {
     return true;
   }
 
-  public async copy(source: string, destinationKey: string) {
-    console.debug(`would copy ${source} to ${destinationKey}`);
+  public async copy(sourceBucket: string, sourceKey: string, sourceRegion: string, destinationKey: string) {
+    console.debug(`would copy ${sourceBucket}/${sourceKey} in ${sourceRegion} to ${destinationKey}`);
     return true;
   }
 }
@@ -31,9 +31,17 @@ export class MockStorage implements Storage {
 export class S3Storage implements Storage {
   private bucket: string;
   private s3Client: S3Client;
+  private clients: any = {
+    default: new S3Client({}),
+  };
 
-  constructor(bucket: string) {
+  constructor(bucket: string, regions?: string[]) {
     this.bucket = bucket;
+    if (regions) {
+      for (let region of regions) {
+        this.clients[region] = new S3Client({ region });
+      }
+    }
     this.s3Client = new S3Client({});
   }
 
@@ -69,20 +77,24 @@ export class S3Storage implements Storage {
     return false;
   }
 
-  public async copy(source: string, destinationKey: string) {
-    console.debug(`copying ${source} to ${destinationKey}`);
-    const command = new CopyObjectCommand({
-      Bucket: this.bucket,
-      Key: destinationKey,
-      CopySource: source,
-      ServerSideEncryption: 'aws:kms',
+  public async copy(sourceBucket: string, sourceKey: string, sourceRegion: string, destinationKey: string) {
+    console.debug(`copying ${sourceKey} in ${sourceRegion} to ${destinationKey}`);
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: sourceBucket,
+      Key: sourceKey,
     });
     try {
-      await this.s3Client.send(command);
+      const object = await this.clients[sourceRegion].send(getObjectCommand);
+      const putObjectCommand = new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: destinationKey,
+        Body: object.Body,
+      });
+      await this.clients.default.send(putObjectCommand);
     } catch (err) {
       console.error(err);
     }
-    console.debug(`successfully copied ${source} to ${destinationKey}`);
+    console.debug(`successfully copied ${sourceBucket}/${sourceKey} to ${destinationKey}`);
     return true;
   }
 }

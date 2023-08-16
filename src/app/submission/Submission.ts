@@ -93,7 +93,7 @@ export class Submission {
     const copyPromises: Promise<any>[] = [];
     copyPromises.push(this.storage.store(`${this.key}/submission.json`, JSON.stringify(this.rawSubmission))); // Submission
     copyPromises.push(this.storage.store(`${this.key}/formdefinition.json`, JSON.stringify(formDefinition))); // Form def
-    copyPromises.push(this.storage.copy(`${this.pdf.bucket}/${this.pdf.key}`, `${this.key}/${this.pdf.key}`)); // PDF
+    copyPromises.push(this.storage.copy(this.pdf.bucket, this.pdf.key, 'eu-west-1', `${this.key}/${this.pdf.key}`)); // PDF
     copyPromises.push(...this.attachmentPromises());
     try {
       await Promise.all(copyPromises);
@@ -142,7 +142,7 @@ export class Submission {
     const promises = [];
     if (this.attachments) {
       for (let attachment of this.attachments) {
-        promises.push(this.storage.copy(`${attachment.bucket}/${attachment.key}`, `${this.key}/attachments/${attachment.originalName}`));
+        promises.push(this.storage.copy(attachment.bucket, attachment.key, 'eu-west-1', `${this.key}/attachments/${attachment.originalName}`));
       }
     }
     return promises;
