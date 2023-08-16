@@ -46,7 +46,28 @@
       "description": "Prepare assets",
       "steps": [
         {
+          "spawn": "bundle:app/submission/getobject.lambda"
+        },
+        {
           "spawn": "bundle:app/submission/submission.lambda"
+        }
+      ]
+    },
+    "bundle:app/submission/getobject.lambda": {
+      "name": "bundle:app/submission/getobject.lambda",
+      "description": "Create a JavaScript bundle from src/app/submission/getobject.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/submission/getobject.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/getobject.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/submission/getobject.lambda:watch": {
+      "name": "bundle:app/submission/getobject.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/submission/getobject.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/submission/getobject.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/getobject.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },

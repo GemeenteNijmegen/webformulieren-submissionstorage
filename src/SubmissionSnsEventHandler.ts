@@ -10,6 +10,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
+import { GetobjectFunction } from './app/submission/getobject-function';
 
 interface SubmissionSnsEventHandlerProps {
   topicArn: string;
@@ -30,6 +31,7 @@ export class SubmissionSnsEventHandler extends Construct {
     const secret = Secret.fromSecretNameV2(this, 'apikey', Statics.secretFormIoApiKey);
 
     this.submissionHandlerLambda(storageBucket, sourceBucket, table, topic, secret);
+    this.getobjectDemo(sourceBucket);
   }
 
   /**
@@ -63,6 +65,19 @@ export class SubmissionSnsEventHandler extends Construct {
     key.grantDecrypt(submissionLambda);
 
     topic.addSubscription(new LambdaSubscription(submissionLambda));
+  }
+
+  private getobjectDemo(bucket: IBucket) {
+    const lambda = new GetobjectFunction(this, 'getobject', {
+      role: this.lambdaRole(),
+      logRetention: RetentionDays.SIX_MONTHS,
+      environment: {
+        BUCKET: bucket.bucketName,
+      }
+    });
+    bucket.grantRead(lambda);
+    const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
+    key.grantDecrypt(lambda);
   }
 
   /**

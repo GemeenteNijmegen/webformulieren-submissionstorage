@@ -4,6 +4,8 @@
     "build": "npx projen build",
     "bump": "npx projen bump",
     "bundle": "npx projen bundle",
+    "bundle:app/submission/getobject.lambda": "npx projen bundle:app/submission/getobject.lambda",
+    "bundle:app/submission/getobject.lambda:watch": "npx projen bundle:app/submission/getobject.lambda:watch",
     "bundle:app/submission/submission.lambda": "npx projen bundle:app/submission/submission.lambda",
     "bundle:app/submission/submission.lambda:watch": "npx projen bundle:app/submission/submission.lambda:watch",
     "clobber": "npx projen clobber",
