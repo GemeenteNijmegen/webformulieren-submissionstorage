@@ -76,7 +76,7 @@ export class SubmissionSnsEventHandler extends Construct {
       }
     });
     bucket.grantRead(lambda);
-    const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
+    const key = Key.fromKeyArn(this, 'sourceBucketKeyGet', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
     key.grantDecrypt(lambda);
   }
 
