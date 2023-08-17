@@ -5,7 +5,7 @@ import { s3Object } from './s3Object';
 interface SubmissionData {
   userId: string;
   key: string;
-  pdf: s3Object;
+  pdf: string;
   attachments?: s3Object[];
 }
 
@@ -60,19 +60,12 @@ function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
   let item: any = {
     pk: { S: pk },
     sk: { S: sk },
-    storageKey: { S: submission.key },
-    pdfKey: { S: submission.pdf?.key },
+    pdfKey: { S: submission.pdf },
   };
   if (submission.attachments) {
     item.attachments = {
       L: submission.attachments?.map((attachment) => {
-        return {
-          M: {
-            key: { S: attachment.key },
-            originalName: { S: attachment.originalName },
-            bucket: { S: attachment.bucket },
-          },
-        };
+        return { S: attachment.originalName }
       }),
     };
   };

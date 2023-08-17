@@ -88,12 +88,12 @@ export class Submission {
     }
 
     const formDefinition = this.formConnector.definition(this.parsedSubmission.formTypeId);
-
+    const pdfKey = `${this.key}/${this.key}.pdf`;
     // Prepare and do all independent requests in parallel
     const copyPromises: Promise<any>[] = [];
     copyPromises.push(this.storage.store(`${this.key}/submission.json`, JSON.stringify(this.rawSubmission))); // Submission
     copyPromises.push(this.storage.store(`${this.key}/formdefinition.json`, JSON.stringify(formDefinition))); // Form def
-    copyPromises.push(this.storage.copy(this.pdf.bucket, this.pdf.key, 'eu-west-1', `${this.key}/${this.pdf.key}`)); // PDF
+    copyPromises.push(this.storage.copy(this.pdf.bucket, this.pdf.key, 'eu-west-1', pdfKey)); // PDF
     copyPromises.push(...this.attachmentPromises());
     try {
       await Promise.all(copyPromises);
@@ -105,7 +105,7 @@ export class Submission {
     await this.database.storeSubmission({
       userId: this.userId(),
       key: this.key,
-      pdf: this.pdf,
+      pdf: pdfKey,
       attachments: this.attachments,
     });
 
