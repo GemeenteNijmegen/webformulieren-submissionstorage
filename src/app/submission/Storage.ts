@@ -35,13 +35,8 @@ export class S3Storage implements Storage {
     default: new S3Client({}),
   };
 
-  constructor(bucket: string, regions?: string[]) {
+  constructor(bucket: string) {
     this.bucket = bucket;
-    if (regions) {
-      for (let region of regions) {
-        this.clients[region] = new S3Client({ region });
-      }
-    }
     this.s3Client = new S3Client({});
   }
 
@@ -84,7 +79,7 @@ export class S3Storage implements Storage {
       Key: sourceKey,
     });
     try {
-      const object = await this.clients[sourceRegion].send(getObjectCommand);
+      const object = await this.clientForRegion(sourceRegion).send(getObjectCommand);
       const putObjectCommand = new PutObjectCommand({
         Bucket: this.bucket,
         Key: destinationKey,
@@ -96,5 +91,12 @@ export class S3Storage implements Storage {
     }
     console.debug(`successfully copied ${sourceBucket}/${sourceKey} to ${destinationKey}`);
     return true;
+  }
+
+  private clientForRegion(region: string): S3Client {
+    if(!this.clients[region]) {
+      this.clients[region] = new S3Client({region: region});
+    }
+    return this.clients[region];
   }
 }
