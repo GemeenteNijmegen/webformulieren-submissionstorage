@@ -87,7 +87,7 @@ export class Submission {
       throw Error('parse submission before attempting to save');
     }
 
-    const formDefinition = this.formConnector.definition(this.parsedSubmission.formTypeId);
+    const formDefinition = await this.formConnector.definition(this.parsedSubmission.formTypeId);
     const pdfKey = `${this.key}/${this.key}.pdf`;
     // Prepare and do all independent requests in parallel
     const copyPromises: Promise<any>[] = [];

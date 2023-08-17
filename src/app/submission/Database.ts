@@ -65,7 +65,7 @@ function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
   if (submission.attachments) {
     item.attachments = {
       L: submission.attachments?.map((attachment) => {
-        return { S: attachment.originalName }
+        return { S: attachment.originalName };
       }),
     };
   };

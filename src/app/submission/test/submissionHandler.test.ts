@@ -1,10 +1,12 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { S3Client } from '@aws-sdk/client-s3';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { mockClient } from 'aws-sdk-client-mock';
 import * as snsSample from './samples/sns.sample.json';
 import { SubmissionHandler } from '../SubmissionHandler';
 const secretsMock = mockClient(SecretsManagerClient);
 const dbMock = mockClient(DynamoDBClient);
+const s3Mock = mockClient(S3Client);
 
 const messages = snsSample.Records.map(record => record.Sns);
 const message = messages.pop();
@@ -20,6 +22,7 @@ beforeAll(() => {
     SecretString: secretValue,
   });
   dbMock.callsFake(() => {});
+  s3Mock.callsFake(() => {});
 });
 
 describe('Submission', () => {

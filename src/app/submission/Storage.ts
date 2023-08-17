@@ -85,7 +85,7 @@ export class S3Storage implements Storage {
         Key: destinationKey,
         Body: object.Body,
         // Request needs to know length to accept a stream: https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-1580901710
-        ContentLength: object.ContentLength 
+        ContentLength: object.ContentLength,
       });
       await this.clients.default.send(putObjectCommand);
     } catch (err) {
@@ -96,8 +96,8 @@ export class S3Storage implements Storage {
   }
 
   private clientForRegion(region: string): S3Client {
-    if(!this.clients[region]) {
-      this.clients[region] = new S3Client({region: region});
+    if (!this.clients[region]) {
+      this.clients[region] = new S3Client({ region: region });
     }
     return this.clients[region];
   }

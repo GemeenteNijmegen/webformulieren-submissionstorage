@@ -10,11 +10,7 @@ describe('Save object', () => {
     expect(await db.storeSubmission({
       userId: 'testuser',
       key: 'TDL.1234',
-      pdf: {
-        bucket: 'testbucket',
-        key: 'test.pdf',
-        originalName: 'test.pdf',
-      },
+      pdf: 'test.pdf',
       attachments: [
         {
           bucket: 'testbucket',
