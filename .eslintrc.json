@@ -147,7 +147,6 @@
         "devDependencies": [
           "**/test/**",
           "**/build-tools/**",
-          "src/app/submission/getobject.lambda.ts",
           "src/app/submission/submission.lambda.ts"
         ],
         "optionalDependencies": false,

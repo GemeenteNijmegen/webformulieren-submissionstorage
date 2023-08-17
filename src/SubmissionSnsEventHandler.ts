@@ -8,9 +8,9 @@ import { ITopic, Topic } from 'aws-cdk-lib/aws-sns';
 import { LambdaSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
-import { GetobjectFunction } from './app/submission/getobject-function';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
+import { Duration } from 'aws-cdk-lib';
 
 interface SubmissionSnsEventHandlerProps {
   topicArn: string;
@@ -57,6 +57,7 @@ export class SubmissionSnsEventHandler extends Construct {
         FORMIO_API_KEY_ARN: secret.secretArn,
         FORMIO_BASE_URL: StringParameter.valueForStringParameter(this, Statics.ssmFormIoBaseUrl),
       },
+      timeout: Duration.seconds(30)
     });
     bucket.grantWrite(submissionLambda);
     sourceBucket.grantRead(submissionLambda);
@@ -66,19 +67,6 @@ export class SubmissionSnsEventHandler extends Construct {
     key.grantDecrypt(submissionLambda);
 
     topic.addSubscription(new LambdaSubscription(submissionLambda));
-  }
-
-  private getobjectDemo(bucket: IBucket) {
-    const lambda = new GetobjectFunction(this, 'getobject', {
-      role: this.lambdaRole(),
-      logRetention: RetentionDays.SIX_MONTHS,
-      environment: {
-        BUCKET: bucket.bucketName,
-      },
-    });
-    bucket.grantRead(lambda);
-    const key = Key.fromKeyArn(this, 'sourceBucketKeyGet', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
-    key.grantDecrypt(lambda);
   }
 
   /**
