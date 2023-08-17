@@ -84,6 +84,8 @@ export class S3Storage implements Storage {
         Bucket: this.bucket,
         Key: destinationKey,
         Body: object.Body,
+        // Request needs to know length to accept a stream: https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-1580901710
+        ContentLength: object.ContentLength 
       });
       await this.clients.default.send(putObjectCommand);
     } catch (err) {
