@@ -1,3 +1,4 @@
+import { Duration } from 'aws-cdk-lib';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
@@ -10,7 +11,6 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
-import { Duration } from 'aws-cdk-lib';
 
 interface SubmissionSnsEventHandlerProps {
   topicArn: string;
@@ -32,7 +32,6 @@ export class SubmissionSnsEventHandler extends Construct {
     const secret = Secret.fromSecretNameV2(this, 'apikey', Statics.secretFormIoApiKey);
 
     this.submissionHandlerLambda(storageBucket, sourceBucket, table, topic, secret);
-    this.getobjectDemo(sourceBucket);
   }
 
   /**
@@ -57,7 +56,7 @@ export class SubmissionSnsEventHandler extends Construct {
         FORMIO_API_KEY_ARN: secret.secretArn,
         FORMIO_BASE_URL: StringParameter.valueForStringParameter(this, Statics.ssmFormIoBaseUrl),
       },
-      timeout: Duration.seconds(30)
+      timeout: Duration.seconds(30),
     });
     bucket.grantWrite(submissionLambda);
     sourceBucket.grantRead(submissionLambda);
