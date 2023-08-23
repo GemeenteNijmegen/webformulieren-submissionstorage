@@ -12,7 +12,12 @@ export abstract class Statics {
   };
 
   static readonly appDevEnvironment = {
-    account: '358927146986', //gn-sandbox-01
+    account: '358927146986', //gn-submission-storage-dev
+    region: 'eu-central-1',
+  };
+
+  static readonly appProdEnvironment = {
+    account: '606343885688', //gn-submission-storag-prod
     region: 'eu-central-1',
   };
 

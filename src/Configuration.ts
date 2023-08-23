@@ -42,4 +42,10 @@ const configurations: { [name: string] : Configuration } = {
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
   },
+  production: {
+    branchName: 'main',
+    deployFromEnvironment: Statics.gnBuildEnvironment,
+    deployToEnvironment: Statics.appProdEnvironment,
+    includePipelineValidationChecks: false,
+  },
 };
