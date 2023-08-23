@@ -1,9 +1,8 @@
 import { Stack } from 'aws-cdk-lib';
-import { MockIntegration, PassthroughBehavior, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
-import { Statics } from './statics';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
+import { Statics } from './statics';
 
 /**
  * Contains all API-related resources.
@@ -11,7 +10,7 @@ import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 export class ApiStack extends Stack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
-
+ø
     // const api = new RestApi(this, 'gateway');
     // api.root.addMethod('ANY', new MockIntegration({
     //   integrationResponses: [
