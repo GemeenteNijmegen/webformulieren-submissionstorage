@@ -10,7 +10,7 @@ import { Statics } from './statics';
 export class ApiStack extends Stack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
-ø
+
     // const api = new RestApi(this, 'gateway');
     // api.root.addMethod('ANY', new MockIntegration({
     //   integrationResponses: [
