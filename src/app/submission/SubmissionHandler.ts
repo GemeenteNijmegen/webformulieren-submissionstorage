@@ -45,9 +45,7 @@ export class SubmissionHandler {
     const storage = this.storage;
     const database = this.database;
     const submission = new Submission({ storage, formConnector, database });
-    if (storage == undefined) {
-      throw Error('No storage engine provided. Check lambda start logs for errors.');
-    }
+
     await submission.parse(message);
     await submission.save();
     //Retrieve form definition and store in S3
