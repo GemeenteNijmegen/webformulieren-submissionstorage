@@ -1,8 +1,8 @@
 import { Stack } from 'aws-cdk-lib';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
-import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 import { Statics } from './statics';
+import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 
 /**
  * Contains all API-related resources.
