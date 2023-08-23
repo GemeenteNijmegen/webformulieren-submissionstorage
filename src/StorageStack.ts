@@ -52,7 +52,7 @@ export class StorageStack extends Stack {
     const key = new Key(this, 'kmskey', {
       enableKeyRotation: true,
       description: 'encryption key for user data',
-      alias: `${Statics.projectName}/userdata`,
+      alias: `${Statics.projectName}/user-data`,
     });
 
     // Store key arn to be used in other stacks/projects
