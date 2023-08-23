@@ -41,7 +41,7 @@ export class SubmissionHandler {
     if (process.env.FORMIO_BASE_URL == undefined) {
       throw Error('No formio base url set');
     }
-    const formConnector = new FormIoFormConnector(new URL(process.env.FORMIO_BASE_URL), key);
+    const formConnector = new FormIoFormConnector(new URL(process.env.FORMIO_BASE_URL), key); //TODO: Only create once
     const storage = this.storage;
     const database = this.database;
     const submission = new Submission({ storage, formConnector, database });

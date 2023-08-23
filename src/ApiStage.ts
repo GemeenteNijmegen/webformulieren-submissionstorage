@@ -3,7 +3,6 @@ import { Aspects, Stage, StageProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { ApiStack } from './ApiStack';
 import { Configurable, Configuration } from './Configuration';
-import { KeyStack } from './KeyStack';
 import { Statics } from './statics';
 import { StorageStack } from './StorageStack';
 
@@ -25,10 +24,7 @@ export class ApiStage extends Stage {
 
     this.configuration = props.configuration;
 
-    const keyStack = new KeyStack(this, 'key');
-
     const storageStack = new StorageStack(this, 'storage');
-    storageStack.addDependency(keyStack);
 
     const apiStack = new ApiStack(this, 'api');
     apiStack.addDependency(storageStack);

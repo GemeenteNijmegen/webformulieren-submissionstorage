@@ -14,7 +14,7 @@ export class StorageStack extends Stack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const key = this.keyFromParameterStore(Statics.ssmDataKeyArn);
+    const key = this.key();
     /**
      * This bucket will receive submission attachments
      * (Submission PDF, uploads) for each submission.
@@ -48,17 +48,27 @@ export class StorageStack extends Stack {
     this.addParameters();
   }
 
+  private key() {
+    const key = new Key(this, 'kmskey', {
+      enableKeyRotation: true,
+      description: 'encryption key for user data',
+      alias: `${Statics.projectName}/userdata`,
+    });
+
+    // Store key arn to be used in other stacks/projects
+    new StringParameter(this, 'key', {
+      stringValue: key.keyArn,
+      parameterName: Statics.ssmDataKeyArn,
+    });
+
+    return key;
+  }
+
   private addArnToParameterStore(id: string, arn: string, name: string) {
     new StringParameter(this, id, {
       stringValue: arn,
       parameterName: name,
     });
-  }
-
-  private keyFromParameterStore(parameterName: string) {
-    const keyArn = StringParameter.valueForStringParameter(this, parameterName);
-    const key = Key.fromKeyArn(this, 'key', keyArn);
-    return key;
   }
 
   /**
