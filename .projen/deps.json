@@ -1,6 +1,10 @@
 {
   "dependencies": [
     {
+      "name": "@aws-sdk/client-secrets-manager",
+      "type": "build"
+    },
+    {
       "name": "@gemeentenijmegen/projen-project-type",
       "type": "build"
     },
@@ -11,6 +15,10 @@
     {
       "name": "@types/node",
       "version": "^16",
+      "type": "build"
+    },
+    {
+      "name": "@types/sns-validator",
       "type": "build"
     },
     {
@@ -26,6 +34,10 @@
     {
       "name": "aws-cdk",
       "version": "^2.1.0",
+      "type": "build"
+    },
+    {
+      "name": "aws-sdk-client-mock",
       "type": "build"
     },
     {
@@ -85,13 +97,49 @@
       "type": "build"
     },
     {
+      "name": "@aws-sdk/client-dynamodb",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/client-s3",
+      "type": "runtime"
+    },
+    {
+      "name": "@gemeentenijmegen/apigateway-http",
+      "type": "runtime"
+    },
+    {
+      "name": "@gemeentenijmegen/aws-constructs",
+      "type": "runtime"
+    },
+    {
+      "name": "@gemeentenijmegen/utils",
+      "type": "runtime"
+    },
+    {
+      "name": "@types/aws-lambda",
+      "type": "runtime"
+    },
+    {
       "name": "aws-cdk-lib",
       "version": "^2.1.0",
       "type": "runtime"
     },
     {
+      "name": "axios",
+      "type": "runtime"
+    },
+    {
       "name": "constructs",
       "version": "^10.0.5",
+      "type": "runtime"
+    },
+    {
+      "name": "sns-validator",
+      "type": "runtime"
+    },
+    {
+      "name": "zod",
       "type": "runtime"
     }
   ],

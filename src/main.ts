@@ -1,23 +1,19 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-
-export class MyStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps = {}) {
-    super(scope, id, props);
-
-    // define resources here...
-  }
-}
-
-// for development, use account/region from cdk cli
-const devEnv = {
-  account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: process.env.CDK_DEFAULT_REGION,
-};
+import { App } from 'aws-cdk-lib';
+import { getConfiguration } from './Configuration';
+import { PipelineStack } from './PipelineStack';
 
 const app = new App();
 
-new MyStack(app, 'webformulieren-submissionstorage-dev', { env: devEnv });
-// new MyStack(app, 'webformulieren-submissionstorage-prod', { env: prodEnv });
+const branchToBuild = process.env.BRANCH_NAME ?? 'development';
+const configuration = getConfiguration(branchToBuild);
+
+console.log('Building branch:', branchToBuild);
+
+new PipelineStack(app, `pipeline-${configuration.branchName}`,
+  {
+    env: configuration.deployFromEnvironment,
+    configuration: configuration,
+  },
+);
 
 app.synth();

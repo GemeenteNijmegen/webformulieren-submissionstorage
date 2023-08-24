@@ -43,7 +43,30 @@
     },
     "bundle": {
       "name": "bundle",
-      "description": "Prepare assets"
+      "description": "Prepare assets",
+      "steps": [
+        {
+          "spawn": "bundle:app/submission/submission.lambda"
+        }
+      ]
+    },
+    "bundle:app/submission/submission.lambda": {
+      "name": "bundle:app/submission/submission.lambda",
+      "description": "Create a JavaScript bundle from src/app/submission/submission.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/submission/submission.lambda:watch": {
+      "name": "bundle:app/submission/submission.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/submission/submission.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
     },
     "clobber": {
       "name": "clobber",
@@ -279,25 +302,13 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor"
+          "exec": "npm-check-updates --upgrade --target=minor --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/node,@types/sns-validator,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,aws-sdk-client-mock,esbuild,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,npm-check-updates,projen,standard-version,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/utils,@types/aws-lambda,aws-cdk-lib,axios,constructs,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit npm-check-updates projen standard-version ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-s3 @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios constructs sns-validator zod"
         },
         {
           "exec": "npx projen"
