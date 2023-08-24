@@ -29,8 +29,12 @@ export interface Configuration {
 }
 
 export function getConfiguration(branchName: string): Configuration {
-  if (Object.keys(configurations).includes(branchName)) {
-    return configurations[branchName];
+  const configName = Object.keys(configurations).find((configurationName) => {
+    const config = configurations[configurationName];
+    return config.branchName == branchName;
+  });
+  if(configName) {
+    return configurations[configName];
   }
   throw Error(`No configuration found for branch name ${branchName}`);
 }
