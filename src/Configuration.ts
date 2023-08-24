@@ -33,7 +33,7 @@ export function getConfiguration(branchName: string): Configuration {
     const config = configurations[configurationName];
     return config.branchName == branchName;
   });
-  if(configName) {
+  if (configName) {
     return configurations[configName];
   }
   throw Error(`No configuration found for branch name ${branchName}`);
