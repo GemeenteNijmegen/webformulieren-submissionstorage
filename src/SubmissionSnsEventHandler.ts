@@ -56,7 +56,7 @@ export class SubmissionSnsEventHandler extends Construct {
         FORMIO_API_KEY_ARN: secret.secretArn,
         FORMIO_BASE_URL: StringParameter.valueForStringParameter(this, Statics.ssmFormIoBaseUrl),
       },
-      timeout: Duration.seconds(30),
+      timeout: Duration.minutes(5),
     });
     bucket.grantWrite(submissionLambda);
     sourceBucket.grantRead(submissionLambda);
