@@ -39,7 +39,7 @@ export class Submission {
 
   async parse(message: any) {
     this.rawSubmission = message;
-    const contents = JSON.parse(message.Message);    
+    const contents = JSON.parse(message.Message);
     this.parsedSubmission = SubmissionSchema.passthrough().parse(contents);
     this.bsn = this.parsedSubmission.bsn;
     this.kvk = this.parsedSubmission.kvk;
