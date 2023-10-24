@@ -26,6 +26,13 @@ export interface Configuration {
    * includePipelineValidationChcks
    */
   readonly includePipelineValidationChecks: boolean;
+
+  /**
+   * Allow this project's SNS topic to be published to
+   * by other accounts. This allows access to lambda
+   * execution roles named 'storesubmissions-lambda-role'.
+   */
+  readonly allowedAccountIdsToPublishToSNS?: string[];
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -45,6 +52,7 @@ const configurations: { [name: string] : Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
+    allowedAccountIdsToPublishToSNS: [Statics.acceptanceWebformulierenAccountId],
   },
   production: {
     branchName: 'main',
