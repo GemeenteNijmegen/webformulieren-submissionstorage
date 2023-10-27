@@ -20,9 +20,11 @@ export class ApiStage extends Stage {
     Tags.of(this).add('Project', Statics.projectName);
     Aspects.of(this).add(new PermissionsBoundaryAspect());
 
-    const storageStack = new StorageStack(this, 'storage');
+    const configuration = props.configuration;
 
-    const apiStack = new ApiStack(this, 'api', { configuration: props.configuration } );
+    const storageStack = new StorageStack(this, 'storage', { configuration });
+
+    const apiStack = new ApiStack(this, 'api', { configuration } );
     apiStack.addDependency(storageStack);
   }
 }
