@@ -52,8 +52,7 @@ export class StorageStack extends Stack {
     this.addParameters();
   }
 
-  private key(crossAccountIds?: string[]) {
-    const crossAccountPrincipalArns = this.crossAccountIdArns(crossAccountIds);
+  private key() {
     const key = new Key(this, 'kmskey', {
       enableKeyRotation: true,
       description: 'encryption key for user data',
