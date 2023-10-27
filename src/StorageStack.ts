@@ -1,5 +1,6 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
@@ -52,12 +53,15 @@ export class StorageStack extends Stack {
     this.addParameters();
   }
 
-  private key() {
+  private key(crossAccountIds?: string[]) {
+    const crossAccountPrincipalArns = this.crossAccountIdArns(crossAccountIds);
     const key = new Key(this, 'kmskey', {
       enableKeyRotation: true,
       description: 'encryption key for user data',
       alias: `${Statics.projectName}/user-data`,
     });
+
+    this.allowCrossAccountKeyAccess(crossAccountPrincipalArns, key);
 
     // Store key arn to be used in other stacks/projects
     new StringParameter(this, 'key', {
