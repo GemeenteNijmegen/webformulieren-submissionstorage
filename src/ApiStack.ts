@@ -1,6 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Key } from 'aws-cdk-lib/aws-kms';
 import { ITopic, Topic } from 'aws-cdk-lib/aws-sns';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
@@ -39,25 +38,11 @@ class SNSTopic extends Construct {
   constructor(scope: Construct, id: string, props: SNSTopicProps) {
     super(scope, id);
 
-    let masterKey = (props.keyProtected !== false) ? this.encryptionKey() : undefined;
-
     this.topic = new Topic(this, 'submissions', {
       displayName: 'submissions',
-      masterKey,
     });
 
     this.allowCrossAccountAccess(props.publishingAccountIds);
-  }
-
-  /**
-   * Returns the customer manager key for the project
-   *
-   * @returns the encryption key
-   */
-  private encryptionKey() {
-    let masterKey = undefined;
-    masterKey = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
-    return masterKey;
   }
 
   /**

@@ -1,5 +1,6 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
@@ -52,12 +53,15 @@ export class StorageStack extends Stack {
     this.addParameters();
   }
 
-  private key() {
+  private key(crossAccountIds?: string[]) {
+    const crossAccountPrincipalArns = this.crossAccountIdArns(crossAccountIds);
     const key = new Key(this, 'kmskey', {
       enableKeyRotation: true,
       description: 'encryption key for user data',
       alias: `${Statics.projectName}/user-data`,
     });
+
+    this.allowCrossAccountKeyAccess(crossAccountPrincipalArns, key);
 
     // Store key arn to be used in other stacks/projects
     new StringParameter(this, 'key', {
@@ -67,6 +71,37 @@ export class StorageStack extends Stack {
 
     return key;
   }
+<<<<<<< HEAD
+=======
+
+  private allowCrossAccountKeyAccess(crossAccountPrincipalArns: string[] | null, key: Key) {
+    if (crossAccountPrincipalArns) {
+      key.addToResourcePolicy(new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: [
+          'kms:GenerateDataKey',
+          'kms:Decrypt',
+        ],
+        resources: [key.keyArn],
+        conditions: {
+          ArnLike: {
+            'aws:PrincipalArn': crossAccountPrincipalArns,
+          },
+        },
+      }), false);
+    }
+  }
+
+  private crossAccountIdArns(crossAccountIds: string[] | undefined) {
+    if (crossAccountIds && crossAccountIds.length > 0) {
+      return crossAccountIds.map(
+        (accountId) => `arn:aws:iam::${accountId}:role/storesubmissions-lambda-role`,
+      );
+    }
+    return null;
+  }
+
+>>>>>>> development
   private addArnToParameterStore(id: string, arn: string, name: string) {
     new StringParameter(this, id, {
       stringValue: arn,
