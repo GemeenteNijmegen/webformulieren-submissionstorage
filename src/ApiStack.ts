@@ -24,11 +24,6 @@ export class ApiStack extends Stack {
 
 interface SNSTopicProps extends StackProps {
   /**
-   * Should the topic be protected by the KMS key (default true)
-   */
-  keyProtected?: boolean;
-
-  /**
    * Allow access for different AWS accounts to publish to this topic
    */
   publishingAccountIds?: string[];
