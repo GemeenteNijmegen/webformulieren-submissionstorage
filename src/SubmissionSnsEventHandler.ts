@@ -2,6 +2,7 @@ import { Duration } from 'aws-cdk-lib';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
+import { Function } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
@@ -13,14 +14,14 @@ import { SubmissionFunction } from './app/submission/submission-function';
 import { Statics } from './statics';
 
 interface SubmissionSnsEventHandlerProps {
-  topicArn: string;
+  topicArns: string[];
 }
 export class SubmissionSnsEventHandler extends Construct {
   private role?: Role;
+  public lambda: Function;
   constructor(scope: Construct, id: string, props: SubmissionSnsEventHandlerProps) {
     super(scope, id);
 
-    const topic = Topic.fromTopicArn(this, 'submission-topic', props.topicArn);
     const table = Table.fromTableName(this, 'table', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName));
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
     // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
@@ -31,7 +32,8 @@ export class SubmissionSnsEventHandler extends Construct {
     const sourceBucket = Bucket.fromBucketArn(this, 'sourceBucket', StringParameter.valueForStringParameter(this, Statics.ssmSourceBucketArn));
     const secret = Secret.fromSecretNameV2(this, 'apikey', Statics.secretFormIoApiKey);
 
-    this.submissionHandlerLambda(storageBucket, sourceBucket, table, topic, secret);
+    const topics = props.topicArns.map((topicArn, i)=> Topic.fromTopicArn(this, `submission-topic-${i}`, topicArn));
+    this.lambda = this.submissionHandlerLambda(storageBucket, sourceBucket, table, topics, secret);
   }
 
   /**
@@ -46,7 +48,7 @@ export class SubmissionSnsEventHandler extends Construct {
    * @param table The dynamodb table to store submission (meta)data in
    * @param topic The SNS Topic to subscribe to for submissions
    */
-  private submissionHandlerLambda(bucket: IBucket, sourceBucket: IBucket, table: ITable, topic: ITopic, secret: ISecret) {
+  private submissionHandlerLambda(bucket: IBucket, sourceBucket: IBucket, table: ITable, topics: ITopic[], secret: ISecret) {
     const submissionLambda = new SubmissionFunction(this, 'submission', {
       role: this.lambdaRole(),
       logRetention: RetentionDays.SIX_MONTHS,
@@ -65,7 +67,10 @@ export class SubmissionSnsEventHandler extends Construct {
     const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
     key.grantDecrypt(submissionLambda);
 
-    topic.addSubscription(new LambdaSubscription(submissionLambda));
+    for (const topic of topics) {
+      topic.addSubscription(new LambdaSubscription(submissionLambda));
+    }
+    return submissionLambda;
   }
 
   /**

@@ -1,0 +1,34 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:eu-west-1: 315037222840:eform-submissions:293455ad-bb4b-4667-971d-7eaba358510d",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "538c926d-27a7-567b-b314-cf7e54168743",
+        "TopicArn": "arn:aws:sns:eu-west-1:315037222840:eform-submissions",
+        "Message": "{\"formId\": \"82307c98-b8fa-4a31-825d-730496dd1e50\",\"formTypeId\": \"formnaam\",\"appId\": \"TDL\",\"reference\": \"TDL123.000\",\"data\": {\"telefoonnummer\": \"<tel>\",\"eMailadres\": \"me@example.com\",\"isIemandAndersUwContactpersoon\": \"nee\",\"kenmerk\": \"TDL123.000\",\"volgende\": true,\"waaroverHeeftUEenVraag\": {\"ikHebHulpNodigBijHetHuishouden\": true,\"ikHebHulpOfEenHulpmiddelNodigBijHetVervoer\": false,\"ikHebEenHulpmiddelOfAanpassingInMijnWoningNodig\": false,\"anders\": false},\"watIsUwVraag\": \"Graag hulp bij het huishouden.\",\"vorige1\": false,\"volgende1\": true,\"toevoegen\": [],\"vorige2\": false,\"volgende2\": true,\"summary1\": {},\"ikHebAlleVragenNaarWaarheidBeantwoord\": true,\"vorige3\": false,\"verzenden2\": true},\"metadata\": {\"timezone\": \"Europe/Amsterdam\",\"offset\": 120,\"origin\": \"https://app6-accp.nijmegen.nl\",\"referrer\": \"https://www.nijmegen.nl/\",\"browserName\": \"Netscape\",\"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36\",\"pathName\": \"/\",\"onLine\": true,\"timestamp\": [2023,8,25,12,20,47,238191797]},\"pdf\": {\"reference\": \"blaat\",\"location\": \"<randomid>/pdf/TDL.1230\",\"bucketName\": \"mybucket\"}}",
+        "Timestamp": "2023-06-26T11:07:29.154Z",
+        "SignatureVersion": "1",
+        "Signature": "MP6SMqgHFUA3eWuR/PkRLKW/eLzsbGa81a7NVN7/8Fq94K9X9DgaiqMmWq1CwWNpR5K8ISd5lwE+MIBK1h19lFVhYa/QgbIWsys8G9pCvfHdI1s+xzEAfVxgrRPa71QHkGNrrxqJN5c78ahChN9IG/XRPddYqltei5ZX6BRdFwTc0pGLkCy0hNj6kqJ30VGT8jpJoo/+PFt0PXTs+NCaOSfUo+kxO2VKtgXmHElPzfb7VAV2QFGtVkcGBgnxA5o0eEwepjf844L/BC3YsHxqHLVeg9rreMtkvoAsETRo9Qy8anYC1TcQ4rkmyWaKp4QlSllidzZxjKtbgvuC5ZPHRQ==",
+        "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem",
+        "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:315037222840:eform-submissions:bb9d78bf-834b-4146-898c-ff3456b26f9e",
+        "MessageAttributes": {
+          "BRP_data": {
+            "Type": "String",
+            "Value": "true"
+          },
+          "AppId": {
+            "Type": "String",
+            "Value": "APV"
+          },
+          "KVK_data": {
+            "Type": "String",
+            "Value": "false"
+          }
+        }
+      }
+    }
+  ]
+}

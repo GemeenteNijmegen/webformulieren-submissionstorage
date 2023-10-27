@@ -12,8 +12,8 @@ export const SubmissionSchema = z.object({
   reference: z.string(),
   data: z.object({
     kenmerk: z.string(),
-    naamIngelogdeGebruiker: z.string(),
-  }).required().passthrough(),
+    naamIngelogdeGebruiker: z.string().optional(),
+  }).passthrough(),
   employeeData: z.any(),
   pdf: z.object({
     reference: z.string(),

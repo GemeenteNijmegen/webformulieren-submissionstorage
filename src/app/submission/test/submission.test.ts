@@ -1,3 +1,4 @@
+import * as snsSampleAnonymous from './samples/sns.sample-anonymous.json';
 import * as snsSample from './samples/sns.sample.json';
 import { MockDatabase } from '../Database';
 import { MockFormConnector } from '../FormConnector';
@@ -25,10 +26,11 @@ describe('Submission parsing', () => {
   });
 
   test('Message without kvk or bsn key is anonymous', async () => {
-    const anonMessage = JSON.parse(JSON.stringify(message));
-    anonMessage.Message = anonMessage.Message.replace(',\"bsn\":\"900222670\"', '');
+    const messagesAnonymous = snsSampleAnonymous.Records.map(record => record.Sns);
+    const messageAnonymous = messagesAnonymous.pop();
+    const anonMessage = JSON.parse(JSON.stringify(messageAnonymous));
     const anonSubmission = new Submission({ storage, formConnector, database });
-    await submission.parse(anonMessage);
+    await anonSubmission.parse(anonMessage);
     expect(anonSubmission.isAnonymous()).toBe(true);
   });
 

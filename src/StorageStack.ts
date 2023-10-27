@@ -1,18 +1,22 @@
-import { Duration, Stack } from 'aws-cdk-lib';
+import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
+import { Configurable } from './Configuration';
 import { Statics } from './statics';
+
+
+interface StorageStackProps extends StackProps, Configurable {};
 
 /**
  * Contains all API-related resources.
  */
 export class StorageStack extends Stack {
-  constructor(scope: Construct, id: string) {
-    super(scope, id);
+  constructor(scope: Construct, id: string, props: StorageStackProps) {
+    super(scope, id, props);
 
     const key = this.key();
     /**
@@ -63,7 +67,6 @@ export class StorageStack extends Stack {
 
     return key;
   }
-
   private addArnToParameterStore(id: string, arn: string, name: string) {
     new StringParameter(this, id, {
       stringValue: arn,

@@ -21,6 +21,8 @@ export abstract class Statics {
     region: 'eu-central-1',
   };
 
+  static readonly acceptanceWebformulierenAccountId = '315037222840';
+
   static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
   static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;
   static ssmSourceBucketArn: string = `/${this.projectName}/sourceBucketArn`;
