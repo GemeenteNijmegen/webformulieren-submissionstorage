@@ -59,5 +59,6 @@ const configurations: { [name: string] : Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
+    allowedAccountIdsToPublishToSNS: [Statics.productionWebformulierenAccountId],
   },
 };
