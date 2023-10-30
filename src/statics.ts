@@ -22,6 +22,7 @@ export abstract class Statics {
   };
 
   static readonly acceptanceWebformulierenAccountId = '315037222840';
+  static readonly productionWebformulierenAccountId = '196212984627';
 
   static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
   static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;
