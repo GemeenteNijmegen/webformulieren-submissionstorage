@@ -52,13 +52,19 @@ const configurations: { [name: string] : Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [Statics.acceptanceWebformulierenAccountId],
+    allowedAccountIdsToPublishToSNS: [
+      Statics.acceptanceWebformulierenAccountIdOldLz,
+      Statics.acceptanceWebformulierenAccountId,
+    ],
   },
   production: {
     branchName: 'main',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [Statics.productionWebformulierenAccountId],
+    allowedAccountIdsToPublishToSNS: [
+      Statics.productionWebformulierenAccountIdOldLz,
+      // Statics.productionWebformulierenAccountId, // TODO enable when live with new production environment!
+    ],
   },
 };
