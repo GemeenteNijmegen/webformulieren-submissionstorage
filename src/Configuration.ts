@@ -33,6 +33,13 @@ export interface Configuration {
    * execution roles named 'storesubmissions-lambda-role'.
    */
   readonly allowedAccountIdsToPublishToSNS?: string[];
+
+  /**
+   * A list of SNS topic ARNs to subscribe to.
+   * Published submissions on this topic are then
+   * processed.
+   */
+  readonly subscribeToTopicArns?: string[];
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -56,6 +63,10 @@ const configurations: { [name: string] : Configuration } = {
       Statics.acceptanceWebformulierenAccountIdOldLz,
       Statics.acceptanceWebformulierenAccountId,
     ],
+    subscribeToTopicArns: [
+      'arn:aws:sns:eu-west-1:315037222840:eform-submissions',
+      'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
+    ],
   },
   production: {
     branchName: 'main',
@@ -65,6 +76,10 @@ const configurations: { [name: string] : Configuration } = {
     allowedAccountIdsToPublishToSNS: [
       Statics.productionWebformulierenAccountIdOldLz,
       // Statics.productionWebformulierenAccountId, // TODO enable when live with new production environment!
+    ],
+    subscribeToTopicArns: [
+      'arn:aws:sns:eu-west-1:196212984627:eform-submissions',
+      //'arn:aws:sns:eu-central-1:147064197580:eform-submissions', // TODO enable when live with new production environment!
     ],
   },
 };

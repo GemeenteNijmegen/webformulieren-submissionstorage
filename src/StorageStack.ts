@@ -78,11 +78,6 @@ export class StorageStack extends Stack {
    * Add general parameters, the values of which should be added later
    */
   private addParameters() {
-    new StringParameter(this, 'submissionTopicArn', {
-      stringValue: '-',
-      parameterName: Statics.ssmSubmissionTopicArn,
-    });
-
     new StringParameter(this, 'sourceBucketArn', {
       stringValue: '-',
       parameterName: Statics.ssmSourceBucketArn,
