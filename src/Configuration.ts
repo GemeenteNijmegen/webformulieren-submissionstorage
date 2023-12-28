@@ -75,11 +75,11 @@ const configurations: { [name: string] : Configuration } = {
     includePipelineValidationChecks: false,
     allowedAccountIdsToPublishToSNS: [
       Statics.productionWebformulierenAccountIdOldLz,
-      // Statics.productionWebformulierenAccountId, // TODO enable when live with new production environment!
+      Statics.productionWebformulierenAccountId,
     ],
     subscribeToTopicArns: [
       'arn:aws:sns:eu-west-1:196212984627:eform-submissions',
-      //'arn:aws:sns:eu-central-1:147064197580:eform-submissions', // TODO enable when live with new production environment!
+      'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
     ],
   },
 };
