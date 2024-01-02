@@ -33,6 +33,13 @@ export interface Configuration {
    * execution roles named 'storesubmissions-lambda-role'.
    */
   readonly allowedAccountIdsToPublishToSNS?: string[];
+
+  /**
+   * A list of SNS topic ARNs to subscribe to.
+   * Published submissions on this topic are then
+   * processed.
+   */
+  readonly subscribeToTopicArns?: string[];
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -52,13 +59,27 @@ const configurations: { [name: string] : Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [Statics.acceptanceWebformulierenAccountId],
+    allowedAccountIdsToPublishToSNS: [
+      Statics.acceptanceWebformulierenAccountIdOldLz,
+      Statics.acceptanceWebformulierenAccountId,
+    ],
+    subscribeToTopicArns: [
+      'arn:aws:sns:eu-west-1:315037222840:eform-submissions',
+      'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
+    ],
   },
   production: {
     branchName: 'main',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [Statics.productionWebformulierenAccountId],
+    allowedAccountIdsToPublishToSNS: [
+      Statics.productionWebformulierenAccountIdOldLz,
+      Statics.productionWebformulierenAccountId,
+    ],
+    subscribeToTopicArns: [
+      'arn:aws:sns:eu-west-1:196212984627:eform-submissions',
+      'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
+    ],
   },
 };

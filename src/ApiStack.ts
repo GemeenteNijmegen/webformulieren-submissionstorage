@@ -1,10 +1,8 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { ITopic, Topic } from 'aws-cdk-lib/aws-sns';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { Configurable } from './Configuration';
-import { Statics } from './statics';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 
 interface ApiStackProps extends StackProps, Configurable {};
@@ -16,8 +14,14 @@ export class ApiStack extends Stack {
     super(scope, id, props);
 
     const internalTopic = new SNSTopic(this, 'submissions', { publishingAccountIds: props.configuration.allowedAccountIdsToPublishToSNS });
+
+    let topicArns = [internalTopic.topic.topicArn];
+    if (props.configuration.subscribeToTopicArns) {
+      topicArns = topicArns.concat(props.configuration.subscribeToTopicArns);
+    }
+
     new SubmissionSnsEventHandler(this, 'submissionhandler', {
-      topicArns: [internalTopic.topic.topicArn, StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTopicArn)],
+      topicArns: topicArns,
     });
   }
 }

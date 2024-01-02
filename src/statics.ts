@@ -21,8 +21,12 @@ export abstract class Statics {
     region: 'eu-central-1',
   };
 
-  static readonly acceptanceWebformulierenAccountId = '315037222840';
-  static readonly productionWebformulierenAccountId = '196212984627';
+  static readonly acceptanceWebformulierenAccountIdOldLz = '315037222840';
+  static readonly productionWebformulierenAccountIdOldLz = '196212984627';
+
+  static readonly acceptanceWebformulierenAccountId = '338472043295';
+  static readonly productionWebformulierenAccountId = '147064197580';
+
 
   static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
   static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;
@@ -31,7 +35,6 @@ export abstract class Statics {
   static ssmSubmissionBucketName: string = `/${this.projectName}/submissionBucketName`;
   static ssmSubmissionTableArn: string = `/${this.projectName}/submissionTableArn`;
   static ssmSubmissionTableName: string = `/${this.projectName}/submissionTableName`;
-  static ssmSubmissionTopicArn: string = `/${this.projectName}/ssmSubmissionTopicArn`;
   static ssmFormIoBaseUrl: string = `/${this.projectName}/formIoBaseUrl`;
 
   static secretFormIoApiKey: string = `/${this.projectName}/FormIoAPIKey`;

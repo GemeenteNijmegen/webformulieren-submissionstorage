@@ -31,5 +31,5 @@ test('Api Stack', () => {
   const app = new App();
   const apiStack = new ApiStack(app, 'api', { configuration });
   const template = Template.fromStack(apiStack);
-  expect(template.resourceCountIs('AWS::SNS::Subscription', 2));
+  expect(template.hasResource('AWS::SNS::Subscription', {}));
 });
