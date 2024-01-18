@@ -1,8 +1,13 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { ITopic, Topic } from 'aws-cdk-lib/aws-sns';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
+import { GetFormOverviewFunction } from './app/get-form-overview/getFormOverview-function';
 import { Configurable } from './Configuration';
+import { Statics } from './statics';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 
 interface ApiStackProps extends StackProps, Configurable {};
@@ -23,6 +28,18 @@ export class ApiStack extends Stack {
     new SubmissionSnsEventHandler(this, 'submissionhandler', {
       topicArns: topicArns,
     });
+
+    //TODO: move later on
+    const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
+    // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
+    const storageBucket = Bucket.fromBucketAttributes(this, 'bucket', {
+      bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
+      encryptionKey: key,
+    });
+
+
+    const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', { environment: { BUCKET_NAME: storageBucket.bucketName } });
+    storageBucket.grantRead(formOverviewFunction);
   }
 }
 

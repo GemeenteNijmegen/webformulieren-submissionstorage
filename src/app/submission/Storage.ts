@@ -170,9 +170,6 @@ export class S3Storage implements Storage {
     const command = new ListObjectsV2Command({
       Bucket: this.bucket,
       Key: searchKey,
-      // The default and maximum number of keys returned is 1000. This limits it to
-      // one for demonstration purposes.
-      MaxKeys: 1,
     } as ListObjectsV2Request);
 
     try {
