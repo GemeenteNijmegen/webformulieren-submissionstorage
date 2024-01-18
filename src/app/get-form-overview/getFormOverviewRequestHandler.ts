@@ -53,9 +53,9 @@ export class FormOverviewRequestHandler {
       console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
       allKeys.forEach(async (key) => {
         console.log(`[getSubmissionFromKeys] foreach ${key}`);
-        await this.storage.getBucketObject(key).then((submission: GetObjectCommandOutput | undefined) => { console.log('The submission json retrieved and should be processed in a csv', submission?.Body);}).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
+        const bucketObject = await this.storage.getBucketObject(key);
+        console.log('[getSubmissionFromKeys] getBucketObject has been executed: ', bucketObject);
       });
     }
   }
 }
-
