@@ -1,4 +1,3 @@
-import { error } from 'console';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
