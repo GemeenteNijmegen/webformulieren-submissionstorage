@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -34,7 +35,7 @@ export class FormOverviewRequestHandler {
           ' first key: ',
           allKeys[0],
         );
-        this.getSubmissionFromKeys(allKeys);
+        this.getSubmissionFromKeys(allKeys).catch((err) => console.log('getFormOverviewRequestHandler - this.getSubmission] error catch ', err));
       },
       )
       .catch(() =>
@@ -46,9 +47,13 @@ export class FormOverviewRequestHandler {
 
 
   }
-  getSubmissionFromKeys(allKeys: string[]): void {
-    if (allKeys[0]) {
-      this.storage.getBucketObject(allKeys[0]).then((submission) => console.log('The submission json retrieved', submission)).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
+  async getSubmissionFromKeys(allKeys: string[]): Promise<void> {
+    console.log(`[getSubmissionFromKeys] begin functie met ${allKeys}`);
+    if (allKeys.length > 0) {
+      console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
+      allKeys.forEach(async (key) => {
+        await this.storage.getBucketObject(key).then((submission) => console.log('The submission json retrieved and should be processed in a csv', submission)).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
+      });
     }
   }
 }

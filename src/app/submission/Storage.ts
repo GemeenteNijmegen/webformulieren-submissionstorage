@@ -6,6 +6,7 @@ import {
   ListObjectsV2Output,
   S3Client,
   GetObjectCommandOutput,
+  GetObjectAclCommandInput,
 } from '@aws-sdk/client-s3';
 
 export interface Storage {
@@ -108,20 +109,21 @@ export class S3Storage implements Storage {
 
   //TODO: afstemmen en wijzigen
   public async getBucketObject( key: string): Promise<GetObjectCommandOutput| undefined> {
+    console.log(`[getBucketObject] Aangeroepen met ${key}`);
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
-    });
-    try {
-      const object = await this.s3Client.send(command);
-      console.debug(
-        `successfully got ${object} of size ${object.Body?.transformToByteArray.length}`,
-      );
-      return object;
-    } catch (err) {
-      console.error(err);
-    }
-    return undefined;
+    } as GetObjectAclCommandInput);
+
+    // try {
+    const object = await this.s3Client.send(command);
+    console.debug(
+      `successfully got ${object} of size ${object.Body?.transformToByteArray.length}`,
+    );
+    return object;
+    // } catch (err) {
+    //   console.error(err);
+    // }
 
   }
 
