@@ -46,9 +46,9 @@ export class FormOverviewRequestHandler {
 
 
   }
-  getSubmissionFromKeys(allKeys: String[]): void {
+  getSubmissionFromKeys(allKeys: string[]): void {
     if (allKeys[0]) {
-      this.storage.getBucketObject(allKeys[0] + '/submission.json').then((submission) => console.log('The submission json retrieved', submission)).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
+      this.storage.getBucketObject(allKeys[0]).then((submission) => console.log('The submission json retrieved', submission)).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
     }
   }
 }

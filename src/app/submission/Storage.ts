@@ -18,7 +18,7 @@ export interface Storage {
   ): Promise<boolean>;
   get(bucket: string, key: string): Promise<boolean>;
   getBucketObject(key: string): Promise<GetObjectCommandOutput| undefined>;
-  searchAllObjectsByShortKey(searchKey: string): Promise<String[]>;
+  searchAllObjectsByShortKey(searchKey: string): Promise<string[]>;
 }
 
 export class MockStorage implements Storage {
@@ -30,7 +30,7 @@ export class MockStorage implements Storage {
   getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined> {
     throw new Error(`MockStorage with ${key}`);
   }
-  searchAllObjectsByShortKey(searchKey: string): Promise<String[]> {
+  searchAllObjectsByShortKey(searchKey: string): Promise<string[]> {
     throw new Error(`MockStorage with ${searchKey}`);
   }
   public async get(bucket: string, key: string) {
@@ -161,7 +161,7 @@ export class S3Storage implements Storage {
 
   public async searchAllObjectsByShortKey(
     searchKey: string,
-  ): Promise<String[]> {
+  ): Promise<string[]> {
     console.info(
       `start searching all objects with listV2Object with searchkey ${searchKey}`,
     );
