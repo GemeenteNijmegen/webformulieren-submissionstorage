@@ -172,26 +172,28 @@ export class S3Storage implements Storage {
       Key: searchKey,
     } as ListObjectsV2Request);
 
-    try {
-      let isTruncated: boolean = true;
+    // try {
+    let isTruncated: boolean = true;
 
-      while (isTruncated) {
-        const listObjectsV2Output: ListObjectsV2Output =
+    while (isTruncated) {
+      console.log('In while isTruncated loop');
+      const listObjectsV2Output: ListObjectsV2Output =
           await this.s3Client.send(command);
-        listObjectsV2Output.Contents?.map((contents) => {
-          contents.Key
-            ? allKeys.push(contents?.Key)
-            : console.log(
-              '[searchAllObjectsByShortKey] Individual key not found and not added to allKeys.',
-            );
-        });
-        isTruncated = !!listObjectsV2Output.IsTruncated;
-        command.input.ContinuationToken =
+      console.log('Send command executed, are there contents? ', listObjectsV2Output.Contents);
+      listObjectsV2Output.Contents?.map((contents) => {
+        contents.Key
+          ? allKeys.push(contents?.Key)
+          : console.log(
+            '[searchAllObjectsByShortKey] Individual key not found and not added to allKeys.',
+          );
+      });
+      isTruncated = !!listObjectsV2Output.IsTruncated;
+      command.input.ContinuationToken =
           listObjectsV2Output.NextContinuationToken;
-      }
-    } catch (err) {
-      console.error(err);
     }
+    // } catch (err) {
+    //   console.error(err);
+    // }
     console.info(
       `[searchAllObjectsByShortKey] Found ${allKeys.length} bucket objects with prefix ${searchKey}`,
     );

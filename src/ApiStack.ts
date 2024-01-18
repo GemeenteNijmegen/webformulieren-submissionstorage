@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -38,7 +38,7 @@ export class ApiStack extends Stack {
     });
 
 
-    const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', { environment: { BUCKET_NAME: storageBucket.bucketName } });
+    const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', { environment: { BUCKET_NAME: storageBucket.bucketName }, timeout: Duration.minutes(5) });
     storageBucket.grantRead(formOverviewFunction);
   }
 }
