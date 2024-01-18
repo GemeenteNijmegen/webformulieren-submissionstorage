@@ -108,7 +108,7 @@ export class S3Storage implements Storage {
   }
 
   //TODO: afstemmen en wijzigen
-  public async getBucketObject( key: string): Promise<GetObjectCommandOutput| undefined> {
+  public async getBucketObject( key: string): Promise<GetObjectCommandOutput> {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
     const command = new GetObjectCommand({
       Bucket: this.bucket,
@@ -116,8 +116,8 @@ export class S3Storage implements Storage {
     } as GetObjectAclCommandInput);
 
     // try {
-    const object = await this.s3Client.send(command);
-    console.debug(
+    const object: GetObjectCommandOutput = await this.s3Client.send(command);
+    console.log(
       `successfully got ${object} of size ${object.Body?.transformToByteArray.length}`,
     );
     return object;

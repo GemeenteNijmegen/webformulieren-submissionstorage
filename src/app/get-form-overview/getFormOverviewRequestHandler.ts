@@ -1,3 +1,4 @@
+import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -51,7 +52,8 @@ export class FormOverviewRequestHandler {
     if (allKeys.length > 0) {
       console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
       allKeys.forEach(async (key) => {
-        await this.storage.getBucketObject(key).then((submission) => console.log('The submission json retrieved and should be processed in a csv', submission)).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
+        console.log(`[getSubmissionFromKeys] foreach ${key}`);
+        await this.storage.getBucketObject(key).then((submission: GetObjectCommandOutput | undefined) => { console.log('The submission json retrieved and should be processed in a csv', submission?.Body);}).catch(() => console.log('[getFormOverviewRequestHandler - getObjectBucket] could not retrieve submission.json catch Promise'));
       });
     }
   }
