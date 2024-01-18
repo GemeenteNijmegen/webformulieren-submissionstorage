@@ -118,9 +118,7 @@ export class S3Storage implements Storage {
     try {
       console.log('[GetObjectBucket] command:', command);
       const objectCommandOutput: GetObjectCommandOutput = await this.s3Client.send(command);
-      console.log(
-        `successfully got ${objectCommandOutput} of size ${objectCommandOutput.Body?.transformToByteArray.length}`,
-      );
+      console.log('Executed send command');
       return objectCommandOutput;
     } catch (err) {
       console.error(err);

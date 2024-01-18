@@ -1,4 +1,3 @@
-import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -49,13 +48,14 @@ export class FormOverviewRequestHandler {
   }
   async getSubmissionFromKeys(allKeys: string[]): Promise<void> {
     console.log(`[getSubmissionFromKeys] begin functie met ${allKeys}`);
-    const streamToString = (stream:any) =>
-      new Promise((resolve, reject) => {
-        const chunks: any[] = [];
-        stream.on('data', (chunk: any) => chunks.push(chunk));
-        stream.on('error', reject);
-        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-      });
+    // const streamToString = (stream:any) =>
+    //   new Promise((resolve, reject) => {
+    //     console.log('In stream to string');
+    //     const chunks: any[] = [];
+    //     stream.on('data', (chunk: any) => chunks.push(chunk));
+    //     stream.on('error', reject);
+    //     stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    //   });
 
 
     if (allKeys.length > 0) {
@@ -64,10 +64,12 @@ export class FormOverviewRequestHandler {
       allKeys.forEach(async (key) => {
         console.log(`[getSubmissionFromKeys] foreach ${key}`);
         const bucketObject = await this.storage.getBucketObject(key);
-        if (bucketObject?.Body) {
-          const bodyContents: string = await streamToString(bucketObject?.Body) as string;
-          console.log(bodyContents);
-          const data = JSON.parse(bodyContents);
+        console.log('BucketObjectBody? 01');
+        console.log('BucketObjectBody? 02', !!bucketObject?.Body);
+        if (!!bucketObject?.Body) {
+          // const bodyContents: string = await streamToString(bucketObject?.Body) as string;
+          const bodyString = await bucketObject.Body.transformToString();
+          const data = JSON.parse(bodyString);
           console.log('JSON data? ', data);
           // Manipulate the JSON data here
 
