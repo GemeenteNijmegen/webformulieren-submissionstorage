@@ -49,13 +49,33 @@ export class FormOverviewRequestHandler {
   }
   async getSubmissionFromKeys(allKeys: string[]): Promise<void> {
     console.log(`[getSubmissionFromKeys] begin functie met ${allKeys}`);
+    const streamToString = (stream:any) =>
+      new Promise((resolve, reject) => {
+        const chunks: any[] = [];
+        stream.on('data', (chunk: any) => chunks.push(chunk));
+        stream.on('error', reject);
+        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+      });
+
+
     if (allKeys.length > 0) {
       console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
+
       allKeys.forEach(async (key) => {
         console.log(`[getSubmissionFromKeys] foreach ${key}`);
         const bucketObject = await this.storage.getBucketObject(key);
-        console.log('[getSubmissionFromKeys] getBucketObject has been executed: ', bucketObject);
+        if (bucketObject?.Body) {
+          const bodyContents: string = await streamToString(bucketObject?.Body) as string;
+          console.log(bodyContents);
+          const data = JSON.parse(bodyContents);
+          console.log('JSON data? ', data);
+          // Manipulate the JSON data here
+
+        }
       });
     }
+
+    console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed' );
   }
 }
+
