@@ -4,6 +4,8 @@
     "build": "npx projen build",
     "bump": "npx projen bump",
     "bundle": "npx projen bundle",
+    "bundle:app/get-form-overview/getFormOverview.lambda": "npx projen bundle:app/get-form-overview/getFormOverview.lambda",
+    "bundle:app/get-form-overview/getFormOverview.lambda:watch": "npx projen bundle:app/get-form-overview/getFormOverview.lambda:watch",
     "bundle:app/submission/submission.lambda": "npx projen bundle:app/submission/submission.lambda",
     "bundle:app/submission/submission.lambda:watch": "npx projen bundle:app/submission/submission.lambda:watch",
     "clobber": "npx projen clobber",

@@ -1,9 +1,24 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  ListObjectsV2Command,
+  ListObjectsV2Request,
+  ListObjectsV2Output,
+  S3Client,
+  GetObjectCommandOutput,
+} from '@aws-sdk/client-s3';
 
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
-  copy(sourceBucket: string, sourceKey: string, sourceRegion: string, destinationKey: string): Promise<boolean>;
+  copy(
+    sourceBucket: string,
+    sourceKey: string,
+    sourceRegion: string,
+    destinationKey: string
+  ): Promise<boolean>;
   get(bucket: string, key: string): Promise<boolean>;
+  getBucketObject(key: string): Promise<GetObjectCommandOutput| undefined>;
+  searchAllObjectsByShortKey(searchKey: string): Promise<String[]>;
 }
 
 export class MockStorage implements Storage {
@@ -12,18 +27,33 @@ export class MockStorage implements Storage {
   constructor(bucket?: string) {
     this.bucket = bucket;
   }
+  getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined> {
+    throw new Error(`MockStorage with ${key}`);
+  }
+  searchAllObjectsByShortKey(searchKey: string): Promise<String[]> {
+    throw new Error(`MockStorage with ${searchKey}`);
+  }
   public async get(bucket: string, key: string) {
     console.debug(`would get ${key} from ${bucket}`);
     return true;
   }
 
   public async store(key: string, contents: string) {
-    console.debug(`would store ${key} with contents of size ${contents.length} to ${this.bucket}`);
+    console.debug(
+      `would store ${key} with contents of size ${contents.length} to ${this.bucket}`,
+    );
     return true;
   }
 
-  public async copy(sourceBucket: string, sourceKey: string, sourceRegion: string, destinationKey: string) {
-    console.debug(`would copy ${sourceBucket}/${sourceKey} in ${sourceRegion} to ${destinationKey}`);
+  public async copy(
+    sourceBucket: string,
+    sourceKey: string,
+    sourceRegion: string,
+    destinationKey: string,
+  ) {
+    console.debug(
+      `would copy ${sourceBucket}/${sourceKey} in ${sourceRegion} to ${destinationKey}`,
+    );
     return true;
   }
 }
@@ -41,7 +71,9 @@ export class S3Storage implements Storage {
   }
 
   public async store(key: string, contents: string) {
-    console.debug(`Storing ${key} with contents of size ${contents.length} to ${this.bucket}`);
+    console.debug(
+      `Storing ${key} with contents of size ${contents.length} to ${this.bucket}`,
+    );
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
@@ -64,7 +96,9 @@ export class S3Storage implements Storage {
     });
     try {
       const object = await this.s3Client.send(command);
-      console.debug(`successfully got ${object} of size ${object.Body?.transformToByteArray.length}`);
+      console.debug(
+        `successfully got ${object} of size ${object.Body?.transformToByteArray.length}`,
+      );
       return true;
     } catch (err) {
       console.error(err);
@@ -72,14 +106,42 @@ export class S3Storage implements Storage {
     return false;
   }
 
-  public async copy(sourceBucket: string, sourceKey: string, sourceRegion: string, destinationKey: string) {
-    console.debug(`copying ${sourceKey} in ${sourceRegion} to ${destinationKey}`);
+  //TODO: afstemmen en wijzigen
+  public async getBucketObject( key: string): Promise<GetObjectCommandOutput| undefined> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+    });
+    try {
+      const object = await this.s3Client.send(command);
+      console.debug(
+        `successfully got ${object} of size ${object.Body?.transformToByteArray.length}`,
+      );
+      return object;
+    } catch (err) {
+      console.error(err);
+    }
+    return undefined;
+
+  }
+
+  public async copy(
+    sourceBucket: string,
+    sourceKey: string,
+    sourceRegion: string,
+    destinationKey: string,
+  ) {
+    console.debug(
+      `copying ${sourceKey} in ${sourceRegion} to ${destinationKey}`,
+    );
     const getObjectCommand = new GetObjectCommand({
       Bucket: sourceBucket,
       Key: sourceKey,
     });
     try {
-      const object = await this.clientForRegion(sourceRegion).send(getObjectCommand);
+      const object = await this.clientForRegion(sourceRegion).send(
+        getObjectCommand,
+      );
       const putObjectCommand = new PutObjectCommand({
         Bucket: this.bucket,
         Key: destinationKey,
@@ -91,8 +153,52 @@ export class S3Storage implements Storage {
     } catch (err) {
       console.error(err);
     }
-    console.debug(`successfully copied ${sourceBucket}/${sourceKey} to ${destinationKey}`);
+    console.debug(
+      `successfully copied ${sourceBucket}/${sourceKey} to ${destinationKey}`,
+    );
     return true;
+  }
+
+  public async searchAllObjectsByShortKey(
+    searchKey: string,
+  ): Promise<String[]> {
+    console.info(
+      `start searching all objects with listV2Object with searchkey ${searchKey}`,
+    );
+
+    const allKeys: string[] = [];
+    const command = new ListObjectsV2Command({
+      Bucket: this.bucket,
+      Key: searchKey,
+      // The default and maximum number of keys returned is 1000. This limits it to
+      // one for demonstration purposes.
+      MaxKeys: 1,
+    } as ListObjectsV2Request);
+
+    try {
+      let isTruncated: boolean = true;
+
+      while (isTruncated) {
+        const listObjectsV2Output: ListObjectsV2Output =
+          await this.s3Client.send(command);
+        listObjectsV2Output.Contents?.map((contents) => {
+          contents.Key
+            ? allKeys.push(contents?.Key)
+            : console.log(
+              '[searchAllObjectsByShortKey] Individual key not found and not added to allKeys.',
+            );
+        });
+        isTruncated = !!listObjectsV2Output.IsTruncated;
+        command.input.ContinuationToken =
+          listObjectsV2Output.NextContinuationToken;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    console.info(
+      `[searchAllObjectsByShortKey] Found ${allKeys.length} bucket objects with prefix ${searchKey}`,
+    );
+    return allKeys;
   }
 
   private clientForRegion(region: string): S3Client {

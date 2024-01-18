@@ -46,7 +46,28 @@
       "description": "Prepare assets",
       "steps": [
         {
+          "spawn": "bundle:app/get-form-overview/getFormOverview.lambda"
+        },
+        {
           "spawn": "bundle:app/submission/submission.lambda"
+        }
+      ]
+    },
+    "bundle:app/get-form-overview/getFormOverview.lambda": {
+      "name": "bundle:app/get-form-overview/getFormOverview.lambda",
+      "description": "Create a JavaScript bundle from src/app/get-form-overview/getFormOverview.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/get-form-overview/getFormOverview.lambda:watch": {
+      "name": "bundle:app/get-form-overview/getFormOverview.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/get-form-overview/getFormOverview.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
