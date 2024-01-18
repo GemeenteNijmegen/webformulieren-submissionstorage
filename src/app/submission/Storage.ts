@@ -169,7 +169,7 @@ export class S3Storage implements Storage {
     const allKeys: string[] = [];
     const command = new ListObjectsV2Command({
       Bucket: this.bucket,
-      Key: searchKey,
+      Prefix: searchKey,
     } as ListObjectsV2Request);
 
     // try {
@@ -179,13 +179,11 @@ export class S3Storage implements Storage {
       console.log('In while isTruncated loop');
       const listObjectsV2Output: ListObjectsV2Output =
           await this.s3Client.send(command);
-      console.log('Send command executed, are there contents? ', listObjectsV2Output.Contents);
-      listObjectsV2Output.Contents?.map((contents) => {
-        contents.Key
-          ? allKeys.push(contents?.Key)
-          : console.log(
-            '[searchAllObjectsByShortKey] Individual key not found and not added to allKeys.',
-          );
+      //TODO: make submission.json are variable and change the function name
+      listObjectsV2Output.Contents?.filter((contents) => contents.Key?.includes('submission.json') ).map((contents) => {
+        contents.Key ? allKeys.push(contents?.Key) : console.log(
+          '[searchAllObjectsByShortKey] Individual key not found and not added to allKeys.',
+        );
       });
       isTruncated = !!listObjectsV2Output.IsTruncated;
       command.input.ContinuationToken =
