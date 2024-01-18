@@ -108,22 +108,25 @@ export class S3Storage implements Storage {
   }
 
   //TODO: afstemmen en wijzigen
-  public async getBucketObject( key: string): Promise<GetObjectCommandOutput| undefined> {
+  public async getBucketObject( key: string): Promise<GetObjectCommandOutput> {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
     } as GetObjectCommandInput);
 
-    try {
-      console.log('[GetObjectBucket] command:', command);
-      const objectCommandOutput: GetObjectCommandOutput = await this.s3Client.send(command);
-      console.log('Executed send command');
-      return objectCommandOutput;
-    } catch (err) {
-      console.error(err);
-    }
-    return undefined;
+    // try {
+    console.log('[GetObjectBucket] command:', command);
+    const objectCommandOutput: GetObjectCommandOutput = await this.s3Client.send(command);
+    console.log('Executed send command');
+    // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
+    const str = await objectCommandOutput?.Body.transformToString();
+    console.log(str);
+    return objectCommandOutput as GetObjectCommandOutput;
+    // } catch (err) {
+    //   console.error(err);
+    // }
+    // return undefined;
 
   }
 
