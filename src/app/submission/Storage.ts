@@ -122,7 +122,7 @@ export class S3Storage implements Storage {
     } catch (err) {
       console.error('getBucketObject send error: ', err);
     } finally {
-      console.log('[getBucketObject] sfinally of send try - catch');
+      console.log('[getBucketObject] sfinally of send try -');
     }
   }
 

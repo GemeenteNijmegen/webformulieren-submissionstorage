@@ -61,7 +61,7 @@ export class FormOverviewRequestHandler {
     if (allKeys.length > 0) {
       console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
 
-      allKeys.forEach(async (key) => {
+      const allBucketObjects: Promise<any>[] = allKeys.forEach(async (key) => {
         console.log(`[getSubmissionFromKeys] foreach ${key}`);
         const bucketObject = await this.storage.getBucketObject(key);
         console.log('BucketObjectBody? 01');
@@ -72,9 +72,10 @@ export class FormOverviewRequestHandler {
           const data = JSON.parse(bodyString);
           console.log('JSON data? ', data);
           // Manipulate the JSON data here
-
+          return new Promise(data);
         }
       });
+      Promise.all(allBucketObjects);
     }
 
     console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed' );
