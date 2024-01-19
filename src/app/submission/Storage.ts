@@ -8,6 +8,7 @@ import {
   GetObjectCommandOutput,
   GetObjectCommandInput,
 } from '@aws-sdk/client-s3';
+import { Duration } from 'aws-cdk-lib';
 
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
@@ -110,13 +111,19 @@ export class S3Storage implements Storage {
   //TODO: afstemmen en wijzigen
   public async getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined > {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
+    const timeoutHandler = async () => {
+      console.error('GetObjectCommand timed out');
+    };
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
-    } as GetObjectCommandInput);
+    } as GetObjectCommandInput );
     try {
       console.log('[GetObjectBucket] command:', command);
-      const bucketObject =await this.clients.default.send(command);
+      const bucketObject =await this.clients.default.send(command, {
+        timeout: Duration.seconds(30),
+        onTimeout: timeoutHandler,
+      });
       console.log('Executed send command should not be visible', bucketObject);
       return bucketObject;
     } catch (err) {

@@ -1,3 +1,4 @@
+import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -46,56 +47,38 @@ export class FormOverviewRequestHandler {
 
 
   }
-  async getSubmissionFromKeys(allKeys: string[]): Promise<void> {
+
+  async getSubmissionFromKeys(allKeys: string[]) {
     console.log(`[getSubmissionFromKeys] begin functie met ${allKeys}`);
-    // const streamToString = (stream:any) =>
-    //   new Promise((resolve, reject) => {
-    //     console.log('In stream to string');
-    //     const chunks: any[] = [];
-    //     stream.on('data', (chunk: any) => chunks.push(chunk));
-    //     stream.on('error', reject);
-    //     stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    //   });
-
-
     if (allKeys.length > 0) {
-      console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
+      console.log('[getSubmissionFromKeys] er zijn keys');
 
-      // allKeys.forEach(async (key) => {
-      //   console.log(`[getSubmissionFromKeys] foreach ${key}`);
-      //   const bucketObject = await this.storage.getBucketObject(key);
-      //   console.log('BucketObjectBody? 01', !!bucketObject?.Body);
-      //   console.log('BucketObjectBody? 0', !!bucketObject?.Body);
-      //   if (!!bucketObject?.Body) {
-      //     // const bodyContents: string = await streamToString(bucketObject?.Body) as string;
-      //     const bodyString = await bucketObject.Body.transformToString();
-      //     const data = JSON.parse(bodyString);
-      //     console.log('JSON data? ', data);
-      //     // Manipulate the JSON data here
+      console.log('[getSubmissionFromKeys] Promise.all callback starts');
 
-      //   }
-      // });
-
+      const bucketObjects: GetObjectCommandOutput[] = [];
 
       await Promise.all(
-        allKeys.map(async key => {
-          console.log(`[getSubmissionFromKeys] foreach ${key}`);
+        allKeys.map(async (key) => {
+          console.log(`[getSubmissionFromKeys] foreach ${key}, start processing`);
           const bucketObject = await this.storage.getBucketObject(key);
 
           if (!!bucketObject?.Body) {
-            // const bodyContents: string = await streamToString(bucketObject.Body) as string;
+            console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete`);
             const bodyString = await bucketObject.Body.transformToString();
             const data = JSON.parse(bodyString);
-            console.log('JSON data', data);
-            // Manipulate the JSON data here
+            console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, data);
+            bucketObjects.push(bucketObject); // Correct cast
           }
+
+          console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete, pushing object`);
         }),
       );
 
-
+      console.log('[getSubmissionFromKeys] Promise.all callback completes');
+      console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed');
     }
-
-    console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed' );
   }
+
+
 }
 
