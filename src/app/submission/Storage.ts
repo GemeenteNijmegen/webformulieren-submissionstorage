@@ -18,7 +18,7 @@ export interface Storage {
     destinationKey: string
   ): Promise<boolean>;
   get(bucket: string, key: string): Promise<boolean>;
-  getBucketObject(key: string): Promise<GetObjectCommandOutput| void>;
+  getBucketObject(key: string): Promise<GetObjectCommandOutput| undefined>;
   searchAllObjectsByShortKey(searchKey: string): Promise<string[]>;
 }
 
@@ -108,7 +108,7 @@ export class S3Storage implements Storage {
   }
 
   //TODO: afstemmen en wijzigen
-  public async getBucketObject( key: string): Promise<GetObjectCommandOutput |void > {
+  public async getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined > {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
     const command = new GetObjectCommand({
       Bucket: this.bucket,
@@ -116,11 +116,12 @@ export class S3Storage implements Storage {
     } as GetObjectCommandInput);
     try {
       console.log('[GetObjectBucket] command:', command);
-      const bucketObject = await this.clients.default.send(command);
+      const bucketObject =await this.clients.default.send(command);
       console.log('Executed send command should not be visible', bucketObject);
       return bucketObject;
     } catch (err) {
       console.error('getBucketObject send error: ', err);
+      return undefined;
     } finally {
       console.log('[getBucketObject] sfinally of send try -');
     }

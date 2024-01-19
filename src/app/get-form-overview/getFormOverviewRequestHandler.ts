@@ -61,21 +61,38 @@ export class FormOverviewRequestHandler {
     if (allKeys.length > 0) {
       console.log('[getSubmissionFromKeys] er zijn keys, de eerste is');
 
-      const allBucketObjects: Promise<any>[] = allKeys.forEach(async (key) => {
-        console.log(`[getSubmissionFromKeys] foreach ${key}`);
-        const bucketObject = await this.storage.getBucketObject(key);
-        console.log('BucketObjectBody? 01');
-        console.log('BucketObjectBody? 02', !!bucketObject?.Body);
-        if (!!bucketObject?.Body) {
-          // const bodyContents: string = await streamToString(bucketObject?.Body) as string;
-          const bodyString = await bucketObject.Body.transformToString();
-          const data = JSON.parse(bodyString);
-          console.log('JSON data? ', data);
-          // Manipulate the JSON data here
-          return new Promise(data);
-        }
-      });
-      Promise.all(allBucketObjects);
+      // allKeys.forEach(async (key) => {
+      //   console.log(`[getSubmissionFromKeys] foreach ${key}`);
+      //   const bucketObject = await this.storage.getBucketObject(key);
+      //   console.log('BucketObjectBody? 01', !!bucketObject?.Body);
+      //   console.log('BucketObjectBody? 0', !!bucketObject?.Body);
+      //   if (!!bucketObject?.Body) {
+      //     // const bodyContents: string = await streamToString(bucketObject?.Body) as string;
+      //     const bodyString = await bucketObject.Body.transformToString();
+      //     const data = JSON.parse(bodyString);
+      //     console.log('JSON data? ', data);
+      //     // Manipulate the JSON data here
+
+      //   }
+      // });
+
+
+      await Promise.all(
+        allKeys.map(async key => {
+          console.log(`[getSubmissionFromKeys] foreach ${key}`);
+          const bucketObject = await this.storage.getBucketObject(key);
+
+          if (!!bucketObject?.Body) {
+            // const bodyContents: string = await streamToString(bucketObject.Body) as string;
+            const bodyString = await bucketObject.Body.transformToString();
+            const data = JSON.parse(bodyString);
+            console.log('JSON data', data);
+            // Manipulate the JSON data here
+          }
+        }),
+      );
+
+
     }
 
     console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed' );
