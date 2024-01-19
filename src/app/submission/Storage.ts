@@ -18,7 +18,7 @@ export interface Storage {
     destinationKey: string
   ): Promise<boolean>;
   get(bucket: string, key: string): Promise<boolean>;
-  getBucketObject(key: string): Promise<GetObjectCommandOutput| undefined>;
+  getBucketObject(key: string): Promise<GetObjectCommandOutput| void>;
   searchAllObjectsByShortKey(searchKey: string): Promise<string[]>;
 }
 
@@ -108,23 +108,16 @@ export class S3Storage implements Storage {
   }
 
   //TODO: afstemmen en wijzigen
-  public async getBucketObject( key: string): Promise<GetObjectCommandOutput| undefined> {
+  public async getBucketObject( key: string): Promise<GetObjectCommandOutput | void> {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
     } as GetObjectCommandInput);
 
-    try {
-      console.log('[GetObjectBucket] command:', command);
-      const objectCommandOutput: GetObjectCommandOutput = await this.clientForRegion('eu-central-1').send(command);
-      console.log('Executed send command');
-      return objectCommandOutput as GetObjectCommandOutput;
-    } catch (err) {
-      console.error(err);
-    }
-    return undefined;
-
+    console.log('[GetObjectBucket] command:', command);
+    return this.s3Client.send(command).then((bucketObject) => { console.log('[getBucketObject then]', key, 'output: ', bucketObject); return bucketObject as GetObjectCommandOutput;}).catch((catchError) => console.log('[getBucketObject catch]', catchError)).finally(() => {console.log('[getBucketObject finally]', key);});
+    console.log('Executed send command should not be visible');
   }
 
   public async copy(
