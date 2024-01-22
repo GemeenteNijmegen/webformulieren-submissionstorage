@@ -55,24 +55,34 @@ export class FormOverviewRequestHandler {
 
       console.log('[getSubmissionFromKeys] Promise.all callback starts');
 
-      const bucketObjects: GetObjectCommandOutput[] = [];
+      const bucketObjects: any[] = [];
 
-      await Promise.all(
-        allKeys.map(async (key) => {
-          console.log(`[getSubmissionFromKeys] foreach ${key}, start processing`);
-          const bucketObject = await this.storage.getBucketObject(key);
+      for ( const key of allKeys) {
+        const bucketObject = await this.storage.getBucketObject(key);
+        if (!!bucketObject?.Body) {
+          console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete`);
+          const bodyString = await bucketObject.Body.transformToString();
+          const data = JSON.parse(bodyString);
+          console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, data);
+          bucketObjects.push(bucketObject);
+        }
+      }
+      // await Promise.all(
+      //   allKeys.map(async (key) => {
+      //     console.log(`[getSubmissionFromKeys] foreach ${key}, start processing`);
+      //     const bucketObject = await this.storage.getBucketObject(key);
 
-          if (!!bucketObject?.Body) {
-            console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete`);
-            const bodyString = await bucketObject.Body.transformToString();
-            const data = JSON.parse(bodyString);
-            console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, data);
-            bucketObjects.push(bucketObject); // Correct cast
-          }
+      //     if (!!bucketObject?.Body) {
+      //       console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete`);
+      //       const bodyString = await bucketObject.Body.transformToString();
+      //       const data = JSON.parse(bodyString);
+      //       console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, data);
+      //       bucketObjects.push(bucketObject); // Correct cast
+      //     }
 
-          console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete, pushing object`);
-        }),
-      );
+      //     console.log(`[getSubmissionFromKeys] foreach ${key}, processing complete, pushing object`);
+      //   }),
+      // );
 
       console.log('[getSubmissionFromKeys] Promise.all callback completes');
       console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed');

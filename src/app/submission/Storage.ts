@@ -111,19 +111,14 @@ export class S3Storage implements Storage {
   //TODO: afstemmen en wijzigen
   public async getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined > {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
-    const timeoutHandler = async () => {
-      console.error('GetObjectCommand timed out');
-    };
+
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
     } as GetObjectCommandInput );
     try {
       console.log('[GetObjectBucket] command:', command);
-      const bucketObject =await this.clients.default.send(command, {
-        timeout: Duration.seconds(30),
-        onTimeout: timeoutHandler,
-      });
+      const bucketObject = await this.clients.default.send(command);
       console.log('Executed send command should not be visible', bucketObject);
       return bucketObject;
     } catch (err) {
@@ -206,6 +201,7 @@ export class S3Storage implements Storage {
     );
     return allKeys;
   }
+
 
   private clientForRegion(region: string): S3Client {
     if (!this.clients[region]) {
