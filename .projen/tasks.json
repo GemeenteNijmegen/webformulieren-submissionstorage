@@ -323,13 +323,13 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
-          "exec": "npm-check-updates --upgrade --target=minor --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/node,@types/sns-validator,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,aws-sdk-client-mock,esbuild,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,npm-check-updates,projen,standard-version,ts-jest,ts-node,typescript,@aws-cdk/aws-apigatewayv2-alpha,@aws-cdk/aws-apigatewayv2-integrations-alpha,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/utils,@types/aws-lambda,aws-cdk-lib,axios,constructs,sns-validator,zod"
+          "exec": "npm-check-updates --upgrade --target=minor --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/node,@types/sns-validator,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,aws-sdk-client-mock,esbuild,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,npm-check-updates,projen,standard-version,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/utils,@types/aws-lambda,aws-cdk-lib,axios,constructs,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit npm-check-updates projen standard-version ts-jest ts-node typescript @aws-cdk/aws-apigatewayv2-alpha @aws-cdk/aws-apigatewayv2-integrations-alpha @aws-sdk/client-dynamodb @aws-sdk/client-s3 @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios constructs sns-validator zod"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit npm-check-updates projen standard-version ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-s3 @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios constructs sns-validator zod"
         },
         {
           "exec": "npx projen"

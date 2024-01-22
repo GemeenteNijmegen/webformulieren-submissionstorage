@@ -17,8 +17,6 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/aws-lambda',
     'sns-validator',
     'zod',
-    '@aws-cdk/aws-apigatewayv2-alpha',
-    '@aws-cdk/aws-apigatewayv2-integrations-alpha',
     '@aws-sdk/client-s3',
     '@aws-sdk/client-dynamodb',
     'axios',
