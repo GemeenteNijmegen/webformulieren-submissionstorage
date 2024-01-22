@@ -42,24 +42,35 @@ export class FormOverviewRequestHandler {
           const bodyString = await bucketObject.Body.transformToString();
           const jsonData = JSON.parse(bodyString);
           const formData = JSON.parse(jsonData.Message);
-          const persoonsGegevens = formData.brpData.Persoonsgegevens;
-          const adresGegevens = formData.brpData.Adres;
-          console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, jsonData);
-          const csvData = [
-            jsonData.Timestamp,
-            formData.bsn,
-            persoonsGegevens.Naam,
-            persoonsGegevens.Geboortedatum,
-            persoonsGegevens.NederlandseNationaliteit,
-            adresGegevens.Gemeente,
-            adresGegevens.Woonplaats,
-          ];
-          csvArray.push(csvData);
-
+          if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
+            const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
+            const adresGegevens = formData.brpData.Persoon.Adres;
+            console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, jsonData);
+            const csvData = [
+              jsonData.Timestamp,
+              formData.bsn,
+              persoonsGegevens.Naam,
+              persoonsGegevens.Geboortedatum,
+              persoonsGegevens.NederlandseNationaliteit,
+              adresGegevens.Gemeente,
+              adresGegevens.Woonplaats,
+            ];
+            csvArray.push(csvData);
+          } else {
+            console.log('Formulier niet verwerkt. FormTypeId: ', formData.formTypeId, ' brpDataObject: ', formData.brpData);
+          }
         }
       }
       console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed');
       console.log('csvData? ', csvArray);
+
+      let csvContent = '';
+
+      csvArray.forEach(row => {
+        csvContent += row.join(',') + '\n';
+      });
+      console.log('CsvContent: ', csvContent);
+
     }
   }
 
