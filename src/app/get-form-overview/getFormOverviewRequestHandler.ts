@@ -1,4 +1,3 @@
-
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -26,26 +25,9 @@ export class FormOverviewRequestHandler {
   async handleRequest(message: any) {
     console.log(`Message not used yet ${message}, using constant searchKey ${this.searchKey}`);
     const storage = this.storage;
-    await storage
-      .searchAllObjectsByShortKey(this.searchKey)
-      .then((allKeys) => {
-        console.log(
-          'Keys returned: ',
-          allKeys.length,
-          ' first key: ',
-          allKeys[0],
-        );
-        this.getSubmissionFromKeys(allKeys).catch((err) => console.log('getFormOverviewRequestHandler - this.getSubmission] error catch ', err));
-      },
-      )
-      .catch(() =>
-        console.log(
-          '[getFormOverviewRequestHandler - handleRequest] searchAllObjectsByShortKey catch',
-        ),
-      );
+    const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
+    await this.getSubmissionFromKeys(allKeys);
     // retrieve forms with a certain key from bucket
-
-
   }
 
   async getSubmissionFromKeys(allKeys: string[]) {
