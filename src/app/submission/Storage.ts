@@ -109,6 +109,7 @@ export class S3Storage implements Storage {
   //TODO: afstemmen en wijzigen
   public async getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined > {
     console.log(`[getBucketObject] Aangeroepen met ${key}`);
+    const uniqueS3Client = new S3Client();
 
     const command = new GetObjectCommand({
       Bucket: this.bucket,
@@ -116,7 +117,7 @@ export class S3Storage implements Storage {
     } as GetObjectCommandInput );
     try {
       console.log('[GetObjectBucket] command:', command);
-      const bucketObject = await this.clients.default.send(command);
+      const bucketObject = await uniqueS3Client.send(command);
       console.log('Executed send command should not be visible', bucketObject);
       return bucketObject;
     } catch (err) {

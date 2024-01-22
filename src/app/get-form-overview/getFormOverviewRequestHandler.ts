@@ -1,4 +1,4 @@
-import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
+
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
