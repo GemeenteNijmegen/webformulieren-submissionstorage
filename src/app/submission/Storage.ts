@@ -1,15 +1,13 @@
 import {
   GetObjectCommand,
-  PutObjectCommand,
-  ListObjectsV2Command,
-  ListObjectsV2Request,
-  ListObjectsV2Output,
-  S3Client,
-  GetObjectCommandOutput,
   GetObjectCommandInput,
+  GetObjectCommandOutput,
+  ListObjectsV2Command,
+  ListObjectsV2Output,
+  ListObjectsV2Request,
+  PutObjectCommand,
+  S3Client,
 } from '@aws-sdk/client-s3';
-import { Duration } from 'aws-cdk-lib';
-
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
   copy(
