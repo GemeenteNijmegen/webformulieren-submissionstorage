@@ -2,6 +2,8 @@ import { CreateTableCommand, DeleteTableCommand, DynamoDBClient } from '@aws-sdk
 import { MockDatabase } from './MockDatabase';
 import { DynamoDBDatabase } from '../Database';
 
+const describeIntegration = process.env.JEST_RUN_INTEGRATION_TESTS ? describe : describe.skip;
+
 describe('Save object', () => {
   test('Creating database object', async () => {
     expect(new MockDatabase('mockTable')).toBeTruthy();
@@ -31,7 +33,7 @@ describe('Save object', () => {
   });
 });
 
-describe('Dynamodb integration tests', () => {
+describeIntegration('Dynamodb integration tests', () => {
   const tableName = 'Test';
   const dynamoDBClient = new DynamoDBClient({ endpoint: 'http://localhost:8000' });
   const database = new DynamoDBDatabase(tableName, { dynamoDBClient });
