@@ -1,3 +1,4 @@
+import { Blob } from 'buffer';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -30,9 +31,9 @@ export class FormOverviewRequestHandler {
   }
 
   async getSubmissionsFromKeys(allKeys: string[]) {
-    console.log(`[getSubmissionFromKeys] begin functie met ${allKeys}`);
+    //TODO: verwerken CSV en foutmeldingen groeperen in andere functie
+    //TODO: zoekterm en op te halen velden flexibel maken
     if (allKeys.length > 0) {
-
       const csvArray = [];
       const csvHeaders = ['Tijd', 'BSN', 'Naam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats'];
       csvArray.push(csvHeaders);
@@ -45,8 +46,8 @@ export class FormOverviewRequestHandler {
           if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
             const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
             const adresGegevens = formData.brpData.Persoon.Adres;
-            console.log(`[getSubmissionFromKeys] foreach ${key}, JSON data`, jsonData);
             const csvData = [
+              //TODO: datum omzetten naar Nederlands leesbaar formaat
               jsonData.Timestamp,
               formData.bsn,
               persoonsGegevens.Naam,
@@ -59,10 +60,10 @@ export class FormOverviewRequestHandler {
           } else {
             console.log('Formulier niet verwerkt. FormTypeId: ', formData.formTypeId, ' brpDataObject: ', formData.brpData);
           }
+        } else {
+          console.log('Formulier bestand niet opgehaald uit bucket met key: ', key);
         }
       }
-      console.log('[getSubmissionFromKeys] getBucketObject foreach has been executed');
-      console.log('csvData? ', csvArray);
 
       let csvContent = '';
 
@@ -70,10 +71,10 @@ export class FormOverviewRequestHandler {
         csvContent += row.join(',') + '\n';
       });
       console.log('CsvContent: ', csvContent);
-
+      //TODO: returning as file
+      // const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8,' });
     }
   }
-
 
 }
 

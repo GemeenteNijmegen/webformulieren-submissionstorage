@@ -1,5 +1,6 @@
 
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
+
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -16,6 +17,7 @@ interface ApiStackProps extends StackProps, Configurable {};
  * Contains all API-related resources.
  */
 export class ApiStack extends Stack {
+  // api: HttpApi;
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 
@@ -41,6 +43,15 @@ export class ApiStack extends Stack {
 
     const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', { environment: { BUCKET_NAME: storageBucket.bucketName }, timeout: Duration.minutes(5) });
     storageBucket.grantRead(formOverviewFunction);
+
+    // this.api = new HttpApi(this, 'api', {
+    //   description: 'Form Overview',
+    // });
+    // this.api.addRoutes({
+    //   integration: new HttpLambdaIntegration('', GetFormOverviewFunction),
+    //   path: '/',
+    //   methods: [HttpMethod.GET],
+    // });
   }
 }
 

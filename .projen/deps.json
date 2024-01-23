@@ -5,6 +5,10 @@
       "type": "build"
     },
     {
+      "name": "@gemeentenijmegen/apiclient",
+      "type": "build"
+    },
+    {
       "name": "@gemeentenijmegen/projen-project-type",
       "type": "build"
     },

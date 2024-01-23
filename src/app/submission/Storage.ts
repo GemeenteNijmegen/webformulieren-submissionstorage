@@ -106,25 +106,18 @@ export class S3Storage implements Storage {
     return false;
   }
 
-  //TODO: afstemmen en wijzigen
   public async getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined > {
-    console.log(`[getBucketObject] Aangeroepen met ${key}`);
-    const uniqueS3Client = new S3Client();
 
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
     } as GetObjectCommandInput );
     try {
-      console.log('[GetObjectBucket] command:', command);
-      const bucketObject = await uniqueS3Client.send(command);
-      console.log('Executed send command should not be visible', bucketObject);
+      const bucketObject = await this.s3Client.send(command);
       return bucketObject;
     } catch (err) {
       console.error('getBucketObject send error: ', err);
       return undefined;
-    } finally {
-      console.log('[getBucketObject] sfinally of send try -');
     }
   }
 

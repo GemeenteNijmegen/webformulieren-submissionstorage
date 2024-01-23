@@ -6,6 +6,7 @@ const project = new GemeenteNijmegenCdkApp({
   defaultReleaseBranch: 'main',
   devDeps: [
     '@gemeentenijmegen/projen-project-type',
+    '@gemeentenijmegen/apiclient',
     '@aws-sdk/client-secrets-manager',
     '@types/sns-validator',
     'aws-sdk-client-mock',
