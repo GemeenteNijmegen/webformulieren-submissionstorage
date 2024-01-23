@@ -1,4 +1,4 @@
-import { MockDatabase } from '../Database';
+import { MockDatabase } from './MockDatabase';
 
 describe('Save object', () => {
   test('Creating database object', async () => {

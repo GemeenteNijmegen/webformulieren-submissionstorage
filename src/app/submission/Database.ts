@@ -2,7 +2,7 @@ import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { hashString } from './hash';
 import { s3Object } from './s3Object';
 
-interface SubmissionData {
+export interface SubmissionData {
   userId: string;
   key: string;
   pdf: string;
@@ -11,23 +11,6 @@ interface SubmissionData {
 
 export interface Database {
   storeSubmission(submission: SubmissionData): Promise<boolean>;
-}
-
-export class MockDatabase implements Database {
-  private table;
-
-  constructor(tableName?: string) {
-    this.table = tableName;
-  }
-
-  async storeSubmission(submission: SubmissionData): Promise<any> {
-    const pk = submission.userId;
-    console.debug(`would store object to table ${this.table} with primary key ${pk} and contents`, submission);
-    let item: any = dynamoDBItem(pk, pk, submission);
-    console.debug(JSON.stringify(item, null, 2));
-
-    return true;
-  }
 }
 
 export class DynamoDBDatabase implements Database {
@@ -56,7 +39,7 @@ export class DynamoDBDatabase implements Database {
   }
 }
 
-function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
+export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
   let item: any = {
     pk: { S: pk },
     sk: { S: sk },
