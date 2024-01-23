@@ -11,7 +11,7 @@ const ParametersSchema = z.object({
 type Parameters = z.infer<typeof ParametersSchema>;
 
 function parsedEvent(event: APIGatewayProxyEventV2): Parameters {
-  return ParametersSchema.passthrough().parse({ 
+  return ParametersSchema.passthrough().parse({
     userId: event.queryStringParameters?.user_id,
     userType: event.queryStringParameters?.user_type,
   });
