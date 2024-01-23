@@ -29,8 +29,17 @@ export class FormOverviewRequestHandler {
     const storage = this.storage;
     const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
     const bucketObjects = await this.getSubmissionsFromKeys(allKeys);
-    const _csvFile: string = await this.compileCsvFile(bucketObjects);
-    console.log('csv', _csvFile);
+    const csvFile: string = await this.compileCsvFile(bucketObjects);
+    console.log('csv', csvFile);
+    return {
+      statusCode: 200,
+      csvFile,
+      headers: {
+        'Content-type': 'text/csv',
+        'Content-Disposition': 'attachment;filename=referendumFormOverview.csv',
+      },
+    };
+
 
   }
 
