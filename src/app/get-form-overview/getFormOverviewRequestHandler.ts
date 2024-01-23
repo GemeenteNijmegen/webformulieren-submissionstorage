@@ -1,4 +1,5 @@
-import { Blob } from 'buffer';
+
+import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -27,53 +28,68 @@ export class FormOverviewRequestHandler {
     console.log(`Message not used yet ${message}, using constant searchKey ${this.searchKey}`);
     const storage = this.storage;
     const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
-    await this.getSubmissionsFromKeys(allKeys);
+    const bucketObjects = await this.getSubmissionsFromKeys(allKeys);
+    const _csvFile: string = await this.compileCsvFile(bucketObjects);
+    console.log('csv', _csvFile);
+
   }
 
-  async getSubmissionsFromKeys(allKeys: string[]) {
-    //TODO: verwerken CSV en foutmeldingen groeperen in andere functie
-    //TODO: zoekterm en op te halen velden flexibel maken
+  async getSubmissionsFromKeys(allKeys: string[]): Promise<GetObjectCommandOutput[]> {
+    const bucketObjects: GetObjectCommandOutput[] = [];
     if (allKeys.length > 0) {
-      const csvArray = [];
-      const csvHeaders = ['Tijd', 'BSN', 'Naam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats'];
-      csvArray.push(csvHeaders);
       for ( const key of allKeys) {
         const bucketObject = await this.storage.getBucketObject(key);
-        if (!!bucketObject?.Body) {
-          const bodyString = await bucketObject.Body.transformToString();
-          const jsonData = JSON.parse(bodyString);
-          const formData = JSON.parse(jsonData.Message);
-          if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
-            const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
-            const adresGegevens = formData.brpData.Persoon.Adres;
-            const csvData = [
-              //TODO: datum omzetten naar Nederlands leesbaar formaat
-              jsonData.Timestamp,
-              formData.bsn,
-              persoonsGegevens.Naam,
-              persoonsGegevens.Geboortedatum,
-              persoonsGegevens.NederlandseNationaliteit,
-              adresGegevens.Gemeente,
-              adresGegevens.Woonplaats,
-            ];
-            csvArray.push(csvData);
-          } else {
-            console.log('Formulier niet verwerkt. FormTypeId: ', formData.formTypeId, ' brpDataObject: ', formData.brpData);
-          }
-        } else {
+        if (!!bucketObject) {bucketObjects.push(bucketObject);} else {
           console.log('Formulier bestand niet opgehaald uit bucket met key: ', key);
         }
       }
 
-      let csvContent = '';
-
-      csvArray.forEach(row => {
-        csvContent += row.join(',') + '\n';
-      });
-      console.log('CsvContent: ', csvContent);
-      //TODO: returning as file
-      // const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8,' });
     }
+    return bucketObjects;
+  }
+
+  async compileCsvFile(bucketObjects: GetObjectCommandOutput[]): Promise<string> {
+    const csvArray = [];
+    const csvHeaders = ['Tijd', 'BSN', 'Naam', 'Voornamen', 'Achternaam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats', 'Adres'];
+    csvArray.push(csvHeaders);
+
+    for (const bucketObject of bucketObjects) {
+      if (bucketObject.Body) {
+        const bodyString = await bucketObject.Body.transformToString();
+        const jsonData = JSON.parse(bodyString);
+        const formData = JSON.parse(jsonData.Message);
+
+        if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
+          const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
+          const adresGegevens = formData.brpData.Persoon.Adres;
+          const csvData = [
+            jsonData.Timestamp,
+            formData.bsn,
+            persoonsGegevens.Naam,
+            persoonsGegevens.Voornamen,
+            persoonsGegevens.Achternaam,
+            persoonsGegevens.Geboortedatum,
+            persoonsGegevens.NederlandseNationaliteit,
+            adresGegevens.Gemeente,
+            adresGegevens.Woonplaats,
+            `${adresGegevens.Straat} ${adresGegevens.Huisnummer} ${adresGegevens.Postcode}`,
+          ];
+          csvArray.push(csvData);
+        } else {
+          console.log('Formulier niet verwerkt. FormTypeId: ', formData.formTypeId, ' brpDataObject: ', formData.brpData);
+        }
+      } else {
+        //lege body
+      }
+    }
+    let csvContent: string = '';
+
+    csvArray.forEach(row => {
+      csvContent += row.join(',') + '\n';
+    });
+    console.log('CsvContent: ', csvContent);
+    return csvContent;
+
   }
 
 }
