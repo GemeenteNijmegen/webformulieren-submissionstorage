@@ -1,6 +1,7 @@
 
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
-
+import { HttpApi, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
+import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -17,9 +18,13 @@ interface ApiStackProps extends StackProps, Configurable {};
  * Contains all API-related resources.
  */
 export class ApiStack extends Stack {
-  // api: HttpApi;
+  api: HttpApi;
+
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
+    this.api = new HttpApi(this, 'api', {
+      description: 'Submission Storage Api',
+    });
 
     const internalTopic = new SNSTopic(this, 'submissions', { publishingAccountIds: props.configuration.allowedAccountIdsToPublishToSNS });
 
@@ -35,6 +40,7 @@ export class ApiStack extends Stack {
     //TODO: move later on
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
     // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
+
     const storageBucket = Bucket.fromBucketAttributes(this, 'bucket', {
       bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
       encryptionKey: key,
@@ -43,15 +49,9 @@ export class ApiStack extends Stack {
 
     const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', { environment: { BUCKET_NAME: storageBucket.bucketName }, timeout: Duration.minutes(5) });
     storageBucket.grantRead(formOverviewFunction);
+    this.api.addRoutes({ integration: new HttpLambdaIntegration('formoverview', formOverviewFunction), path: '/formoverview', methods: [HttpMethod.GET] });
 
-    // this.api = new HttpApi(this, 'api', {
-    //   description: 'Form Overview',
-    // });
-    // this.api.addRoutes({
-    //   integration: new HttpLambdaIntegration('', GetFormOverviewFunction),
-    //   path: '/',
-    //   methods: [HttpMethod.GET],
-    // });
+
   }
 }
 
