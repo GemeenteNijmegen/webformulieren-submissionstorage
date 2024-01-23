@@ -42,21 +42,21 @@ describeIntegration('Dynamodb integration tests', () => {
       TableName: tableName,
       AttributeDefinitions: [
         {
-          AttributeName: "pk",
-          AttributeType: "S",
-        },{
-          AttributeName: "sk",
-          AttributeType: "S",
+          AttributeName: 'pk',
+          AttributeType: 'S',
+        }, {
+          AttributeName: 'sk',
+          AttributeType: 'S',
         },
       ],
       KeySchema: [
         {
-          AttributeName: "pk",
-          KeyType: "HASH",
+          AttributeName: 'pk',
+          KeyType: 'HASH',
         },
         {
-          AttributeName: "sk",
-          KeyType: "RANGE",
+          AttributeName: 'sk',
+          KeyType: 'RANGE',
         },
       ],
       ProvisionedThroughput: {
@@ -64,25 +64,25 @@ describeIntegration('Dynamodb integration tests', () => {
         WriteCapacityUnits: 1,
       },
     });
-  
+
     console.debug(await dynamoDBClient.send(command));
   });
   test('Add submissions to table', async() => {
     await database.storeSubmission({
       key: 'TDL10.002',
       pdf: 'submission.pdf',
-      userId: '900222670'
+      userId: '900222670',
     });
     expect(await database.storeSubmission({
       key: 'TDL10.001',
       pdf: 'submission.pdf',
-      userId: '900222670'
+      userId: '900222670',
     })).toBeTruthy();
   });
 
   test('Retrieve submission from table', async() => {
     expect(await database.listSubmissions({
-      userId: '900222670'
+      userId: '900222670',
     })).toHaveLength(2);
   });
 
@@ -90,7 +90,7 @@ describeIntegration('Dynamodb integration tests', () => {
     const command = new DeleteTableCommand({
       TableName: tableName,
     });
-  
+
     const response = await dynamoDBClient.send(command);
     return response;
   });

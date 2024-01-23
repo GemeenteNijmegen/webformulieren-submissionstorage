@@ -48,14 +48,14 @@ export class DynamoDBDatabase implements Database {
     const queryCommand = new QueryCommand({
       TableName: this.table,
       ExpressionAttributeNames: {
-        "#pk": "pk",
-    },
+        '#pk': 'pk',
+      },
       ExpressionAttributeValues: {
         ':id': {
-          S: `USER#${hashedId}`
+          S: `USER#${hashedId}`,
         },
       },
-      KeyConditionExpression: '#pk = :id'
+      KeyConditionExpression: '#pk = :id',
     });
     try {
       const results = await this.client.send(queryCommand);
@@ -63,8 +63,8 @@ export class DynamoDBDatabase implements Database {
         return {
           userId: parameters.userId,
           key: item?.sk.S ?? '',
-          pdf: item?.pdfKey.S ?? ''
-        }
+          pdf: item?.pdfKey.S ?? '',
+        };
       }) ?? [];
       return items;
     } catch (err) {
