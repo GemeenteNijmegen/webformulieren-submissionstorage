@@ -126,6 +126,10 @@
       "type": "runtime"
     },
     {
+      "name": "dotenv",
+      "type": "runtime"
+    },
+    {
       "name": "sns-validator",
       "type": "runtime"
     },
