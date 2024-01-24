@@ -1,42 +1,30 @@
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { hashString } from './hash';
 import { s3Object } from './s3Object';
 
-interface SubmissionData {
+export interface SubmissionData {
   userId: string;
   key: string;
   pdf: string;
   attachments?: s3Object[];
 }
 
-export interface Database {
-  storeSubmission(submission: SubmissionData): Promise<boolean>;
+export interface ListSubmissionParameters {
+  userId: string;
 }
 
-export class MockDatabase implements Database {
-  private table;
-
-  constructor(tableName?: string) {
-    this.table = tableName;
-  }
-
-  async storeSubmission(submission: SubmissionData): Promise<any> {
-    const pk = submission.userId;
-    console.debug(`would store object to table ${this.table} with primary key ${pk} and contents`, submission);
-    let item: any = dynamoDBItem(pk, pk, submission);
-    console.debug(JSON.stringify(item, null, 2));
-
-    return true;
-  }
+export interface Database {
+  storeSubmission(submission: SubmissionData): Promise<boolean>;
+  listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]>;
 }
 
 export class DynamoDBDatabase implements Database {
   private table: string;
   private client: DynamoDBClient;
 
-  constructor(tableName: string) {
+  constructor(tableName: string, config?: { dynamoDBClient?: DynamoDBClient }) {
     this.table = tableName;
-    this.client = new DynamoDBClient({});
+    this.client = config?.dynamoDBClient ?? new DynamoDBClient({});
   }
 
   async storeSubmission(submission: SubmissionData): Promise<any> {
@@ -47,16 +35,46 @@ export class DynamoDBDatabase implements Database {
     let item: any = dynamoDBItem(pk, sk, submission);
     console.debug(JSON.stringify(item, null, 2));
     const command = new PutItemCommand({
-      TableName: process.env.TABLE_NAME,
+      TableName: this.table,
       Item: item,
     });
     await this.client.send(command);
-    console.debug(`Stored object to table ${this.table} with primary key ${pk}`);
+    console.debug(`Stored object to table ${this.table} with partition key ${pk}`);
     return true;
+  }
+
+  async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]> {
+    const hashedId = hashString(parameters.userId);
+    const queryCommand = new QueryCommand({
+      TableName: this.table,
+      ExpressionAttributeNames: {
+        '#pk': 'pk',
+      },
+      ExpressionAttributeValues: {
+        ':id': {
+          S: `USER#${hashedId}`,
+        },
+      },
+      KeyConditionExpression: '#pk = :id',
+    });
+    try {
+      const results = await this.client.send(queryCommand);
+      const items = results.Items?.map((item) => {
+        return {
+          userId: parameters.userId,
+          key: item?.sk.S ?? '',
+          pdf: item?.pdfKey.S ?? '',
+        };
+      }) ?? [];
+      return items;
+    } catch (err) {
+      console.error('Error getting data from DynamoDB: ' + err);
+      throw err;
+    }
   }
 }
 
-function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
+export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
   let item: any = {
     pk: { S: pk },
     sk: { S: sk },

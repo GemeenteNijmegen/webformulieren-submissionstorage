@@ -1,4 +1,4 @@
-import { MockStorage } from '../Storage';
+import { MockStorage } from './MockStorage';
 
 const storage = new MockStorage('mockBucketName');
 

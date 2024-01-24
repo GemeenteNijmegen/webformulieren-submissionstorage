@@ -1,8 +1,8 @@
+import { MockDatabase } from './MockDatabase';
+import { MockStorage } from './MockStorage';
 import * as snsSampleAnonymous from './samples/sns.sample-anonymous.json';
 import * as snsSample from './samples/sns.sample.json';
-import { MockDatabase } from '../Database';
 import { MockFormConnector } from '../FormConnector';
-import { MockStorage } from '../Storage';
 import { Submission } from '../Submission';
 
 const messages = snsSample.Records.map(record => record.Sns);

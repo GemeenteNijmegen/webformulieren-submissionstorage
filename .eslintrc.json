@@ -147,6 +147,8 @@
         "devDependencies": [
           "**/test/**",
           "**/build-tools/**",
+          "src/app/get-form-overview/getFormOverview.lambda.ts",
+          "src/app/listSubmissions/listSubmissions.lambda.ts",
           "src/app/submission/submission.lambda.ts"
         ],
         "optionalDependencies": false,

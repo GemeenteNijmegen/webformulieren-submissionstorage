@@ -30,6 +30,7 @@ jspm_packages/
 *.tgz
 .yarn-integrity
 .cache
+src/app/submission/test/docker/
 test-reports/junit.xml
 test/__snapshots__/*
 .env
@@ -37,7 +38,6 @@ test/__snapshots__/*
 .DS_Store
 test/playwright/report
 test/playwright/screenshots
-!/.projenrc.js
 /test-reports/
 junit.xml
 /coverage/
@@ -47,7 +47,6 @@ junit.xml
 !/.github/workflows/release.yml
 !/.github/workflows/upgrade-acceptance.yml
 !/.github/pull_request_template.md
-!/.npmrc
 !/test/
 !/tsconfig.json
 !/tsconfig.dev.json
@@ -60,6 +59,9 @@ junit.xml
 /cdk.out/
 .cdk.staging/
 .parcel-cache/
+!/src/app/get-form-overview/getFormOverview-function.ts
+!/src/app/listSubmissions/listSubmissions-function.ts
 !/src/app/submission/submission-function.ts
 !/.github/workflows/emergency.yml
 !/.github/workflows/auto-merge.yml
+!/.projenrc.js

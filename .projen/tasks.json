@@ -46,7 +46,49 @@
       "description": "Prepare assets",
       "steps": [
         {
+          "spawn": "bundle:app/get-form-overview/getFormOverview.lambda"
+        },
+        {
+          "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
+        },
+        {
           "spawn": "bundle:app/submission/submission.lambda"
+        }
+      ]
+    },
+    "bundle:app/get-form-overview/getFormOverview.lambda": {
+      "name": "bundle:app/get-form-overview/getFormOverview.lambda",
+      "description": "Create a JavaScript bundle from src/app/get-form-overview/getFormOverview.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/get-form-overview/getFormOverview.lambda:watch": {
+      "name": "bundle:app/get-form-overview/getFormOverview.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/get-form-overview/getFormOverview.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:app/listSubmissions/listSubmissions.lambda": {
+      "name": "bundle:app/listSubmissions/listSubmissions.lambda",
+      "description": "Create a JavaScript bundle from src/app/listSubmissions/listSubmissions.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/listSubmissions/listSubmissions.lambda:watch": {
+      "name": "bundle:app/listSubmissions/listSubmissions.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/listSubmissions/listSubmissions.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -159,7 +201,8 @@
       "description": "Runs eslint against the codebase",
       "steps": [
         {
-          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools .projenrc.js"
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern $@ src test build-tools .projenrc.js",
+          "receiveArgs": true
         }
       ]
     },
@@ -299,16 +342,13 @@
       },
       "steps": [
         {
-          "exec": "yarn upgrade npm-check-updates"
-        },
-        {
-          "exec": "npm-check-updates --upgrade --target=minor --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/node,@types/sns-validator,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,aws-sdk-client-mock,esbuild,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,npm-check-updates,projen,standard-version,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/utils,@types/aws-lambda,aws-cdk-lib,axios,constructs,sns-validator,zod"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/node,@types/sns-validator,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,projen,standard-version,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/utils,@types/aws-lambda,aws-cdk-lib,axios,constructs,dotenv,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit npm-check-updates projen standard-version ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-s3 @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios constructs sns-validator zod"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen standard-version ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-s3 @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios constructs dotenv sns-validator zod"
         },
         {
           "exec": "npx projen"
