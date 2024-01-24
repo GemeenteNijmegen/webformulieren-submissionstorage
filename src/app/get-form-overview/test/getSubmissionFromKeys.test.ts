@@ -4,8 +4,7 @@ import { FormOverviewRequestHandler } from '../getFormOverviewRequestHandler';
 
 let mockSearchAllObjectsByShortKey = jest.fn();
 let mockGetBucketObject = jest.fn();
-
-const describeIntegration = process.env.JEST_RUN_INTEGRATION_TESTS ? describe : describe.skip;
+let mockStore = jest.fn();
 
 jest.mock('../../submission/Storage', () => {
 
@@ -14,6 +13,7 @@ jest.mock('../../submission/Storage', () => {
       return {
         searchAllObjectsByShortKey: mockSearchAllObjectsByShortKey,
         getBucketObject: mockGetBucketObject,
+        store: mockStore,
       };
     }),
   };
@@ -24,12 +24,13 @@ jest.mock('../../submission/Storage', () => {
 );
 
 const originalEnv = process.env;
-describeIntegration('getSubmissionFromKeysTests', () => {
+describe('getSubmissionFromKeysTests', () => {
   beforeEach(() => {
     jest.resetModules();
     process.env = {
       ...originalEnv,
       BUCKET_NAME: 'My_mocked_bucketname',
+      DOWNLOAD_BUCKET_NAME: 'My_mocked_downloadbucketname',
     };
   });
   afterEach(() => {
