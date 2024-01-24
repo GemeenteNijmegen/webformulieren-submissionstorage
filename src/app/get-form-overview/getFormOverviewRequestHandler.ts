@@ -5,6 +5,7 @@ import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
   private storage!: Storage;
+  private downloadStorage!: Storage;
   private searchKey = 'PU2';
 
   constructor() {
@@ -19,10 +20,11 @@ export class FormOverviewRequestHandler {
    * storage and database objects to pass to handler.
    */
   private setup() {
-    if (process.env.BUCKET_NAME == undefined) {
+    if (process.env.BUCKET_NAME == undefined || process.env.DOWNLOAD_BUCKET_NAME == undefined) {
       throw Error('No bucket NAME provided, retrieving forms will fail');
     }
     this.storage = new S3Storage(process.env.BUCKET_NAME);
+    this.downloadStorage = new S3Storage(process.env.DOWNLOAD_BUCKET_NAME);
   }
 
   async handleRequest(message: any): Promise<APIGatewayProxyResult> {
@@ -31,7 +33,7 @@ export class FormOverviewRequestHandler {
     const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
     const bucketObjects = await this.getSubmissionsFromKeys(allKeys);
     const csvFile: string = await this.compileCsvFile(bucketObjects);
-    console.log('csv', csvFile);
+    await this.downloadStorage.store('referendumFormOverview.csv', csvFile);
     return {
       statusCode: 200,
       body: csvFile,
@@ -51,6 +53,7 @@ export class FormOverviewRequestHandler {
       for ( const key of allKeys) {
         const bucketObject = await this.storage.getBucketObject(key);
         if (!!bucketObject) {bucketObjects.push(bucketObject);} else {
+          console.log('Got getBucketObject with key ', key);
           failedGetBucketKeys.push(key);
         }
       }
@@ -72,8 +75,10 @@ export class FormOverviewRequestHandler {
         const formData = JSON.parse(jsonData.Message);
 
         if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
+
           const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
           const adresGegevens = formData.brpData.Persoon.Adres;
+          console.log('Parsing csv for object', persoonsGegevens.Naam);
           const csvData = [
             jsonData.Timestamp,
             formData.bsn,
