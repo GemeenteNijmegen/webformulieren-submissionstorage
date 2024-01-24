@@ -46,15 +46,17 @@ export class FormOverviewRequestHandler {
 
   async getSubmissionsFromKeys(allKeys: string[]): Promise<GetObjectCommandOutput[]> {
     const bucketObjects: GetObjectCommandOutput[] = [];
+    const failedGetBucketKeys = [];
     if (allKeys.length > 0) {
       for ( const key of allKeys) {
         const bucketObject = await this.storage.getBucketObject(key);
         if (!!bucketObject) {bucketObjects.push(bucketObject);} else {
-          console.log('Formulier bestand niet opgehaald uit bucket met key: ', key);
+          failedGetBucketKeys.push(key);
         }
       }
 
     }
+    console.log('[getSubmissionsFromKeys] getBucketObject calls that failed. Count: ', failedGetBucketKeys.length, ' Keys of failed calls: ', failedGetBucketKeys);
     return bucketObjects;
   }
 
@@ -62,7 +64,7 @@ export class FormOverviewRequestHandler {
     const csvArray = [];
     const csvHeaders = ['Tijd', 'BSN', 'Naam', 'Voornamen', 'Achternaam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats', 'Adres'];
     csvArray.push(csvHeaders);
-
+    const failedCsvProcessing = [];
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
@@ -86,10 +88,10 @@ export class FormOverviewRequestHandler {
           ];
           csvArray.push(csvData);
         } else {
-          console.log('Formulier niet verwerkt. FormTypeId: ', formData.formTypeId, ' brpDataObject: ', formData.brpData);
+          failedCsvProcessing.push(`FormTypeId: ${formData.formTypeId} brpDataObject: ${formData.brpData}`);
         }
       } else {
-        //lege body
+        failedCsvProcessing.push(`Geen body. Mogelijk metadata requestId: ${bucketObject.$metadata.requestId}`);
       }
     }
     let csvContent: string = '';
@@ -97,7 +99,9 @@ export class FormOverviewRequestHandler {
     csvArray.forEach(row => {
       csvContent += row.join(',') + '\n';
     });
-    console.log('CsvContent: ', csvContent);
+    console.log('Aantal verwerkte csv rijen: ', (csvArray.length - 1));
+    console.log('Failed csv transformations. Count: ', failedCsvProcessing.length, ' Objects failed: ', failedCsvProcessing);
+
     return csvContent;
 
   }
