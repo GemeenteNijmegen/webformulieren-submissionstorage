@@ -1,8 +1,11 @@
-import { Blob } from 'buffer';
+
+import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
+import { APIGatewayProxyResult } from 'aws-lambda';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
   private storage!: Storage;
+  private downloadStorage!: Storage;
   private searchKey = 'PU2';
 
   constructor() {
@@ -17,63 +20,95 @@ export class FormOverviewRequestHandler {
    * storage and database objects to pass to handler.
    */
   private setup() {
-    if (process.env.BUCKET_NAME == undefined) {
+    if (process.env.BUCKET_NAME == undefined || process.env.DOWNLOAD_BUCKET_NAME == undefined) {
       throw Error('No bucket NAME provided, retrieving forms will fail');
     }
     this.storage = new S3Storage(process.env.BUCKET_NAME);
+    this.downloadStorage = new S3Storage(process.env.DOWNLOAD_BUCKET_NAME);
   }
 
-  async handleRequest(message: any) {
+  async handleRequest(message: any): Promise<APIGatewayProxyResult> {
     console.log(`Message not used yet ${message}, using constant searchKey ${this.searchKey}`);
     const storage = this.storage;
     const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
-    await this.getSubmissionsFromKeys(allKeys);
+    const bucketObjects = await this.getSubmissionsFromKeys(allKeys);
+    const csvFile: string = await this.compileCsvFile(bucketObjects);
+    await this.downloadStorage.store('referendumFormOverview.csv', csvFile);
+    return {
+      statusCode: 200,
+      body: csvFile,
+      headers: {
+        'Content-type': 'text/csv',
+        'Content-Disposition': 'attachment;filename=referendumFormOverview.csv',
+      },
+    };
+
+
   }
 
-  async getSubmissionsFromKeys(allKeys: string[]) {
-    //TODO: verwerken CSV en foutmeldingen groeperen in andere functie
-    //TODO: zoekterm en op te halen velden flexibel maken
+  async getSubmissionsFromKeys(allKeys: string[]): Promise<GetObjectCommandOutput[]> {
+    const bucketObjects: GetObjectCommandOutput[] = [];
+    const failedGetBucketKeys = [];
     if (allKeys.length > 0) {
-      const csvArray = [];
-      const csvHeaders = ['Tijd', 'BSN', 'Naam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats'];
-      csvArray.push(csvHeaders);
       for ( const key of allKeys) {
         const bucketObject = await this.storage.getBucketObject(key);
-        if (!!bucketObject?.Body) {
-          const bodyString = await bucketObject.Body.transformToString();
-          const jsonData = JSON.parse(bodyString);
-          const formData = JSON.parse(jsonData.Message);
-          if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
-            const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
-            const adresGegevens = formData.brpData.Persoon.Adres;
-            const csvData = [
-              //TODO: datum omzetten naar Nederlands leesbaar formaat
-              jsonData.Timestamp,
-              formData.bsn,
-              persoonsGegevens.Naam,
-              persoonsGegevens.Geboortedatum,
-              persoonsGegevens.NederlandseNationaliteit,
-              adresGegevens.Gemeente,
-              adresGegevens.Woonplaats,
-            ];
-            csvArray.push(csvData);
-          } else {
-            console.log('Formulier niet verwerkt. FormTypeId: ', formData.formTypeId, ' brpDataObject: ', formData.brpData);
-          }
-        } else {
-          console.log('Formulier bestand niet opgehaald uit bucket met key: ', key);
+        if (!!bucketObject) {bucketObjects.push(bucketObject);} else {
+          console.log('Got getBucketObject with key ', key);
+          failedGetBucketKeys.push(key);
         }
       }
 
-      let csvContent = '';
-
-      csvArray.forEach(row => {
-        csvContent += row.join(',') + '\n';
-      });
-      console.log('CsvContent: ', csvContent);
-      //TODO: returning as file
-      // const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8,' });
     }
+    console.log('[getSubmissionsFromKeys] getBucketObject calls that failed. Count: ', failedGetBucketKeys.length, ' Keys of failed calls: ', failedGetBucketKeys);
+    return bucketObjects;
+  }
+
+  async compileCsvFile(bucketObjects: GetObjectCommandOutput[]): Promise<string> {
+    const csvArray = [];
+    const csvHeaders = ['Tijd', 'BSN', 'Naam', 'Voornamen', 'Achternaam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats', 'Adres'];
+    csvArray.push(csvHeaders);
+    const failedCsvProcessing = [];
+    for (const bucketObject of bucketObjects) {
+      if (bucketObject.Body) {
+        const bodyString = await bucketObject.Body.transformToString();
+        const jsonData = JSON.parse(bodyString);
+        const formData = JSON.parse(jsonData.Message);
+
+        if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
+
+          const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
+          const adresGegevens = formData.brpData.Persoon.Adres;
+          console.log('Parsing csv for object', persoonsGegevens.Naam);
+          const csvData = [
+            jsonData.Timestamp,
+            formData.bsn,
+            persoonsGegevens.Naam,
+            persoonsGegevens.Voornamen,
+            persoonsGegevens.Achternaam,
+            persoonsGegevens.Geboortedatum,
+            persoonsGegevens.NederlandseNationaliteit,
+            adresGegevens.Gemeente,
+            adresGegevens.Woonplaats,
+            `${adresGegevens.Straat} ${adresGegevens.Huisnummer} ${adresGegevens.Postcode}`,
+          ];
+          csvArray.push(csvData);
+        } else {
+          failedCsvProcessing.push(`FormTypeId: ${formData.formTypeId} brpDataObject: ${formData.brpData}`);
+        }
+      } else {
+        failedCsvProcessing.push(`Geen body. Mogelijk metadata requestId: ${bucketObject.$metadata.requestId}`);
+      }
+    }
+    let csvContent: string = '';
+
+    csvArray.forEach(row => {
+      csvContent += row.join(',') + '\n';
+    });
+    console.log('Aantal verwerkte csv rijen: ', (csvArray.length - 1));
+    console.log('Failed csv transformations. Count: ', failedCsvProcessing.length, ' Objects failed: ', failedCsvProcessing);
+
+    return csvContent;
+
   }
 
 }
