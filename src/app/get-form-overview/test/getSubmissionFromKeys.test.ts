@@ -5,6 +5,8 @@ import { FormOverviewRequestHandler } from '../getFormOverviewRequestHandler';
 let mockSearchAllObjectsByShortKey = jest.fn();
 let mockGetBucketObject = jest.fn();
 
+const describeIntegration = process.env.JEST_RUN_INTEGRATION_TESTS ? describe : describe.skip;
+
 jest.mock('../../submission/Storage', () => {
 
   return {
@@ -22,7 +24,7 @@ jest.mock('../../submission/Storage', () => {
 );
 
 const originalEnv = process.env;
-describe('getSubmissionFromKeysTests', () => {
+describeIntegration('getSubmissionFromKeysTests', () => {
   beforeEach(() => {
     jest.resetModules();
     process.env = {

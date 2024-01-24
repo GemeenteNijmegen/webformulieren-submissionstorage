@@ -38,6 +38,25 @@ export class StorageStack extends Stack {
     this.addArnToParameterStore('bucketParam', bucket.bucketArn, Statics.ssmSubmissionBucketArn);
     this.addArnToParameterStore('bucketNameParam', bucket.bucketName, Statics.ssmSubmissionBucketName);
 
+    /**
+     * This bucket will receive submission attachments
+     * (Submission PDF, uploads) for each submission.
+     */
+    const downloadBucket = new Bucket(this, 'downloads', {
+      eventBridgeEnabled: true,
+      enforceSSL: true,
+      encryption: BucketEncryption.KMS,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED,
+      lifecycleRules: [
+        {
+          expiration: Duration.days(365),
+        },
+      ],
+      encryptionKey: key,
+    });
+    this.addArnToParameterStore('downloadBucketParam', downloadBucket.bucketArn, Statics.ssmDownloadBucketArn);
+    this.addArnToParameterStore('downloadBucketNameParam', downloadBucket.bucketName, Statics.ssmDownloadBucketName);
+
     const table = new Table(this, 'submissions', {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },

@@ -45,9 +45,22 @@ export class ApiStack extends Stack {
       encryptionKey: key,
     });
 
+    const downloadBucket = Bucket.fromBucketAttributes(this, 'downloadBucket', {
+      bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmDownloadBucketArn),
+      encryptionKey: key,
+    });
 
-    const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', { environment: { BUCKET_NAME: storageBucket.bucketName }, timeout: Duration.minutes(5) });
+
+    const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', {
+      environment: {
+        BUCKET_NAME: storageBucket.bucketName,
+        DOWNLOAD_BUCKET_NAME: downloadBucket.bucketName,
+      },
+      timeout: Duration.minutes(10),
+      memorySize: 1024,
+    });
     storageBucket.grantRead(formOverviewFunction);
+    downloadBucket.grantReadWrite(formOverviewFunction);
 
     const formOverviewApi = this.api.root.addResource('formoverview');
     formOverviewApi.addMethod('GET', new LambdaIntegration(formOverviewFunction), {
