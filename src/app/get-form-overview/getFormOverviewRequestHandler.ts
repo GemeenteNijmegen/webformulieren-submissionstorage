@@ -1,5 +1,6 @@
 
 import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
+import { APIGatewayProxyResult } from 'aws-lambda';
 import { S3Storage, Storage } from '../submission/Storage';
 
 export class FormOverviewRequestHandler {
@@ -24,7 +25,7 @@ export class FormOverviewRequestHandler {
     this.storage = new S3Storage(process.env.BUCKET_NAME);
   }
 
-  async handleRequest(message: any) {
+  async handleRequest(message: any): Promise<APIGatewayProxyResult> {
     console.log(`Message not used yet ${message}, using constant searchKey ${this.searchKey}`);
     const storage = this.storage;
     const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
@@ -33,7 +34,7 @@ export class FormOverviewRequestHandler {
     console.log('csv', csvFile);
     return {
       statusCode: 200,
-      csvFile,
+      body: csvFile,
       headers: {
         'Content-type': 'text/csv',
         'Content-Disposition': 'attachment;filename=referendumFormOverview.csv',
