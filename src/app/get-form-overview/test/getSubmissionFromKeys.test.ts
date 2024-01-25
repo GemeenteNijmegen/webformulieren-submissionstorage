@@ -4,7 +4,7 @@ import { FormOverviewRequestHandler } from '../getFormOverviewRequestHandler';
 
 let mockSearchAllObjectsByShortKey = jest.fn();
 let mockGetBucketObject = jest.fn();
-let mockStore = jest.fn();
+let mockStore = jest.fn().mockReturnValue(true);
 
 jest.mock('../../submission/Storage', () => {
 
