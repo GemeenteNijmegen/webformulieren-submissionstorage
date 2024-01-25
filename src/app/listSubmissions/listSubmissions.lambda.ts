@@ -8,7 +8,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGateway
   try {
     const params = parsedEvent(event);
     const requestHandler = new ListSubmissionsRequestHandler();
-    return requestHandler.handleRequest(params);
+    return await requestHandler.handleRequest(params);
   } catch (error: any) {
     console.error(error);
     return Response.error(400);
