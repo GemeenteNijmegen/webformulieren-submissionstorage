@@ -119,12 +119,12 @@ class ListSubmissionsLambda extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const table = Table.fromTableName(this, 'table', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName));
-    this.lambda = new ListSubmissionsFunction(this, 'list-submissions', {
-      environment: {
-        TABLE_NAME: table.tableName,
-      },
+    const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
+    const table = Table.fromTableAttributes(this, 'table', {
+      tableName: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName),
+      encryptionKey: key,
     });
+    this.lambda = new ListSubmissionsFunction(this, 'list-submissions');
     table.grantReadData(this.lambda);
   }
 }
