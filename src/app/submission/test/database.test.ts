@@ -1,8 +1,7 @@
 import { CreateTableCommand, DeleteTableCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { MockDatabase } from './MockDatabase';
+import { describeIntegration } from '../../test-utils/describeIntegration';
 import { DynamoDBDatabase } from '../Database';
-
-const describeIntegration = process.env.JEST_RUN_INTEGRATION_TESTS ? describe : describe.skip;
 
 describe('Save object', () => {
   test('Creating database object', async () => {
