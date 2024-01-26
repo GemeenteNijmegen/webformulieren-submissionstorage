@@ -16,8 +16,7 @@ export interface Storage {
     sourceRegion: string,
     destinationKey: string
   ): Promise<boolean>;
-  get(bucket: string, key: string): Promise<boolean>;
-  getBucketObject(key: string): Promise<GetObjectCommandOutput| undefined>;
+  get(key: string): Promise<GetObjectCommandOutput| undefined>;
   searchAllObjectsByShortKey(searchKey: string): Promise<string[]>;
 }
 
@@ -52,25 +51,7 @@ export class S3Storage implements Storage {
     return true;
   }
 
-  public async get(bucket: string, key: string) {
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    });
-    try {
-      const object = await this.s3Client.send(command);
-      console.debug(
-        `successfully got ${object} of size ${object.Body?.transformToByteArray.length}`,
-      );
-      return true;
-    } catch (err) {
-      console.error(err);
-    }
-    return false;
-  }
-
-  public async getBucketObject( key: string): Promise<GetObjectCommandOutput | undefined > {
-
+  public async get( key: string): Promise<GetObjectCommandOutput | undefined > {
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,

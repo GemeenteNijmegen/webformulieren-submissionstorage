@@ -43,23 +43,17 @@ export class FormOverviewRequestHandler {
       },
     };
 
-
   }
 
   async getSubmissionsFromKeys(allKeys: string[]): Promise<GetObjectCommandOutput[]> {
-    const bucketObjects: GetObjectCommandOutput[] = [];
-    const failedGetBucketKeys = [];
+    const getObjectPromises: Promise<any>[] = [];
+    let bucketObjects: GetObjectCommandOutput[] = [];
     if (allKeys.length > 0) {
       for ( const key of allKeys) {
-        const bucketObject = await this.storage.getBucketObject(key);
-        if (!!bucketObject) {bucketObjects.push(bucketObject);} else {
-          console.log('Got getBucketObject with key ', key);
-          failedGetBucketKeys.push(key);
-        }
+        getObjectPromises.push(this.storage.get(key));
       }
-
+      bucketObjects = await Promise.all(getObjectPromises);
     }
-    console.log('[getSubmissionsFromKeys] getBucketObject calls that failed. Count: ', failedGetBucketKeys.length, ' Keys of failed calls: ', failedGetBucketKeys);
     return bucketObjects;
   }
 

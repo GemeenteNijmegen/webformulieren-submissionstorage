@@ -8,7 +8,7 @@ export class MockStorage implements Storage {
   constructor(bucket?: string) {
     this.bucket = bucket;
   }
-  getBucketObject(key: string): Promise<GetObjectCommandOutput | undefined> {
+  get(key: string): Promise<GetObjectCommandOutput | undefined> {
     throw new Error(`MockStorage with ${key}`);
   }
   searchAllObjectsByShortKey(searchKey: string): Promise<string[]> {
