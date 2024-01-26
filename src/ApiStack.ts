@@ -1,11 +1,13 @@
 
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { GetFormOverviewFunction } from './app/get-form-overview/getFormOverview-function';
+import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
 import { Configurable } from './Configuration';
 import { Statics } from './statics';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
@@ -44,6 +46,15 @@ export class ApiStack extends Stack {
       // },
     });
 
+    const listSubmissionsFunction = new ListSubmissionsLambda(this, 'listsubmissions');
+    const listSubmissionsEndpoint = api.root.addResource('submissions');
+    listSubmissionsEndpoint.addMethod('GET', new LambdaIntegration(listSubmissionsFunction.lambda), {
+      apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.user_id': true,
+        'method.request.querystring.user_type': true,
+      },
+    });
   }
 
   private createApi() {
@@ -99,5 +110,17 @@ export class ApiStack extends Stack {
     storageBucket.grantRead(formOverviewFunction);
     downloadBucket.grantReadWrite(formOverviewFunction);
     return formOverviewFunction;
+  }
+}
+
+
+class ListSubmissionsLambda extends Construct {
+  lambda: ListSubmissionsFunction;
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+
+    const table = Table.fromTableName(this, 'table', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName));
+    this.lambda = new ListSubmissionsFunction(this, 'list-submissions');
+    table.grantReadData(this.lambda);
   }
 }
