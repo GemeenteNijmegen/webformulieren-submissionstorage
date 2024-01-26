@@ -3,7 +3,7 @@ import { S3Storage } from '../../submission/Storage';
 import { FormOverviewRequestHandler } from '../getFormOverviewRequestHandler';
 
 let mockSearchAllObjectsByShortKey = jest.fn();
-let mockGetBucketObject = jest.fn();
+let mockGetBucketObjects = jest.fn();
 let mockStore = jest.fn().mockReturnValue(true);
 
 jest.mock('../../submission/Storage', () => {
@@ -12,7 +12,7 @@ jest.mock('../../submission/Storage', () => {
     S3Storage: jest.fn(() => {
       return {
         searchAllObjectsByShortKey: mockSearchAllObjectsByShortKey,
-        getBucketObject: mockGetBucketObject,
+        getBatch: mockGetBucketObjects,
         store: mockStore,
       };
     }),
@@ -47,14 +47,14 @@ describe('getSubmissionFromKeysTests', () => {
       'PU219.892/submission.json',
     ];
     mockSearchAllObjectsByShortKey.mockResolvedValue(expectedObjectKeys);
-    mockGetBucketObject.mockReturnValueOnce( {
+    mockGetBucketObjects.mockReturnValueOnce( [{
       Body: {
         transformToString:
-         () => { return JSON.stringify(FORM_FILE_MOCK_WITH_BRP_FORM_REFERENDUM_01); },
+          () => { return JSON.stringify(FORM_FILE_MOCK_WITH_BRP_FORM_REFERENDUM_01); },
       },
-    })
-      .mockReturnValueOnce({ Body: { transformToString: () => { return JSON.stringify(FORM_FILE_MOCK_WITH_BRP_NOT_FORM_REFERENDUM_02); } } })
-      .mockReturnValueOnce({ Body: { transformToString: () => { return JSON.stringify(FORM_FILE_MOCK_WITHOUT_BRP_WITH_REFERENDUM_03); } } });
+    },
+    { Body: { transformToString: () => { return JSON.stringify(FORM_FILE_MOCK_WITH_BRP_NOT_FORM_REFERENDUM_02); } } },
+    { Body: { transformToString: () => { return JSON.stringify(FORM_FILE_MOCK_WITHOUT_BRP_WITH_REFERENDUM_03); } } }]);
 
 
     const formOverviewRequestHandler = new FormOverviewRequestHandler();
