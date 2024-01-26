@@ -46,15 +46,7 @@ export class FormOverviewRequestHandler {
   }
 
   async getSubmissionsFromKeys(allKeys: string[]): Promise<GetObjectCommandOutput[]> {
-    const getObjectPromises: Promise<any>[] = [];
-    let bucketObjects: GetObjectCommandOutput[] = [];
-    if (allKeys.length > 0) {
-      for ( const key of allKeys) {
-        getObjectPromises.push(this.storage.get(key));
-      }
-      bucketObjects = await Promise.all(getObjectPromises);
-    }
-    return bucketObjects;
+    return this.storage.getBatch(allKeys);
   }
 
   async compileCsvFile(bucketObjects: GetObjectCommandOutput[]): Promise<string> {
@@ -62,6 +54,7 @@ export class FormOverviewRequestHandler {
     const csvHeaders = ['Tijd', 'BSN', 'Naam', 'Voornamen', 'Achternaam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats', 'Adres'];
     csvArray.push(csvHeaders);
     const failedCsvProcessing = [];
+    console.debug('objects', bucketObjects);
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
@@ -72,7 +65,7 @@ export class FormOverviewRequestHandler {
 
           const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
           const adresGegevens = formData.brpData.Persoon.Adres;
-          console.log('Parsing csv for object', persoonsGegevens.Naam);
+          console.log('Parsing csv for object', formData.reference);
           const csvData = [
             jsonData.Timestamp,
             formData.bsn,
@@ -87,7 +80,7 @@ export class FormOverviewRequestHandler {
           ];
           csvArray.push(csvData);
         } else {
-          failedCsvProcessing.push(`FormTypeId: ${formData.formTypeId} brpDataObject: ${formData.brpData}`);
+          failedCsvProcessing.push(`${formData.reference}: FormTypeId: ${formData.formTypeId}, Has BRP Data: ${formData.brpData ? 'yes' : 'no'}`);
         }
       } else {
         failedCsvProcessing.push(`Geen body. Mogelijk metadata requestId: ${bucketObject.$metadata.requestId}`);

@@ -17,6 +17,7 @@ export interface Storage {
     destinationKey: string
   ): Promise<boolean>;
   get(key: string): Promise<GetObjectCommandOutput| undefined>;
+  getBatch( keys: string[]): Promise<GetObjectCommandOutput[]>;
   searchAllObjectsByShortKey(searchKey: string): Promise<string[]>;
 }
 
@@ -27,9 +28,9 @@ export class S3Storage implements Storage {
     default: new S3Client({}),
   };
 
-  constructor(bucket: string) {
+  constructor(bucket: string, config?: { client?: S3Client }) {
     this.bucket = bucket;
-    this.s3Client = new S3Client({});
+    this.s3Client = config?.client ?? new S3Client({});
   }
 
   public async store(key: string, contents: string) {
@@ -47,6 +48,7 @@ export class S3Storage implements Storage {
       console.debug(`successfully stored ${key}`);
     } catch (err) {
       console.error(err);
+      return false;
     }
     return true;
   }
@@ -60,9 +62,21 @@ export class S3Storage implements Storage {
       const bucketObject = await this.s3Client.send(command);
       return bucketObject;
     } catch (err) {
-      console.error('getBucketObject send error: ', err);
+      console.error(`getBucketObject failed for key ${key} with error: `, err);
       return undefined;
     }
+  }
+
+  public async getBatch( keys: string[]): Promise<GetObjectCommandOutput[]> {
+    const promises = keys.map((key) => this.get(key));
+    const results = await Promise.allSettled(promises);
+    const bucketObjects = (results.filter((result, index) => {
+      if (result.status == 'rejected') {
+        console.log(`object ${keys[index]} in batch failed: ${result.reason}`);
+      }
+      return result.status == 'fulfilled' && result.value;
+    }) as PromiseFulfilledResult<GetObjectCommandOutput>[]);
+    return bucketObjects.map(bucketObject => bucketObject.value);
   }
 
   public async copy(

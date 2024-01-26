@@ -8,15 +8,18 @@ export class MockStorage implements Storage {
   constructor(bucket?: string) {
     this.bucket = bucket;
   }
-  get(key: string): Promise<GetObjectCommandOutput | undefined> {
-    throw new Error(`MockStorage with ${key}`);
-  }
+
   searchAllObjectsByShortKey(searchKey: string): Promise<string[]> {
     throw new Error(`MockStorage with ${searchKey}`);
   }
-  public async get(bucket: string, key: string) {
-    console.debug(`would get ${key} from ${bucket}`);
-    return true;
+
+  public async get(key: string): Promise<GetObjectCommandOutput | undefined> {
+    console.debug(`would get ${key} from ${this.bucket}`);
+    return {} as GetObjectCommandOutput;
+  }
+  public async getBatch(keys: string[]): Promise<GetObjectCommandOutput[]> {
+    console.debug(`would get ${keys.length} objects from ${this.bucket}`);
+    return [] as GetObjectCommandOutput[];
   }
 
   public async store(key: string, contents: string) {
