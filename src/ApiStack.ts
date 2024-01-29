@@ -124,7 +124,12 @@ class ListSubmissionsLambda extends Construct {
       tableName: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName),
       encryptionKey: key,
     });
-    this.lambda = new ListSubmissionsFunction(this, 'list-submissions');
+    this.lambda = new ListSubmissionsFunction(this, 'list-submissions', {
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
     table.grantReadData(this.lambda);
+    key.grantDecrypt(this.lambda);
   }
 }
