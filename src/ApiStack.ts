@@ -119,7 +119,7 @@ class ListSubmissionsLambda extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
+    const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
     const table = Table.fromTableAttributes(this, 'table', {
       tableName: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName),
       encryptionKey: key,
@@ -130,6 +130,5 @@ class ListSubmissionsLambda extends Construct {
       },
     });
     table.grantReadData(this.lambda);
-    key.grantDecrypt(this.lambda);
   }
 }
