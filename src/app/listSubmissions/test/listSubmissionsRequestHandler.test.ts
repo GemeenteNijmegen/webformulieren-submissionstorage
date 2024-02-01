@@ -1,16 +1,44 @@
+import * as snsSample from '../../submission/test/samples/sns.sample.json';
 import { ListSubmissionsRequestHandler } from '../ListSubmissionsRequestHandler';
 
-const expectedResults = {
-  key: 'TDL01.001',
-  pdf: 'TDL01.001/submission.pdf',
-};
+const listResults = [{
+  key: 'TDL17.957',
+  pdf: 'TDL17.957/submission.pdf',
+}];
+
+const expectedListResults = [{
+  key: 'TDL17.957',
+  pdf: 'TDL17.957/submission.pdf',
+  formName: 'test',
+  date: '2024-03-01T15:35:55.229Z',
+}];
+
+const getObjectMock = (file:any) => ({
+  Body: {
+    // Stringify the file to simulate the AWS getObject response
+    transformToString: () => Promise.resolve(JSON.stringify(file)),
+  },
+});
+
 jest.mock('../../submission/Database', () => {
 
   return {
     DynamoDBDatabase: jest.fn(() => {
       return {
         listSubmissions: async () => {
-          return expectedResults;
+          return listResults;
+        },
+      };
+    }),
+  };
+});
+
+jest.mock('../../submission/Storage', () => {
+  return {
+    S3Storage: jest.fn(() => {
+      return {
+        getBatch: async () => {
+          return [getObjectMock(snsSample)];
         },
       };
     }),
@@ -23,6 +51,7 @@ beforeAll(() => {
   process.env = {
     ...originalEnv,
     TABLE_NAME: 'mock_table',
+    BUCKET_NAME: 'mock_bucket',
   };
   handler = new ListSubmissionsRequestHandler();
 });
@@ -30,7 +59,7 @@ beforeAll(() => {
 describe('Request Handler', () => {
   test('Handler correctly returns', async() => {
     const result = await handler.handleRequest({ userId: '900222670', userType: 'person' });
-    expect(result.body).toBe(JSON.stringify(expectedResults));
+    expect(result.body).toBe(JSON.stringify(expectedListResults));
   });
 
 });
