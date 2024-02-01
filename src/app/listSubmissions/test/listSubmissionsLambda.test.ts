@@ -215,11 +215,11 @@ jest.mock('../../submission/Database', () => {
     DynamoDBDatabase: jest.fn(() => {
       return {
         listSubmissions: async () => {
-          const results = {
+          const results = [{
             userId: '900222670',
             key: 'TDL01.001',
             pdf: 'TDL01.001/submission.pdf',
-          };
+          }];
           return results;
         },
       };
@@ -232,6 +232,7 @@ beforeAll(() => {
   process.env = {
     ...originalEnv,
     TABLE_NAME: 'mock_table',
+    BUCKET_NAME: 'mock_bucket',
   };
 });
 
