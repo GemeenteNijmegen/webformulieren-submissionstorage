@@ -12,7 +12,6 @@ export const SubmissionSchema = z.object({
   appId: z.string(),
   reference: z.string(),
   data: z.object({
-    kenmerk: z.string(),
     naamIngelogdeGebruiker: z.string().optional(),
   }).passthrough(),
   employeeData: z.any(),
