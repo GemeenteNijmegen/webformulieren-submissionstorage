@@ -11,7 +11,7 @@ describe('Storage methods', () => {
   });
 
   test('Copy method returns succesfully', async () => {
-    expect(await storage.copy('somebucket', 'somekey', 'eu-west-1', 'somekey')).toBeTruthy();
+    expect(await storage.copy('somebucket', 'somekey', 'eu-central-1', 'somekey')).toBeTruthy();
   });
 
   test('Get method returns succesfully', async () => {
