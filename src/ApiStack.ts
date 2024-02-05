@@ -138,5 +138,6 @@ class ListSubmissionsLambda extends Construct {
       },
     });
     table.grantReadData(this.lambda);
+    storageBucket.grantRead(this.lambda);
   }
 }
