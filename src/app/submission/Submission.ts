@@ -43,7 +43,8 @@ export class Submission {
     try {
       this.parsedSubmission = SubmissionSchema.passthrough().parse(contents);
     } catch (error) {
-      throw Error(`Could not parse form submission: ${contents?.reference}`);
+      console.error(`Could not parse form submission: ${contents?.reference}`);
+      throw error;
     }
     this.bsn = this.parsedSubmission.bsn;
     this.kvk = this.parsedSubmission.kvk;
