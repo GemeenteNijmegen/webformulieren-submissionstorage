@@ -1,0 +1,27 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:eu-central-1:338472043295:eform-submissions:dfa680c1-1596-48cf-845e-42c3e8c7dda0",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "98b2ef62-1a5f-5a5c-9fcb-b157631f3cb1",
+        "TopicArn": "arn:aws:sns:eu-central-1:338472043295:eform-submissions",
+        "Subject": null,
+        "Message": "{\"uuid\":\"bfb38183-357b-4783-b8b5-659c7313d68d\",\"appId\":\"VKZ-Betaling\",\"reference\":\"VKZ25.151\",\"formTitle\":\"aanmeldenpolitiekepartij\",\"amount\":112.5,\"validTill\":[2024,2,3,2,47,13,907278222],\"type\":\"form\",\"secured\":false}",
+        "Timestamp": "2024-02-01T10:48:32.916Z",
+        "SignatureVersion": "1",
+        "Signature": "kG1p+08jck3k0ET9Y9bu+6nWIzhq47nHfBt3gKzXlB/QbgN8DtugnWCukdov4roG2jqCLSbv6TbXxQ1LOv2c5KkLQknlj/SGvJwIMqAK2uumrIUGrmVh7V8QPh4dcc3MIcFOqux5iAiTCYEiitjuY9q+1XUguLHBoWkQI2sNFZE/XU2lHSnBRRW3Nk5DWZqqC+BC0kRr80Ni4y/HxbEOJPgimolpqi85cmtSJEmIDgIniITIdAgHQ2rbwEz2/ketAsia6HnL9272IxtX2VYkE9YwtnQcC36Q4seWlQkyeoEl3vuCHihjiz6tJqAlX1EVi4iFCdlV9DUGtS40cFTv3A==",
+        "SigningCertUrl": "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-60eadc530605d63b8e62a523676ef735.pem",
+        "UnsubscribeUrl": "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:338472043295:eform-submissions:dfa680c1-1596-48cf-845e-42c3e8c7dda0",
+        "MessageAttributes": {
+          "AppId": {
+            "Type": "String",
+            "Value": "VKZ-Betaling"
+          }
+        }
+      }
+    }
+  ]
+}

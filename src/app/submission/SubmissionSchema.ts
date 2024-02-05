@@ -5,6 +5,7 @@ export const s3ObjectSchema = z.object({
   key: z.string(),
   originalName: z.string().optional(),
 });
+
 export const SubmissionSchema = z.object({
   formId: z.string(),
   formTypeId: z.string(),
@@ -22,4 +23,10 @@ export const SubmissionSchema = z.object({
   }),
   bsn: z.string().optional(),
   kvk: z.string().optional(),
+});
+
+export const SubmissionPaymentSchema = z.object({
+  appId: z.string(),
+  reference: z.string(),
+  amount: z.number(),
 });

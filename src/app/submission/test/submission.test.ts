@@ -1,6 +1,7 @@
 import { MockDatabase } from './MockDatabase';
 import { MockStorage } from './MockStorage';
 import * as snsSampleAnonymous from './samples/sns.sample-anonymous.json';
+import * as snsSamplePayment from './samples/sns.sample-payment.json';
 import * as snsSample from './samples/sns.sample.json';
 import { MockFormConnector } from '../FormConnector';
 import { Submission } from '../Submission';
@@ -32,6 +33,17 @@ describe('Submission parsing', () => {
     const anonSubmission = new Submission({ storage, formConnector, database });
     await anonSubmission.parse(anonMessage);
     expect(anonSubmission.isAnonymous()).toBe(true);
+  });
+
+  test('Message for payment is rejected', async () => {
+    const messagesPayment = snsSamplePayment.Records.map(record => record.Sns);
+    const messagePayment = messagesPayment.pop();
+    const paymentMessage = JSON.parse(JSON.stringify(messagePayment));
+    const paymentSubmission = new Submission({ storage, formConnector, database });
+
+    await expect(async () => {
+      await paymentSubmission.parse(paymentMessage);
+    }).rejects.toThrow();
   });
 
   test('Invalid message throws', async () => {

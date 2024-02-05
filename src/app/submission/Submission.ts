@@ -4,7 +4,7 @@ import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 import { s3Object } from './s3Object';
 import { Storage } from './Storage';
-import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
+import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
@@ -43,8 +43,18 @@ export class Submission {
     try {
       this.parsedSubmission = SubmissionSchema.passthrough().parse(contents);
     } catch (error) {
-      console.error(`Could not parse form submission: ${contents?.reference}`);
-      throw error;
+      try {
+        const payment = SubmissionPaymentSchema.passthrough().parse(contents);
+        console.error(`Submission was a payment for ${payment.appId}`);
+        throw new Error(`Submission was a payment for ${payment.appId}`);
+      } catch {
+        console.error(`Could not parse form submission: ${contents?.reference}`);
+        throw error;
+      }
+    }
+    const appId = this.parsedSubmission.appId;
+    if (appId.includes('betaling')) {
+      throw Error('Payments are not handled by this class');
     }
     this.bsn = this.parsedSubmission.bsn;
     this.kvk = this.parsedSubmission.kvk;
