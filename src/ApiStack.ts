@@ -87,6 +87,7 @@ export class ApiStack extends Stack {
 
   private getFormOverviewFunction() {
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
+
     // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
     const storageBucket = Bucket.fromBucketAttributes(this, 'bucket', {
       bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
@@ -119,13 +120,20 @@ class ListSubmissionsLambda extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
+    // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
+    const storageBucket = Bucket.fromBucketAttributes(this, 'bucket', {
+      bucketArn: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionBucketArn),
+      encryptionKey: key,
+    });
+
     const table = Table.fromTableAttributes(this, 'table', {
       tableName: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName),
       encryptionKey: key,
     });
     this.lambda = new ListSubmissionsFunction(this, 'list-submissions', {
       environment: {
+        BUCKET_NAME: storageBucket.bucketName,
         TABLE_NAME: table.tableName,
       },
     });
