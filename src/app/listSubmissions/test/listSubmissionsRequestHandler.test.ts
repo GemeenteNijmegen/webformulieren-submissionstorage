@@ -38,7 +38,7 @@ jest.mock('../../submission/Storage', () => {
     S3Storage: jest.fn(() => {
       return {
         getBatch: async () => {
-          return [getObjectMock(snsSample)];
+          return [getObjectMock(snsSample.Records[0].Sns)];
         },
       };
     }),

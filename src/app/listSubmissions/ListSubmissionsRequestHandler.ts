@@ -64,7 +64,7 @@ export class ListSubmissionsRequestHandler {
       if (object.Body) {
         const bodyString = await object.Body.transformToString();
         const objectJson = JSON.parse(bodyString);
-        const submission = JSON.parse(objectJson.Records[0].Sns.Message);
+        const submission = JSON.parse(objectJson.Message);
         submissions[submission.reference] = submission;
       }
     }
