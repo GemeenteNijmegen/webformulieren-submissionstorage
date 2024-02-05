@@ -60,11 +60,9 @@ const configurations: { [name: string] : Configuration } = {
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
     allowedAccountIdsToPublishToSNS: [
-      //Statics.acceptanceWebformulierenAccountIdOldLz,
       Statics.acceptanceWebformulierenAccountId,
     ],
     subscribeToTopicArns: [
-      //'arn:aws:sns:eu-west-1:315037222840:eform-submissions', //old lz
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
   },
@@ -74,11 +72,9 @@ const configurations: { [name: string] : Configuration } = {
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
     allowedAccountIdsToPublishToSNS: [
-      //Statics.productionWebformulierenAccountIdOldLz,
       Statics.productionWebformulierenAccountId,
     ],
     subscribeToTopicArns: [
-      //'arn:aws:sns:eu-west-1:196212984627:eform-submissions', //old lz
       'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
     ],
   },
