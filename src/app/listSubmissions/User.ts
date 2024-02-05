@@ -11,6 +11,21 @@ export interface User {
 }
 
 /**
+ * Convenience function for creating a user. Returns the correct type based on
+ * provided parameters. This function can throw if no valid BSN is provided for
+ * persons.
+ *
+ * @param userId string value of kvk or bsn
+ * @param userType person for users with BSN, organisation for those with KVK
+ */
+export function userFromIdAndType(userId: string, userType: 'person'|'organisation') {
+  if (userType == 'organisation') {
+    return new Organisation(userId);
+  } else {
+    return new Person(new Bsn('userId'));
+  }
+}
+/**
  * Implementation of a 'natuurlijk persoon', a human, having a BSN.
  */
 export class Person implements User {

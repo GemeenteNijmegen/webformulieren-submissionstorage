@@ -209,18 +209,45 @@ const invalidEvent = {
   },
 };
 
+jest.mock('../../submission/Database', () => {
+
+  return {
+    DynamoDBDatabase: jest.fn(() => {
+      return {
+        listSubmissions: async () => {
+          const results = [{
+            userId: '900222670',
+            key: 'TDL01.001',
+            pdf: 'TDL01.001/submission.pdf',
+          }];
+          return results;
+        },
+      };
+    }),
+  };
+});
+
+beforeAll(() => {
+  const originalEnv = process.env;
+  process.env = {
+    ...originalEnv,
+    TABLE_NAME: 'mock_table',
+    BUCKET_NAME: 'mock_bucket',
+  };
+});
+
 describe('Handler parsing events', () => {
-  test('Handler correctly parses event with correct query params', async() => {
+  test('returns 200 with correct query params for person', async() => {
     const result = await handler(personEvent);
     expect(result.statusCode).toBe(200);
   });
 
-  test('Handler correctly parses event with correct query params', async() => {
+  test('returns 200 with correct query params for organisation', async() => {
     const result = await handler(organisationEvent);
     expect(result.statusCode).toBe(200);
   });
 
-  test('Handler correctly parses event with correct query params', async() => {
+  test('returns 400 with incorrect query params', async() => {
     const result = await handler(invalidEvent);
     expect(result.statusCode).toBe(400);
   });

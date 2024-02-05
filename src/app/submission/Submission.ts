@@ -4,7 +4,7 @@ import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 import { s3Object } from './s3Object';
 import { Storage } from './Storage';
-import { SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
+import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
@@ -40,7 +40,22 @@ export class Submission {
   async parse(message: any) {
     this.rawSubmission = message;
     const contents = JSON.parse(message.Message);
-    this.parsedSubmission = SubmissionSchema.passthrough().parse(contents);
+    try {
+      this.parsedSubmission = SubmissionSchema.passthrough().parse(contents);
+    } catch (error) {
+      try {
+        const payment = SubmissionPaymentSchema.passthrough().parse(contents);
+        console.error(`Submission was a payment for ${payment.appId}`);
+        throw new Error(`Submission was a payment for ${payment.appId}`);
+      } catch {
+        console.error(`Could not parse form submission: ${contents?.reference}`);
+        throw error;
+      }
+    }
+    const appId = this.parsedSubmission.appId;
+    if (appId.includes('betaling')) {
+      throw Error('Payments are not handled by this class');
+    }
     this.bsn = this.parsedSubmission.bsn;
     this.kvk = this.parsedSubmission.kvk;
     this.pdf = {
@@ -93,7 +108,7 @@ export class Submission {
     const copyPromises: Promise<any>[] = [];
     copyPromises.push(this.storage.store(`${this.key}/submission.json`, JSON.stringify(this.rawSubmission))); // Submission
     copyPromises.push(this.storage.store(`${this.key}/formdefinition.json`, JSON.stringify(formDefinition))); // Form def
-    copyPromises.push(this.storage.copy(this.pdf.bucket, this.pdf.key, 'eu-west-1', pdfKey)); // PDF
+    copyPromises.push(this.storage.copy(this.pdf.bucket, this.pdf.key, 'eu-central-1', pdfKey)); // PDF
     copyPromises.push(...this.attachmentPromises());
     try {
       await Promise.all(copyPromises);
@@ -142,7 +157,7 @@ export class Submission {
     const promises = [];
     if (this.attachments) {
       for (let attachment of this.attachments) {
-        promises.push(this.storage.copy(attachment.bucket, attachment.key, 'eu-west-1', `${this.key}/attachments/${attachment.originalName}`));
+        promises.push(this.storage.copy(attachment.bucket, attachment.key, 'eu-central-1', `${this.key}/attachments/${attachment.originalName}`));
       }
     }
     return promises;

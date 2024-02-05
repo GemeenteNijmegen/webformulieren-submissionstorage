@@ -5,13 +5,13 @@ export const s3ObjectSchema = z.object({
   key: z.string(),
   originalName: z.string().optional(),
 });
+
 export const SubmissionSchema = z.object({
   formId: z.string(),
   formTypeId: z.string(),
   appId: z.string(),
   reference: z.string(),
   data: z.object({
-    kenmerk: z.string(),
     naamIngelogdeGebruiker: z.string().optional(),
   }).passthrough(),
   employeeData: z.any(),
@@ -22,4 +22,10 @@ export const SubmissionSchema = z.object({
   }),
   bsn: z.string().optional(),
   kvk: z.string().optional(),
+});
+
+export const SubmissionPaymentSchema = z.object({
+  appId: z.string(),
+  reference: z.string(),
+  amount: z.number(),
 });
