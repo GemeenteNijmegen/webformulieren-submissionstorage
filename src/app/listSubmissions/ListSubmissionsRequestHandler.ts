@@ -48,7 +48,7 @@ export class ListSubmissionsRequestHandler {
         return {
           ...result,
           formName: submissions[result.key].formTypeId,
-          date: new Date(...submissions[result.key].metadata.timestamp as []),
+          date: new Date(Date.UTC(...submissions[result.key].metadata.timestamp as [number, number, number, number, number, number, number])),
         };
       } else {
         return results;
