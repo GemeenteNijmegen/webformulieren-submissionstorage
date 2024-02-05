@@ -1,7 +1,7 @@
 import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
-import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 import { S3Storage, Storage } from '../submission/Storage';
+import { EventParameters } from './parsedEvent';
 
 export class ListSubmissionsRequestHandler {
 
@@ -48,7 +48,7 @@ export class ListSubmissionsRequestHandler {
         return {
           ...result,
           formName: submissions[result.key].formTypeId,
-          date: new Date(...submissions[result.key].metadata.timestamp as []),
+          date: new Date(Date.UTC(...submissions[result.key].metadata.timestamp as [number, number, number, number, number, number, number])),
         };
       } else {
         return results;
