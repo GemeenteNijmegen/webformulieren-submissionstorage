@@ -1,7 +1,7 @@
 import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 import { S3Storage, Storage } from '../submission/Storage';
-import { EventParameters } from './parsedEvent';
 
 export class ListSubmissionsRequestHandler {
 
