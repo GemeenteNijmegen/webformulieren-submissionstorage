@@ -5,7 +5,6 @@ import { S3Storage, Storage } from '../submission/Storage';
 
 export class ListSubmissionsRequestHandler {
 
-  // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#definite-assignment-assertions
   private database: Database;
   private storage: Storage;
   constructor() {
@@ -40,11 +39,8 @@ export class ListSubmissionsRequestHandler {
   async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
     const results = await this.database.listSubmissions({ userId: parameters.userId });
     const submissions = await this.getBucketObjects(results.map(result => `${result.key}/submission.json`));
-    // TODO: Match list from db with form name and submission date from S3
     const resultObjects = results.map((result) => {
       if (submissions[result.key]) {
-        console.debug('key', result.key);
-        console.debug('date', new Date(submissions[result.key].metadata.timestamp));
         return {
           ...result,
           formName: submissions[result.key].formTypeId,

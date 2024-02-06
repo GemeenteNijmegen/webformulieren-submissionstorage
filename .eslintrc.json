@@ -149,7 +149,8 @@
           "**/build-tools/**",
           "src/app/get-form-overview/getFormOverview.lambda.ts",
           "src/app/listSubmissions/listSubmissions.lambda.ts",
-          "src/app/submission/submission.lambda.ts"
+          "src/app/submission/submission.lambda.ts",
+          "src/migrations/2024-02-06-enrich-table.lambda.ts"
         ],
         "optionalDependencies": false,
         "peerDependencies": true
