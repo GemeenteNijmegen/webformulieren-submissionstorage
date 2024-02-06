@@ -55,7 +55,7 @@
           "spawn": "bundle:app/submission/submission.lambda"
         },
         {
-          "spawn": "bundle:migrations/2024-02-06-enrich-table.lambda"
+          "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
         }
       ]
     },
@@ -113,21 +113,21 @@
         }
       ]
     },
-    "bundle:migrations/2024-02-06-enrich-table.lambda": {
-      "name": "bundle:migrations/2024-02-06-enrich-table.lambda",
-      "description": "Create a JavaScript bundle from src/migrations/2024-02-06-enrich-table.lambda.ts",
+    "bundle:migrations/migration-2024-02-06-enrich-table.lambda": {
+      "name": "bundle:migrations/migration-2024-02-06-enrich-table.lambda",
+      "description": "Create a JavaScript bundle from src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/2024-02-06-enrich-table.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/migrations/2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
-    "bundle:migrations/2024-02-06-enrich-table.lambda:watch": {
-      "name": "bundle:migrations/2024-02-06-enrich-table.lambda:watch",
-      "description": "Continuously update the JavaScript bundle from src/migrations/2024-02-06-enrich-table.lambda.ts",
+    "bundle:migrations/migration-2024-02-06-enrich-table.lambda:watch": {
+      "name": "bundle:migrations/migration-2024-02-06-enrich-table.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/2024-02-06-enrich-table.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/migrations/2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
