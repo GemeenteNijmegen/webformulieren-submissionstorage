@@ -17,8 +17,8 @@ import { Storage } from '../app/submission/Storage';
  * Filter the scan on one of the attributes we will add, to make this operation idempotent and to be able to update items added during the scan?
  *
  * TODO:
- * - [ ] Grab info from the form definition (in enrichedItems)
- * - [ ] Modify the scan to only scan for items not yet updated (check for 'formName' or 'updatedTime')
+ * - [x] Grab info from the form definition (in enrichedItems)
+ * - [x] Modify the scan to only scan for items not yet updated (check for 'formName' or 'updatedTime')
  * POSSIBLE FAILURE MODES:
  * - Scan returning too many items for the rest of the lambda to process (too many S3 objects, too high memory use). This would be annoying, since it would stall and never complete on retry.
  *   Possible solution: Put items to be updated on a queue, process one by one / in batches. Overkill?
@@ -50,6 +50,7 @@ export class Migration {
     const command = new ScanCommand({
       TableName: this.tableName,
       ExclusiveStartKey: this.lastKey,
+      FilterExpression: 'NOT attribute_exists(formName)',
     });
     try {
       const result = await this.client.send(command);
