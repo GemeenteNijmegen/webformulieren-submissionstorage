@@ -145,7 +145,7 @@ export class Migration {
         const formNameLowerCased = (submissionKey.formTypeId as string).toLowerCase();
         const formTitle = formdefinitions?.[formNameLowerCased]?.title;
         if (!formTitle) {
-          this.error(`No title found in form definition for key ${key}`);
+          this.error(`No title found in form definition for key ${key}, form name: ${formNameLowerCased}`);
         } else {
           return {
             ...result,
