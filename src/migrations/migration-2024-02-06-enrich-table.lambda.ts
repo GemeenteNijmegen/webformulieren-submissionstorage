@@ -28,6 +28,8 @@ export class Migration {
   private client: DynamoDBClient;
   private tableName: string;
   private storage: Storage;
+  private _errors: string[] = [];
+  private _info: string[] = [];
 
   constructor(client: DynamoDBClient, tableName: string, storage: Storage) {
     this.client = client;
@@ -53,16 +55,22 @@ export class Migration {
       FilterExpression: 'NOT attribute_exists(formName)',
     });
     try {
+      this.info('Starting scan');
       const result = await this.client.send(command);
+      this.info(`Scan filtered in ${result.Count} of ${result.ScannedCount} scanned items.`);
       const newItems = await this.enrichedItems(result);
       await this.updateItems(newItems);
       this.lastKey = result.LastEvaluatedKey;
       if (this.lastKey) {
+        this.info('More items to scan.');
         await this.run();
       }
     } catch (error: any) {
-      console.error(error);
+      this.error(error);
     }
+    this.info('Finished run');
+    console.log(...this._info.flatMap(line => [line, '\n']));
+    console.error(...this._errors.flatMap(line => [line, '\n']));
   }
 
   /**
@@ -81,7 +89,7 @@ export class Migration {
       if (submissions[key]) {
         const formTitle = formdefinitions?.[submissions[key].formTypeId].title;
         if (!formTitle) {
-          console.error(`No title found in form definition for key ${key}`);
+          this.error(`No title found in form definition for key ${key}`);
         }
         return {
           ...result,
@@ -90,7 +98,7 @@ export class Migration {
           formTitle: formTitle,
         };
       } else {
-        console.error(`Submission ${key} could not be enriched from S3`);
+        this.error(`Submission ${key} could not be enriched from S3`);
         return result;
       }
     }).filter((result: any) => result.formName);
@@ -105,14 +113,21 @@ export class Migration {
    * @returns array of submission JSON's, keyed by reference
    */
   async getSubmissionObjectsFromBucket(keys: string[]) {
+    this.info('Retrieving submissions from S3');
     const objects = await this.storage.getBatch(keys);
     const submissions: any = {};
     for (const object of objects) {
-      if (object.Body) {
-        const bodyString = await object.Body.transformToString();
-        const objectJson = JSON.parse(bodyString);
-        const submission = JSON.parse(objectJson.Message);
-        submissions[submission.reference] = submission;
+      try {
+        if (object.Body) {
+          const bodyString = await object.Body.transformToString();
+          const objectJson = JSON.parse(bodyString);
+          const submission = JSON.parse(objectJson.Message);
+          submissions[submission.reference] = submission;
+          this.info(`- ${submission.reference}`);
+        }
+      } catch (error: any) {
+        this.error(error);
+        this.error(error);
       }
     }
     return submissions;
@@ -126,15 +141,23 @@ export class Migration {
    * @returns array of submission JSON's, keyed by reference
    */
   async getFormDefinitionObjectsFromBucket(keys: string[]) {
+    this.info('Retrieving form definitions from S3');
     const objects = await this.storage.getBatch(keys);
     const definitions: any = {};
     for (const object of objects) {
-      if (object.Body) {
-        const bodyString = await object.Body.transformToString();
-        const objectJson = JSON.parse(bodyString);
-        definitions[objectJson.name] = objectJson;
+      try {
+        if (object.Body) {
+          const bodyString = await object.Body.transformToString();
+          const objectJson = JSON.parse(bodyString);
+          definitions[objectJson.name] = objectJson;
+          this.info(`- ${objectJson.name}`);
+        }
+      } catch (error: any) {
+        this.error(error);
+        this.error(error);
       }
     }
+
     return definitions;
   }
 
@@ -145,7 +168,7 @@ export class Migration {
    * objects, but do not modify anything else.
    */
   async updateItems(items: any) {
-    console.info(`Updating ${items.length} items`);
+    this.info(`Updating ${items.length} items in dynamoDB`);
     for (const item of items) {
       try {
         const command = new UpdateItemCommand({
@@ -167,11 +190,21 @@ export class Migration {
           UpdateExpression: 'SET #formName = :formName, #formTitle = :formTitle, #dateSubmitted = :dateSubmitted',
         });
         await this.client.send(command);
-        console.info(`Updated item ${item.sk.S}`);
+        this.info(`Updated item ${item.sk.S}`);
       } catch (error) {
-        console.error('Failed updating item `${item.sk.S}`');
+        this.error('Failed updating item `${item.sk.S}`');
         throw (error);
       }
     }
+  }
+
+  info(message: string) {
+    this._info.push(message);
+    console.info(message);
+  }
+
+  error(message: string) {
+    this._errors.push(message);
+    console.error(message);
   }
 }

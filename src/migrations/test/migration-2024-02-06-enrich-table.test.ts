@@ -114,9 +114,10 @@ describeIntegration('Dynamodb migration test', () => {
   });
 
   test('can perform update', async() => {
+    await prefillDatabase(database, 1000, 2000);
     const migration = new Migration(dynamoDBClient, tableName, storage);
     await expect(migration.run()).resolves.not.toThrow();
-  });
+  }, 10000);
 
   test('can get new attributes for updated item after update', async() => {
     await new Migration(dynamoDBClient, tableName, storage).run();
@@ -135,12 +136,12 @@ describeIntegration('Dynamodb migration test', () => {
   test('Running migration twice should result in same table', async() => {
     const consoleSpy = jest.spyOn(console, 'info');
     await new Migration(dynamoDBClient, tableName, storage).run();
-    expect(consoleSpy).toHaveBeenCalledWith('Updating 1 items');
+    expect(consoleSpy).toHaveBeenCalledWith('Updating 1 items in dynamoDB');
     const command = getItemCommand(tableName, 'TDL17.1');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
     await new Migration(dynamoDBClient, tableName, storage).run();
-    expect(consoleSpy).toHaveBeenCalledWith('Updating 0 items');
+    expect(consoleSpy).toHaveBeenCalledWith('Updating 0 items in dynamoDB');
     const secondCommand = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(secondCommand)).toHaveProperty('Item.dateSubmitted');
     expect(await dynamoDBClient.send(secondCommand)).toHaveProperty('Item.formTitle');
@@ -158,8 +159,9 @@ function getItemCommand(tableName: string, itemKey: string) {
 }
 
 // Be able to fill up the db with enough data to have the scan be paginated (1MB per page)
-async function prefillDatabase(database: DynamoDBDatabase, items: number) {
-  for (let index = 0; index < items; index++) {
+async function prefillDatabase(database: DynamoDBDatabase, items: number, startAt?: number) {
+  startAt = startAt ?? 0;
+  for (let index = startAt; index < items + startAt; index++) {
     await database.storeSubmission({
       key: `TDL17.${index}`,
       pdf: generateRandomString(1000),
