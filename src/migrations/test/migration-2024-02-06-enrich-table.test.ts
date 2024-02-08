@@ -61,6 +61,14 @@ describeIntegration('Dynamodb migration test', () => {
     environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
       .withWaitStrategy('dynamodb-local', Wait.forLogMessage('CorsParams: null'))
       .up();
+  }, 60000); // long timeout, can start docker image
+
+  afterAll(async() => {
+    console.debug('bringing environment down');
+    await environment.down({ timeout: 10000 });
+  });
+
+  beforeEach( async () => {
     const command = new CreateTableCommand({
       TableName: tableName,
       AttributeDefinitions: [
@@ -90,16 +98,15 @@ describeIntegration('Dynamodb migration test', () => {
 
     await dynamoDBClient.send(command);
     await prefillDatabase(database, 10);
-  }, 60000); // long timeout, can start docker image
-  afterAll(async() => {
+  });
+
+  afterEach(async () => {
     const command = new DeleteTableCommand({
       TableName: tableName,
     });
 
     console.debug('removing table');
     await dynamoDBClient.send(command);
-    console.debug('bringing environment down');
-    await environment.down({ timeout: 10000 });
   });
 
   test('can create migration', async() => {
@@ -111,16 +118,32 @@ describeIntegration('Dynamodb migration test', () => {
     await expect(migration.run()).resolves.not.toThrow();
   });
 
-  test('can get dateSubmitted for updated item after update', async() => {
+  test('can get new attributes for updated item after update', async() => {
+    await new Migration(dynamoDBClient, tableName, storage).run();
     const command = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.dateSubmitted');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.formTitle');
   });
 
   test('item without S3 item shouldnt have been updated but still exist', async() => {
+    await new Migration(dynamoDBClient, tableName, storage).run();
     const command = getItemCommand(tableName, 'TDL17.1');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
+  });
+
+  test('Running migration twice should result in same table', async() => {
+    const consoleSpy = jest.spyOn(console, 'info');
+    await new Migration(dynamoDBClient, tableName, storage).run();
+    expect(consoleSpy).toHaveBeenCalledWith('Updating 1 items');
+    const command = getItemCommand(tableName, 'TDL17.1');
+    expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
+    expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
+    await new Migration(dynamoDBClient, tableName, storage).run();
+    expect(consoleSpy).toHaveBeenCalledWith('Updating 0 items');
+    const secondCommand = getItemCommand(tableName, 'TDL17.957');
+    expect(await dynamoDBClient.send(secondCommand)).toHaveProperty('Item.dateSubmitted');
+    expect(await dynamoDBClient.send(secondCommand)).toHaveProperty('Item.formTitle');
   });
 });
 
