@@ -1,5 +1,5 @@
 import { AttributeValue, DynamoDBClient, ScanCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import { Storage } from '../app/submission/Storage';
+import { S3Storage, Storage } from '../app/submission/Storage';
 
 /**
  * This is a one-time use function to migrate the dynamoDB table used for storing submissions. The following changes need to be performed:
@@ -31,10 +31,10 @@ export async function handler(event: any) {
     throw Error('No table name or bucket provided');
   }
   try {
-    // const client = new DynamoDBClient();
-    // const storage = new S3Storage(process.env.BUCKET_NAME);
-    // const migration = new Migration(client, process.env.TABLE_NAME, storage);
-    // await migration.run(dryrun);
+    const client = new DynamoDBClient();
+    const storage = new S3Storage(process.env.BUCKET_NAME);
+    const migration = new Migration(client, process.env.TABLE_NAME, storage);
+    await migration.run(dryrun);
   } catch (error: any) {
     console.error(error);
   }
