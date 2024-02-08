@@ -23,6 +23,24 @@ import { Storage } from '../app/submission/Storage';
  * - Scan returning too many items for the rest of the lambda to process (too many S3 objects, too high memory use). This would be annoying, since it would stall and never complete on retry.
  *   Possible solution: Put items to be updated on a queue, process one by one / in batches. Overkill?
  */
+
+export async function handler(event: any) {
+  const dryrun = event?.runlive === 'true' ? false: true; // Only update when the event object contains runlive: 'true'
+  console.debug('dry run', dryrun);
+  if (!process.env.BUCKET_NAME || !process.env.TABLE_NAME) {
+    throw Error('No table name or bucket provided');
+  }
+  try {
+    // const client = new DynamoDBClient();
+    // const storage = new S3Storage(process.env.BUCKET_NAME);
+    // const migration = new Migration(client, process.env.TABLE_NAME, storage);
+    // await migration.run(dryrun);
+  } catch (error: any) {
+    console.error(error);
+  }
+}
+
+
 export class Migration {
   private lastKey?: Record<string, AttributeValue>;
   private client: DynamoDBClient;
@@ -48,7 +66,7 @@ export class Migration {
    * After grabbing the data from S3, it will call `updateItems`
    * to update each item in the database individually (to prevent data loss).
    */
-  async run() {
+  async run(dryrun?: boolean) {
     const command = new ScanCommand({
       TableName: this.tableName,
       ExclusiveStartKey: this.lastKey,
@@ -59,7 +77,11 @@ export class Migration {
       const result = await this.client.send(command);
       this.info(`Scan filtered in ${result.Count} of ${result.ScannedCount} scanned items.`);
       const newItems = await this.enrichedItems(result);
-      await this.updateItems(newItems);
+      if (dryrun) {
+        this.info(`Would update ${newItems.length} items in dynamoDB`);
+      } else {
+        await this.updateItems(newItems);
+      }
       this.lastKey = result.LastEvaluatedKey;
       if (this.lastKey) {
         this.info('More items to scan.');

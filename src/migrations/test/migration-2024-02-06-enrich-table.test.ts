@@ -8,7 +8,7 @@ import { DynamoDBDatabase } from '../../app/submission/Database';
 import { S3Storage } from '../../app/submission/Storage';
 import * as snsSample from '../../app/submission/test/samples/sns.sample.json';
 import { describeIntegration } from '../../app/test-utils/describeIntegration';
-import { Migration } from '../migration-2024-02-06-enrich-table.lambda';
+import { Migration, handler } from '../migration-2024-02-06-enrich-table.lambda';
 
 
 const getObjectMock = (file:any) => ({
@@ -109,6 +109,15 @@ describeIntegration('Dynamodb migration test', () => {
     await dynamoDBClient.send(command);
   });
 
+  test('handler returns', async() => {
+    process.env = {
+      ...process.env,
+      TABLE_NAME: 'dummytable',
+      BUCKET_NAME: 'dummybucket',
+    };
+    expect(handler({ runlive: 'true' })).toBeTruthy();
+  });
+
   test('can create migration', async() => {
     expect(new Migration(dynamoDBClient, tableName, storage)).toBeTruthy();
   });
@@ -124,6 +133,13 @@ describeIntegration('Dynamodb migration test', () => {
     const command = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.dateSubmitted');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.formTitle');
+  });
+
+  test('dryrun does not actually update', async() => {
+    await new Migration(dynamoDBClient, tableName, storage).run(true);
+    const command = getItemCommand(tableName, 'TDL17.957');
+    expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
+    expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.formTitle');
   });
 
   test('item without S3 item shouldnt have been updated but still exist', async() => {
