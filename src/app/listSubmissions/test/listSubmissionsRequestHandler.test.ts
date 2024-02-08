@@ -9,7 +9,7 @@ const listResults = [{
 const expectedListResults = [{
   key: 'TDL17.957',
   pdf: 'TDL17.957/submission.pdf',
-  formName: 'test',
+  formName: 'bingoMeldenOfLoterijvergunningAanvragen',
   date: '2024-03-01T16:35:55.229Z',
 }];
 
@@ -59,8 +59,7 @@ beforeAll(() => {
 describe('Request Handler', () => {
   test('Handler correctly returns', async() => {
     const result = await handler.handleRequest({ userId: '900222670', userType: 'person' });
-    expect(result.body).toBe(JSON.stringify(expectedListResults)); // TODO fix this test
-    console.error('TODO this test should be fixed!');
+    expect(result.body).toBe(JSON.stringify(expectedListResults));
   });
 
 });
