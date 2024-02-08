@@ -3,11 +3,12 @@ import { CreateTableCommand, DeleteTableCommand, DynamoDBClient, GetItemCommand 
 // import { S3Client } from '@aws-sdk/client-s3';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
-import { Migration } from './migration-2024-02-06-enrich-table.lambda';
-import { DynamoDBDatabase } from '../app/submission/Database';
-import { S3Storage } from '../app/submission/Storage';
-import * as snsSample from '../app/submission/test/samples/sns.sample.json';
-import { describeIntegration } from '../app/test-utils/describeIntegration';
+import * as formDefinitionSample from './sample-formdefinition.json';
+import { DynamoDBDatabase } from '../../app/submission/Database';
+import { S3Storage } from '../../app/submission/Storage';
+import * as snsSample from '../../app/submission/test/samples/sns.sample.json';
+import { describeIntegration } from '../../app/test-utils/describeIntegration';
+import { Migration } from '../migration-2024-02-06-enrich-table.lambda';
 
 
 const getObjectMock = (file:any) => ({
@@ -17,12 +18,17 @@ const getObjectMock = (file:any) => ({
   },
 });
 
-jest.mock('../app/submission/Storage', () => {
+jest.mock('../../app/submission/Storage', () => {
   return {
     S3Storage: jest.fn(() => {
       return {
-        getBatch: async () => {
-          return [getObjectMock(snsSample.Records[0].Sns)];
+        getBatch: async (params: string[]) => {
+          let returnObjects = [];
+          for (const key of params) {
+            if (key.includes('submission')) {returnObjects.push(getObjectMock(snsSample.Records[0].Sns)); }
+            if (key.includes('formdefinition')) {returnObjects.push(getObjectMock(formDefinitionSample)); }
+          }
+          return returnObjects;
         },
       };
     }),
@@ -82,16 +88,16 @@ describeIntegration('Dynamodb migration test', () => {
       },
     });
 
-    console.debug(await dynamoDBClient.send(command));
-    await prefillDatabase(database, 1000);
+    await dynamoDBClient.send(command);
+    await prefillDatabase(database, 10);
   }, 60000); // long timeout, can start docker image
   afterAll(async() => {
     const command = new DeleteTableCommand({
       TableName: tableName,
     });
 
-    const response = await dynamoDBClient.send(command);
-    console.debug(response);
+    console.debug('removing table');
+    await dynamoDBClient.send(command);
     console.debug('bringing environment down');
     await environment.down({ timeout: 10000 });
   });
@@ -108,6 +114,7 @@ describeIntegration('Dynamodb migration test', () => {
   test('can get dateSubmitted for updated item after update', async() => {
     const command = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.dateSubmitted');
+    expect(await dynamoDBClient.send(command)).toHaveProperty('Item.formTitle');
   });
 
   test('item without S3 item shouldnt have been updated but still exist', async() => {
