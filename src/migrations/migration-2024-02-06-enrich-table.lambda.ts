@@ -140,23 +140,23 @@ export class Migration {
     const formdefinitions = await this.getFormDefinitionObjectsFromBucket(results.map((result: any) => `${result.sk.S}/formdefinition.json`));
     const resultObjects = results.map((result: any) => {
       const key = result.sk.S;
-      if (submissions[key]) {
-        const formTitle = formdefinitions?.[submissions[key].formTypeId]?.title;
+      const submissionKey = submissions[key];
+      if (submissionKey) {
+        const formNameLowerCased = (submissionKey.formTypeId as string).toLowerCase();
+        const formTitle = formdefinitions?.[formNameLowerCased]?.title;
         if (!formTitle) {
           this.error(`No title found in form definition for key ${key}`);
         } else {
           return {
             ...result,
-            formName: submissions[key].formTypeId,
-            date: new Date(Date.UTC(...submissions[key].metadata.timestamp as [number, number, number, number, number, number, number])),
+            formName: formNameLowerCased,
+            date: new Date(Date.UTC(...submissionKey.metadata.timestamp as [number, number, number, number, number, number, number])),
             formTitle: formTitle,
           };
         }
       } else {
-        this.error(`Submission ${key} could not be enriched from S3`);
-        return result;
       }
-    }).filter((result: any) => result.formName);
+    }).filter((result: any) => result?.formName);
     return resultObjects;
   }
 
@@ -205,7 +205,8 @@ export class Migration {
         if (object.Body) {
           const bodyString = await object.Body.transformToString();
           const objectJson = JSON.parse(bodyString);
-          definitions[objectJson.name] = objectJson;
+          const formNameLowerCased = (objectJson.name as string).toLowerCase();
+          definitions[formNameLowerCased] = objectJson;
           this.info(`- ${objectJson.name}`);
         }
       } catch (error: any) {

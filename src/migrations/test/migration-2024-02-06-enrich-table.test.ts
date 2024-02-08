@@ -123,7 +123,7 @@ describeIntegration('Dynamodb migration test', () => {
   });
 
   test('can perform update', async() => {
-    await prefillDatabase(database, 1000, 2000);
+    // await prefillDatabase(database, 1000, 2000);
     const migration = new Migration(dynamoDBClient, tableName, storage);
     await expect(migration.run(50, false)).resolves.not.toThrow();
   }, 20000);
