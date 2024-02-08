@@ -49,6 +49,8 @@ export class Migration {
   private storage: Storage;
   private _errors: string[] = [];
   private _info: string[] = [];
+  private _success: string[] = [];
+  private _failed: string[] = [];
 
   constructor(client: DynamoDBClient, tableName: string, storage: Storage) {
     this.client = client;
@@ -89,6 +91,10 @@ export class Migration {
     this.info('Finished run');
     console.log(...this._info.flatMap(line => [line, '\n']));
     console.error(...this._errors.flatMap(line => [line, '\n']));
+    console.log(`Successfully updated ${this._success.length} items`, ...this._success.flatMap(line => [line, '\n']));
+    if (this._failed.length > 0) {
+      console.error(`FAILED updating ${this._failed.length} items`, ...this._success.flatMap(line => [line, '\n']));
+    }
   }
 
   async batchUpdate(scanResults: ScanCommandOutput, batchSize: number, dryrun?: boolean) {
@@ -235,8 +241,10 @@ export class Migration {
         });
         await this.client.send(command);
         this.info(`Updated item ${item.sk.S}`);
+        this._success.push(item.sk.S);
       } catch (error) {
         this.error('Failed updating item `${item.sk.S}`');
+        this._failed.push(item.sk.S);
         throw (error);
       }
     }
