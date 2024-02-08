@@ -152,7 +152,7 @@ export class Migration {
         this.error(error);
       }
     }
-    this.info(`Retrieved ${submissions.length} form submissions from S3`);
+    this.info(`Retrieved ${Object.keys(submissions).length} form submissions from S3`);
     return submissions;
   }
 
@@ -181,7 +181,7 @@ export class Migration {
       }
     }
 
-    this.info(`Retrieved ${definitions.length} form definitions from S3`);
+    this.info(`Retrieved ${Object.keys(definitions).length} form definitions from S3`);
     return definitions;
   }
 
