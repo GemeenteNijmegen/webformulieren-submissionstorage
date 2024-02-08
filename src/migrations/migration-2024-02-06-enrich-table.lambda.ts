@@ -141,16 +141,17 @@ export class Migration {
     const resultObjects = results.map((result: any) => {
       const key = result.sk.S;
       if (submissions[key]) {
-        const formTitle = formdefinitions?.[submissions[key].formTypeId].title;
+        const formTitle = formdefinitions?.[submissions[key].formTypeId]?.title;
         if (!formTitle) {
           this.error(`No title found in form definition for key ${key}`);
+        } else {
+          return {
+            ...result,
+            formName: submissions[key].formTypeId,
+            date: new Date(Date.UTC(...submissions[key].metadata.timestamp as [number, number, number, number, number, number, number])),
+            formTitle: formTitle,
+          };
         }
-        return {
-          ...result,
-          formName: submissions[key].formTypeId,
-          date: new Date(Date.UTC(...submissions[key].metadata.timestamp as [number, number, number, number, number, number, number])),
-          formTitle: formTitle,
-        };
       } else {
         this.error(`Submission ${key} could not be enriched from S3`);
         return result;
