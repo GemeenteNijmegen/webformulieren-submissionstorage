@@ -1,4 +1,4 @@
-import { AttributeValue, DynamoDBClient, ScanCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, DynamoDBClient, ScanCommand, ScanCommandOutput, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { S3Storage, Storage } from '../app/submission/Storage';
 
 /**
@@ -26,6 +26,7 @@ import { S3Storage, Storage } from '../app/submission/Storage';
 
 export async function handler(event: any) {
   const dryrun = event?.runlive === 'true' ? false: true; // Only update when the event object contains runlive: 'true'
+  const batchSize = event?.batchSize ?? 50; // Only update when the event object contains runlive: 'true'
   console.debug('dry run', dryrun);
   if (!process.env.BUCKET_NAME || !process.env.TABLE_NAME) {
     throw Error('No table name or bucket provided');
@@ -34,7 +35,7 @@ export async function handler(event: any) {
     const client = new DynamoDBClient();
     const storage = new S3Storage(process.env.BUCKET_NAME);
     const migration = new Migration(client, process.env.TABLE_NAME, storage);
-    await migration.run(dryrun);
+    await migration.run(batchSize, dryrun);
   } catch (error: any) {
     console.error(error);
   }
@@ -66,7 +67,7 @@ export class Migration {
    * After grabbing the data from S3, it will call `updateItems`
    * to update each item in the database individually (to prevent data loss).
    */
-  async run(dryrun?: boolean) {
+  async run(batchSize: number, dryrun: boolean) {
     const command = new ScanCommand({
       TableName: this.tableName,
       ExclusiveStartKey: this.lastKey,
@@ -76,16 +77,11 @@ export class Migration {
       this.info('Starting scan');
       const result = await this.client.send(command);
       this.info(`Scan filtered in ${result.Count} of ${result.ScannedCount} scanned items.`);
-      const newItems = await this.enrichedItems(result);
-      if (dryrun) {
-        this.info(`Would update ${newItems.length} items in dynamoDB`);
-      } else {
-        await this.updateItems(newItems);
-      }
+      await this.batchUpdate(result, batchSize, dryrun);
       this.lastKey = result.LastEvaluatedKey;
       if (this.lastKey) {
         this.info('More items to scan.');
-        await this.run();
+        await this.run(batchSize, dryrun);
       }
     } catch (error: any) {
       this.error(error);
@@ -95,6 +91,28 @@ export class Migration {
     console.error(...this._errors.flatMap(line => [line, '\n']));
   }
 
+  async batchUpdate(scanResults: ScanCommandOutput, batchSize: number, dryrun?: boolean) {
+    if (!scanResults.Items) { return; }
+    let startIndex = 0;
+    let processedItems = 0;
+    const totalItems = scanResults.Items.length;
+    this.info(`Processing ${totalItems} items in batches of ${batchSize}`);
+    for (let i = startIndex; i < scanResults.Items.length; i+=batchSize) {
+      const resultsBatch = scanResults.Items.slice(i, i + batchSize);
+      const newItems = await this.enrichedItems(resultsBatch);
+      if (dryrun) {
+        this.info(`Would update ${newItems.length} items in dynamoDB`);
+      } else {
+        await this.updateItems(newItems);
+      }
+      processedItems += resultsBatch.length;
+    }
+    this.info(`Processed ${processedItems} items`);
+    if (processedItems != totalItems) {
+      this.error(`Mismatch in total and processed items count, processed ${processedItems} of ${totalItems}`);
+    }
+  }
+
   /**
    * Grab data from S3 based on the provided dynamoDB items
    *
@@ -102,11 +120,13 @@ export class Migration {
    * and returns all updated items. Items which fail to update (no bucket object for instance)
    * will be ignored and an error will be logged.
    *
+   * Since the amount of data could be large, we split this into manageable batches
+   *
    */
   async enrichedItems(results: any) {
-    const submissions = await this.getSubmissionObjectsFromBucket(results.Items.map((result: any) => `${result.sk.S}/submission.json`));
-    const formdefinitions = await this.getFormDefinitionObjectsFromBucket(results.Items.map((result: any) => `${result.sk.S}/formdefinition.json`));
-    const resultObjects = results.Items.map((result: any) => {
+    const submissions = await this.getSubmissionObjectsFromBucket(results.map((result: any) => `${result.sk.S}/submission.json`));
+    const formdefinitions = await this.getFormDefinitionObjectsFromBucket(results.map((result: any) => `${result.sk.S}/formdefinition.json`));
+    const resultObjects = results.map((result: any) => {
       const key = result.sk.S;
       if (submissions[key]) {
         const formTitle = formdefinitions?.[submissions[key].formTypeId].title;

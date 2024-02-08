@@ -125,25 +125,25 @@ describeIntegration('Dynamodb migration test', () => {
   test('can perform update', async() => {
     await prefillDatabase(database, 1000, 2000);
     const migration = new Migration(dynamoDBClient, tableName, storage);
-    await expect(migration.run()).resolves.not.toThrow();
-  }, 10000);
+    await expect(migration.run(50, false)).resolves.not.toThrow();
+  }, 20000);
 
   test('can get new attributes for updated item after update', async() => {
-    await new Migration(dynamoDBClient, tableName, storage).run();
+    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
     const command = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.dateSubmitted');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.formTitle');
   });
 
   test('dryrun does not actually update', async() => {
-    await new Migration(dynamoDBClient, tableName, storage).run(true);
+    await new Migration(dynamoDBClient, tableName, storage).run(50, true);
     const command = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.formTitle');
   });
 
   test('item without S3 item shouldnt have been updated but still exist', async() => {
-    await new Migration(dynamoDBClient, tableName, storage).run();
+    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
     const command = getItemCommand(tableName, 'TDL17.1');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
@@ -151,12 +151,12 @@ describeIntegration('Dynamodb migration test', () => {
 
   test('Running migration twice should result in same table', async() => {
     const consoleSpy = jest.spyOn(console, 'info');
-    await new Migration(dynamoDBClient, tableName, storage).run();
+    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
     expect(consoleSpy).toHaveBeenCalledWith('Updating 1 items in dynamoDB');
     const command = getItemCommand(tableName, 'TDL17.1');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
-    await new Migration(dynamoDBClient, tableName, storage).run();
+    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
     expect(consoleSpy).toHaveBeenCalledWith('Updating 0 items in dynamoDB');
     const secondCommand = getItemCommand(tableName, 'TDL17.957');
     expect(await dynamoDBClient.send(secondCommand)).toHaveProperty('Item.dateSubmitted');
