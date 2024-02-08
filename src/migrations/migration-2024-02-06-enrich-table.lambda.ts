@@ -73,16 +73,20 @@ export class Migration {
    *
    */
   async enrichedItems(results: any) {
-    const submissions = await this.getBucketObjects(results.Items.map((result: any) => `${result.sk.S}/submission.json`));
-    console.debug(submissions);
+    const submissions = await this.getSubmissionObjectsFromBucket(results.Items.map((result: any) => `${result.sk.S}/submission.json`));
+    const formdefinitions = await this.getFormDefinitionObjectsFromBucket(results.Items.map((result: any) => `${result.sk.S}/formdefinition.json`));
     const resultObjects = results.Items.map((result: any) => {
       const key = result.sk.S;
-      console.debug(key);
       if (submissions[key]) {
+        const formTitle = formdefinitions?.[submissions[key].formTypeId].title;
+        if (!formTitle) {
+          console.error(`No title found in form definition for key ${key}`);
+        }
         return {
           ...result,
           formName: submissions[key].formTypeId,
           date: new Date(Date.UTC(...submissions[key].metadata.timestamp as [number, number, number, number, number, number, number])),
+          formTitle: formTitle,
         };
       } else {
         console.error(`Submission ${key} could not be enriched from S3`);
@@ -93,13 +97,13 @@ export class Migration {
   }
 
   /**
-   * Batch get objects from S3
+   * Batch get form submission objects from S3
    *
    * Gets the JSON from the submission and return it as an array keyed by reference
    * @param keys array of s3 object keys
    * @returns array of submission JSON's, keyed by reference
    */
-  async getBucketObjects(keys: string[]) {
+  async getSubmissionObjectsFromBucket(keys: string[]) {
     const objects = await this.storage.getBatch(keys);
     const submissions: any = {};
     for (const object of objects) {
@@ -111,6 +115,26 @@ export class Migration {
       }
     }
     return submissions;
+  }
+
+  /**
+   * Batch get form definitions from S3
+   *
+   * Gets the JSON from the submission and return it as an array keyed by reference
+   * @param keys array of s3 object keys
+   * @returns array of submission JSON's, keyed by reference
+   */
+  async getFormDefinitionObjectsFromBucket(keys: string[]) {
+    const objects = await this.storage.getBatch(keys);
+    const definitions: any = {};
+    for (const object of objects) {
+      if (object.Body) {
+        const bodyString = await object.Body.transformToString();
+        const objectJson = JSON.parse(bodyString);
+        definitions[objectJson.name] = objectJson;
+      }
+    }
+    return definitions;
   }
 
   /**
@@ -131,13 +155,15 @@ export class Migration {
           TableName: this.tableName,
           ExpressionAttributeNames: {
             '#formName': 'formName',
+            '#formTitle': 'formTitle',
             '#dateSubmitted': 'dateSubmitted',
           },
           ExpressionAttributeValues: {
             ':formName': { S: item.formName },
+            ':formTitle': { S: item.formTitle },
             ':dateSubmitted': { S: item.date },
           },
-          UpdateExpression: 'SET #formName = :formName, #dateSubmitted = :dateSubmitted',
+          UpdateExpression: 'SET #formName = :formName, #formTitle = :formTitle, #dateSubmitted = :dateSubmitted',
         });
         await this.client.send(command);
         console.info(`Updated item ${item.sk.S}`);
