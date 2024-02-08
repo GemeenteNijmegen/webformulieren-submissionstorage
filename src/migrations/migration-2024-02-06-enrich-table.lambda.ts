@@ -95,6 +95,12 @@ export class Migration {
     if (this._failed.length > 0) {
       console.error(`FAILED updating ${this._failed.length} items`, ...this._success.flatMap(line => [line, '\n']));
     }
+    return {
+      success: this._success.length,
+      failed: this._failed.length,
+      updated_items: this._success,
+      failed_items: this._failed,
+    };
   }
 
   async batchUpdate(scanResults: ScanCommandOutput, batchSize: number, dryrun?: boolean) {
