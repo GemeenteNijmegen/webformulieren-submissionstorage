@@ -127,10 +127,11 @@ describeIntegration('Dynamodb migration test', () => {
   });
 
   test('can perform update', async() => {
-    // await prefillDatabase(database, 1000, 2000);
+    await prefillDatabase(database, 20000, 2000);
     const migration = new Migration(dynamoDBClient, tableName, storage);
-    await expect(migration.run(50, false)).resolves.not.toThrow();
-  }, 20000);
+    const result = await migration.run(50, false);
+    expect(result).toBeTruthy();
+  }, 240000);
 
   test('can get new attributes for updated item after update', async() => {
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
@@ -191,7 +192,7 @@ async function prefillDatabase(database: DynamoDBDatabase, items: number, startA
   for (let index = startAt; index < items + startAt; index++) {
     await database.storeSubmission({
       key: `TDL17.${index}`,
-      pdf: generateRandomString(1000),
+      pdf: generateRandomString(10),
       userId: '900222670',
     });
   }

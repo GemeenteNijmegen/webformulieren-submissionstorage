@@ -47,10 +47,10 @@ export class Migration {
   private client: DynamoDBClient;
   private tableName: string;
   private storage: Storage;
-  private _errors: string[] = [];
-  private _info: string[] = [];
-  private _success: string[] = [];
-  private _failed: string[] = [];
+  private _errors: string = '';
+  private _info: string = '';
+  private _success: string = '';
+  private _failed: string = '';
 
   constructor(client: DynamoDBClient, tableName: string, storage: Storage) {
     this.client = client;
@@ -70,34 +70,30 @@ export class Migration {
    * to update each item in the database individually (to prevent data loss).
    */
   async run(batchSize: number, dryrun: boolean) {
-    const command = new ScanCommand({
-      TableName: this.tableName,
-      ExclusiveStartKey: this.lastKey,
-      FilterExpression: 'NOT attribute_exists(formName)',
-    });
     try {
-      this.info('Starting scan');
-      const result = await this.client.send(command);
-      this.info(`Scan filtered in ${result.Count} of ${result.ScannedCount} scanned items.`);
-      await this.batchUpdate(result, batchSize, dryrun);
-      this.lastKey = result.LastEvaluatedKey;
-      if (this.lastKey) {
-        this.info('More items to scan.');
-        await this.run(batchSize, dryrun);
-      }
+      do {
+        const command = new ScanCommand({
+          TableName: this.tableName,
+          ExclusiveStartKey: this.lastKey,
+          FilterExpression: 'NOT attribute_exists(formName)',
+        });
+        this.info('Starting scan');
+        const result = await this.client.send(command);
+        this.info(`Scan filtered in ${result.Count} of ${result.ScannedCount} scanned items.`);
+        await this.batchUpdate(result, batchSize, dryrun);
+        this.lastKey = result.LastEvaluatedKey;
+      } while (this.lastKey);
     } catch (error: any) {
       this.error(error);
     }
     this.info('Finished run');
-    console.log(...this._info.flatMap(line => [line, '\n']));
-    console.error(...this._errors.flatMap(line => [line, '\n']));
-    console.log(`Successfully updated ${this._success.length} items`, ...this._success.flatMap(line => [line, '\n']));
+    console.log(this._info);
+    console.error(this._errors);
+    console.log('Successfully updated these items', this._success);
     if (this._failed.length > 0) {
-      console.error(`FAILED updating ${this._failed.length} items`, ...this._success.flatMap(line => [line, '\n']));
+      console.error('FAILED updating these items', this._failed);
     }
     return {
-      success: this._success.length,
-      failed: this._failed.length,
       updated_items: this._success,
       failed_items: this._failed,
     };
@@ -258,22 +254,22 @@ export class Migration {
         });
         await this.client.send(command);
         this.info(`Updated item ${item.sk.S}`);
-        this._success.push(item.sk.S);
+        this._success = this._success.concat(`${item.sk.S} \n`);
       } catch (error) {
-        this.error('Failed updating item `${item.sk.S}`');
-        this._failed.push(item.sk.S);
+        this.error(`Failed updating item ${item.sk.S} \n`);
+        this._failed = this._failed.concat(`Failed updating item ${item.sk.S} \n`);
         throw (error);
       }
     }
   }
 
   info(message: string) {
-    this._info.push(message);
+    this._info = this._info.concat(message, '\n');
     console.info(message);
   }
 
   error(message: string) {
-    this._errors.push(message);
+    this._errors = this._errors.concat(message, '\n');
     console.error(message);
   }
 }
