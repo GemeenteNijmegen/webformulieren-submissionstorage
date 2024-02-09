@@ -4,6 +4,7 @@ import { CreateTableCommand, DeleteTableCommand, DynamoDBClient, GetItemCommand 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
 import * as formDefinitionSample from './sample-formdefinition.json';
+import * as submissionSampleNoTimestamp from './sample-submission-no-timestamp.json';
 import { DynamoDBDatabase } from '../../app/submission/Database';
 import { S3Storage } from '../../app/submission/Storage';
 import * as snsSample from '../../app/submission/test/samples/sns.sample.json';
@@ -25,7 +26,11 @@ jest.mock('../../app/submission/Storage', () => {
         getBatch: async (params: string[]) => {
           let returnObjects = [];
           for (const key of params) {
-            if (key.includes('submission')) {returnObjects.push(getObjectMock(snsSample.Records[0].Sns)); }
+            if (key.includes('TDL17.1/submission')) {
+              returnObjects.push(getObjectMock(submissionSampleNoTimestamp));
+            } else if (key.includes('submission')) {
+              returnObjects.push(getObjectMock(snsSample.Records[0].Sns));
+            }
             if (key.includes('formdefinition')) {returnObjects.push(getObjectMock(formDefinitionSample)); }
           }
           return returnObjects;
@@ -34,7 +39,6 @@ jest.mock('../../app/submission/Storage', () => {
     }),
   };
 });
-
 
 describeIntegration('Dynamodb migration test', () => {
   const composeFilePath = '/Users/joostvanderborg/Developer/webformulieren-submissionstorage/src/app/submission/test/';
@@ -144,16 +148,23 @@ describeIntegration('Dynamodb migration test', () => {
 
   test('item without S3 item shouldnt have been updated but still exist', async() => {
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
-    const command = getItemCommand(tableName, 'TDL17.1');
+    const command = getItemCommand(tableName, 'TDL17.2');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
+  });
+
+  test('item without timestamp in submission uses sns timestamp', async() => {
+    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
+    const command = getItemCommand(tableName, 'TDL17.1');
+    expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
+    expect(await dynamoDBClient.send(command)).toHaveProperty('Item.dateSubmitted');
   });
 
   test('Running migration twice should result in same table', async() => {
     const consoleSpy = jest.spyOn(console, 'info');
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
-    expect(consoleSpy).toHaveBeenCalledWith('Updating 1 items in dynamoDB');
-    const command = getItemCommand(tableName, 'TDL17.1');
+    expect(consoleSpy).toHaveBeenCalledWith('Updating 2 items in dynamoDB');
+    const command = getItemCommand(tableName, 'TDL17.2');
     expect(await dynamoDBClient.send(command)).toHaveProperty('Item.pdfKey');
     expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.dateSubmitted');
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
