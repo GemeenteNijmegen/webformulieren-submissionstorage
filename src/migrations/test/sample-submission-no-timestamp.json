@@ -1,0 +1,22 @@
+{
+  "Type": "Notification",
+  "MessageId": "35b5cd0f-de17-5ad0-9cc4-906da4341f5e",
+  "TopicArn": "arn:aws:sns:eu-west-1:315037222840:eform-submissions",
+  "Subject": null,
+  "Message": "{\"formId\":\"407440cb-c735-4ab1-a8f0-94511c4116f7\",\"formTypeId\":\"bingomeldenofloterijvergunningaanvragen\",\"appId\":\"TDL\",\"reference\":\"TDL17.1\",\"data\":{\"bsn\":\"900026236\",\"kvk\":\"\",\"achternaam\":\"\",\"betrouwbaarheidsniveau\":\"digid\",\"familienaam\":\"\",\"geboortedatum\":\"01-01-1956\",\"gemeente\":\"\",\"geslacht\":\"\",\"huisnummer\":\"\",\"initialen\":\"\",\"inlogmiddel\":\"digid\",\"kenmerk\":\"TDL-18.243\",\"naamIngelogdeGebruiker\":\"H. de Jong\",\"nationaliteit\":\"\",\"postcode\":\"\",\"straatnaam\":\"\",\"totaalbedrag\":\"\",\"tussenvoegsel\":\"\",\"vipZaakType\":\"\",\"volledigeNaam\":\"H. de Jong\",\"voornaam\":\"\",\"woonplaats\":\"Nijmegen\",\"adres_nijmegen\":{\"adres_nijmegen-postalcode\":\"6511 pp\",\"adres_nijmegen-housenr\":\"5\",\"adres_nijmegen-streetname\":\"Korte Nieuwstraat\",\"adres_nijmegen-city\":\"Nijmegen\"},\"select_nijmegen\":\"\",\"eMailadres\":\"\",\"selectBoxesNijmegen\":{\"test\":false,\"tweede\":false,\"derde\":true},\"test\":false,\"dataGrid\":[{\"textareaNijmegen\":\"\"}],\"fileNijmegen\":[{\"storage\":\"url\",\"name\":\"test-1m-12d5a986-883c-48a6-a280-13343176024c.pdf\",\"url\":\"https://app6-accp.nijmegen.nl/form/cloud/s3/upload/407440cb-c735-4ab1-a8f0-94511c4116f7?baseUrl=https%3A%2F%2Fapp6-accp.nijmegen.nl&project=&form=/test-1m-12d5a986-883c-48a6-a280-13343176024c.pdf\",\"size\":\"1048576\",\"type\":\"application/pdf\",\"reference\":\"88dc3f213488401347943b96bfc26c52\",\"originalName\":\"test-1m.pdf\",\"location\":\"407440cb-c735-4ab1-a8f0-94511c4116f7/files/test-1m.pdf\",\"bucketName\":\"acceptance-eformgenericse-eformattuploads951db329-1s58estbegn6m\"}],\"opslaan\":false,\"volgende\":false,\"submit1\":true,\"submit\":false},\"metadata\":{\"timezone\":\"Europe/Amsterdam\",\"offset\":120,\"origin\":\"https://app6-accp.nijmegen.nl\",\"referrer\":\"\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5.2 Safari/605.1.15\",\"pathName\":\"/\",\"onLine\":true},\"employeeData\":{},\"pdf\":{\"reference\":\"8a3f06b5bcb4ea87b3db8e9ef8180308\",\"location\":\"407440cb-c735-4ab1-a8f0-94511c4116f7/pdf/TDL17.1\",\"bucketName\":\"acceptance-eformgenericse-eformattuploads951db329-1s58estbegn6m\"},\"brpData\":{\"Persoon\":{\"BSN\":{\"BSN\":\"900026236\"},\"Persoonsgegevens\":{\"Voorletters\":\"H.\",\"Voornamen\":\"Hans\",\"Voorvoegsel\":\"de\",\"Geslachtsnaam\":\"Jong\",\"Achternaam\":\"de Jong\",\"Naam\":\"H. de Jong\",\"Geboortedatum\":\"01-01-1956\",\"Geslacht\":\"M\",\"NederlandseNationaliteit\":\"Ja\",\"Geboorteplaats\":\"Nijmegen\",\"Geboorteland\":\"Nederland\"},\"Adres\":{\"Straat\":\"Kelfkensbos\",\"Huisnummer\":\"80-A-1\",\"Gemeente\":\"Nijmegen\",\"Postcode\":\"6511 RN\",\"Woonplaats\":\"Nijmegen\"},\"Reisdocument\":{\"Documentsoort\":\"\",\"Documentnummer\":\"\",\"Uitgiftedatum\":\"\",\"Verloopdatum\":\"\"},\"ageLimits\":{\"over12\":\"Yes\",\"over16\":\"Yes\",\"over18\":\"Yes\",\"over21\":\"Yes\",\"over65\":\"Yes\"}}},\"bsn\":\"900026236\"}",
+  "Timestamp": "2023-08-25T09:44:03.058Z",
+  "SignatureVersion": "1",
+  "Signature": "XhXD0sUz2ufs+saAMAa3VLv6VdOSNacLWG5MXnVLWQcfc1Wiz75q80QAJAGnky9TR2Eis6MqBDtHwpwoYLdiYqO8QDjBQi1DRbNEbMhuQEl/0kXiAu3oJShsKkhdvnRH864Jqzhmh11ct3gUC6E3HLJYVBltHXc4gaDJm7BphxL0F4ufRcRhbMiGrrHTnn1KHYV/MTz9q98S1FRM/BY9eZCO2edJThhb2QARvpDKnSlEx/UjGtxmjHysxokfYZKAeo0kS5+qjLRG5yHqxmwJS2UIT0RXRPtUN8EzUCXOtkCKgNb3zaufCAAKPaJdMhAdJKgs/KBIaXv+hwUl6sMpGg==",
+  "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem",
+  "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:315037222840:eform-submissions:182bcc56-eb20-4e48-92f5-972819927c6c",
+  "MessageAttributes": {
+    "resubmitted": {
+      "Type": "String",
+      "Value": "true"
+    },
+    "AppId": {
+      "Type": "String",
+      "Value": "TDL"
+    }
+  }
+}

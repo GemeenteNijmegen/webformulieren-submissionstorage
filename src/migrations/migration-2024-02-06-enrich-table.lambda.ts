@@ -140,17 +140,24 @@ export class Migration {
     const formdefinitions = await this.getFormDefinitionObjectsFromBucket(results.map((result: any) => `${result.sk.S}/formdefinition.json`));
     const resultObjects = results.map((result: any) => {
       const key = result.sk.S;
-      const submissionKey = submissions[key];
-      if (submissionKey) {
-        const formNameLowerCased = (submissionKey.formTypeId as string).toLowerCase();
+      const submission = submissions[key];
+      if (submission) {
+        const formNameLowerCased = (submission.formTypeId as string).toLowerCase();
         const formTitle = formdefinitions?.[formNameLowerCased]?.title;
+        let submissionDate;
+        if (submission.metadata.timestamp) {
+          submissionDate = new Date(Date.UTC(...submission.metadata.timestamp as [number, number, number, number, number, number, number]));
+        } else {
+          this.info(`submission object for ${key} has no timestamp, using sns timestamp`);
+          submissionDate = submission.snsTimeStamp;
+        }
         if (!formTitle) {
           this.error(`No title found in form definition for key ${key}, form name: ${formNameLowerCased}`);
         } else {
           return {
             ...result,
             formName: formNameLowerCased,
-            date: new Date(Date.UTC(...submissionKey.metadata.timestamp as [number, number, number, number, number, number, number])),
+            date: submissionDate,
             formTitle: formTitle,
           };
         }
@@ -177,6 +184,8 @@ export class Migration {
           const bodyString = await object.Body.transformToString();
           const objectJson = JSON.parse(bodyString);
           const submission = JSON.parse(objectJson.Message);
+          //Add the sns message timestamp in, we might need it
+          submission.snsTimeStamp = objectJson.Timestamp;
           submissions[submission.reference] = submission;
           this.info(`- ${submission.reference}`);
         }
