@@ -22,6 +22,7 @@
 /src/app/get-form-overview/getFormOverview-function.ts linguist-generated
 /src/app/listSubmissions/listSubmissions-function.ts linguist-generated
 /src/app/submission/submission-function.ts linguist-generated
+/src/migrations/migration-2024-02-06-enrich-table-function.ts linguist-generated
 /tsconfig.dev.json linguist-generated
 /tsconfig.json linguist-generated
 /yarn.lock linguist-generated

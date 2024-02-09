@@ -6,6 +6,7 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { Configurable } from './Configuration';
+import { Migration20240206EnrichTableFunction } from './migrations/migration-2024-02-06-enrich-table-function';
 import { Statics } from './statics';
 
 
@@ -23,7 +24,7 @@ export class StorageStack extends Stack {
      * This bucket will receive submission attachments
      * (Submission PDF, uploads) for each submission.
      */
-    const bucket = new Bucket(this, 'submission-attachments', {
+    const storageBucket = new Bucket(this, 'submission-attachments', {
       eventBridgeEnabled: true,
       enforceSSL: true,
       encryption: BucketEncryption.KMS,
@@ -35,8 +36,8 @@ export class StorageStack extends Stack {
       ],
       encryptionKey: key,
     });
-    this.addArnToParameterStore('bucketParam', bucket.bucketArn, Statics.ssmSubmissionBucketArn);
-    this.addArnToParameterStore('bucketNameParam', bucket.bucketName, Statics.ssmSubmissionBucketName);
+    this.addArnToParameterStore('bucketParam', storageBucket.bucketArn, Statics.ssmSubmissionBucketArn);
+    this.addArnToParameterStore('bucketNameParam', storageBucket.bucketName, Statics.ssmSubmissionBucketName);
 
     /**
      * This bucket will receive submission attachments
@@ -69,6 +70,23 @@ export class StorageStack extends Stack {
     this.addArnToParameterStore('tableNameParam', table.tableName, Statics.ssmSubmissionTableName);
 
     this.addParameters();
+
+    this.addMigrations(table, storageBucket);
+  }
+
+  private addMigrations(table: Table, bucket: Bucket) {
+    /**
+     * Enrich table items using data from S3 storage
+     */
+    const migration = new Migration20240206EnrichTableFunction(this, 'migration-20240206', {
+      environment: {
+        TABLE_NAME: table.tableName,
+        BUCKET_NAME: bucket.bucketName,
+      },
+      memorySize: 2048,
+    });
+    table.grantReadWriteData(migration);
+    bucket.grantRead(migration);
   }
 
   private key() {
