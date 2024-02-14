@@ -115,7 +115,7 @@ export class Submission {
     } catch (error: any) {
       console.error(error);
     }
-
+    // Timestamps are provided as an array of [year, monthindex, day, hour, minute, second, somethingwhichisnotmillis]. We don't need subsecond precision, so we slice that element off.
     const timestamp = this.parsedSubmission.metadata.timestamp.slice(0, -1) as [number, number, number, number, number, number];
     timestamp.slice(0);
     const parsedDefinition = FormDefinitionSchema.parse(formDefinition);
