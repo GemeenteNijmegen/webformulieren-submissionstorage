@@ -5,6 +5,7 @@ import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 import { s3Object } from './s3Object';
 import { Storage } from './Storage';
 import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
+import { dateArrayToDate } from '../../utils/dateArrayToDate';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
@@ -115,13 +116,23 @@ export class Submission {
     } catch (error: any) {
       console.error(error);
     }
-
+    // Timestamps are provided as an array of [year, monthindex, day, hour, minute, second, somethingwhichisnotmillis]. We don't need subsecond precision, so we slice that element off.
+    let dateSubmitted: Date|undefined;
+    try {
+      dateSubmitted = dateArrayToDate(this.parsedSubmission.metadata.timestamp);
+    } catch (error) {
+      console.error('Could not get submission date from submission, continueing');
+    }
+    const parsedDefinition = FormDefinitionSchema.parse(formDefinition);
     // Store in dynamodb
     await this.database.storeSubmission({
       userId: this.userId(),
       key: this.key,
       pdf: pdfKey,
       attachments: this.attachments,
+      dateSubmitted: dateSubmitted?.toISOString(),
+      formName: this.parsedSubmission.formTypeId,
+      formTitle: parsedDefinition.title,
     });
 
     return true;
@@ -163,3 +174,10 @@ export class Submission {
     return promises;
   }
 }
+
+export const FormDefinitionSchema = z.object({
+  title: z.string(),
+  name: z.string(),
+});
+
+

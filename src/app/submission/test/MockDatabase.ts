@@ -24,6 +24,9 @@ export class MockDatabase implements Database {
       userId: parameters.userId,
       key: 'TDL123.001',
       pdf: 'submission.pdf',
+      dateSubmitted: '2023-12-23T11:58:52.670Z',
+      formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+      formTitle: 'Bingo melden of loterijvergunning aanvragen',
     }];
   }
 }

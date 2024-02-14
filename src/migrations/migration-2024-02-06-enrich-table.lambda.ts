@@ -1,5 +1,6 @@
 import { AttributeValue, DynamoDBClient, ScanCommand, ScanCommandOutput, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { S3Storage, Storage } from '../app/submission/Storage';
+import { dateArrayToDate } from '../utils/dateArrayToDate';
 
 /**
  * This is a one-time use function to migrate the dynamoDB table used for storing submissions. The following changes need to be performed:
@@ -142,7 +143,7 @@ export class Migration {
         const formTitle = formdefinitions?.[formNameLowerCased]?.title;
         let submissionDate;
         if (submission.metadata.timestamp) {
-          submissionDate = new Date(Date.UTC(...submission.metadata.timestamp as [number, number, number, number, number, number, number]));
+          submissionDate = dateArrayToDate(submission.metadata.timestamp);
         } else {
           this.info(`submission object for ${key} has no timestamp, using sns timestamp`);
           submissionDate = submission.snsTimeStamp;
