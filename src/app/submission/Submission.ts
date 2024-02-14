@@ -118,10 +118,6 @@ export class Submission {
 
     const timestamp = this.parsedSubmission.metadata.timestamp.slice(0, -1) as [number, number, number, number, number, number];
     timestamp.slice(0);
-    console.debug('timestamp', timestamp);
-    console.debug('form def', formDefinition);
-    console.debug(timestamp);
-    console.debug(new Date(Date.UTC(...timestamp)).toISOString());
     const parsedDefinition = FormDefinitionSchema.parse(formDefinition);
     // Store in dynamodb
     await this.database.storeSubmission({
