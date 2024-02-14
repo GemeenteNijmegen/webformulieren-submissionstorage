@@ -21,6 +21,9 @@ describe('Save object', () => {
           originalName: 'testattachment2.pdf',
         },
       ],
+      dateSubmitted: '2023-12-23T11:58:52.670Z',
+      formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+      formTitle: 'Bingo melden of loterijvergunning aanvragen',
     })).toBeTruthy();
   });
 
@@ -71,11 +74,17 @@ describeIntegration('Dynamodb integration tests', () => {
       key: 'TDL10.002',
       pdf: 'submission.pdf',
       userId: '900222670',
+      dateSubmitted: '2023-12-23T11:58:52.670Z',
+      formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+      formTitle: 'Bingo melden of loterijvergunning aanvragen',
     });
     expect(await database.storeSubmission({
       key: 'TDL10.001',
       pdf: 'submission.pdf',
       userId: '900222670',
+      dateSubmitted: '2023-12-23T11:58:52.670Z',
+      formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+      formTitle: 'Bingo melden of loterijvergunning aanvragen',
     })).toBeTruthy();
   });
 

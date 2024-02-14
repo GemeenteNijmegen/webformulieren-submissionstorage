@@ -7,6 +7,9 @@ export interface SubmissionData {
   key: string;
   pdf: string;
   attachments?: s3Object[];
+  dateSubmitted?: string;
+  formName?: string;
+  formTitle?: string;
 }
 
 export interface ListSubmissionParameters {
@@ -64,6 +67,9 @@ export class DynamoDBDatabase implements Database {
           userId: parameters.userId,
           key: item?.sk.S ?? '',
           pdf: item?.pdfKey.S ?? '',
+          dateSubmitted: item?.dateSubmitted.S ?? '',
+          formName: item?.formName.S ?? '',
+          formTitle: item?.formTitle.S ?? '',
         };
       }) ?? [];
       return items;
@@ -80,6 +86,15 @@ export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData)
     sk: { S: sk },
     pdfKey: { S: submission.pdf },
   };
+  if (submission.dateSubmitted) {
+    item.dateSubmitted = { S: item.dateSubmitted };
+  }
+  if (submission.formName) {
+    item.formName = { S: item.formName };
+  }
+  if (submission.formTitle) {
+    item.formTitle = { S: item.formTitle };
+  }
   if (submission.attachments) {
     item.attachments = {
       L: submission.attachments?.map((attachment) => {
