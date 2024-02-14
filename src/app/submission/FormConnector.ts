@@ -6,7 +6,7 @@ export interface FormConnector {
 export class MockFormConnector implements FormConnector {
   async definition(formName: string) {
     return Promise.resolve({
-      formName: formName,
+      name: formName,
       title: formName,
     });
   }
