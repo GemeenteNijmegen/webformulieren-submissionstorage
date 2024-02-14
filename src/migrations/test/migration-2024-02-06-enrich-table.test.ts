@@ -136,8 +136,10 @@ describeIntegration('Dynamodb migration test', () => {
   test('can get new attributes for updated item after update', async() => {
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
     const command = getItemCommand(tableName, 'TDL17.957');
-    expect(await dynamoDBClient.send(command)).toHaveProperty('Item.dateSubmitted');
-    expect(await dynamoDBClient.send(command)).toHaveProperty('Item.formTitle');
+    const results = await dynamoDBClient.send(command);
+    expect(results).toHaveProperty('Item.dateSubmitted');
+    expect(results).toHaveProperty('Item.formTitle');
+    expect(results?.Item?.dateSubmitted?.S).toBe('2024-03-01T13:19:04.000Z');
   });
 
   test('dryrun does not actually update', async() => {

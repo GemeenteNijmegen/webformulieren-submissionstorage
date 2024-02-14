@@ -142,7 +142,7 @@ export class Migration {
         const formTitle = formdefinitions?.[formNameLowerCased]?.title;
         let submissionDate;
         if (submission.metadata.timestamp) {
-          submissionDate = new Date(Date.UTC(...submission.metadata.timestamp as [number, number, number, number, number, number, number]));
+          submissionDate = new Date(Date.UTC(...submission.metadata.timestamp.slice(0, -1) as [number, number, number, number, number, number]));
         } else {
           this.info(`submission object for ${key} has no timestamp, using sns timestamp`);
           submissionDate = submission.snsTimeStamp;
