@@ -116,12 +116,18 @@ export class Submission {
       console.error(error);
     }
 
+    const timestamp = this.parsedSubmission.metadata.timestamp as [number, number, number, number, number, number, number];
+    console.debug('form def', formDefinition);
+    const parsedDefinition = FormDefinitionSchema.parse(formDefinition);
     // Store in dynamodb
     await this.database.storeSubmission({
       userId: this.userId(),
       key: this.key,
       pdf: pdfKey,
       attachments: this.attachments,
+      dateSubmitted: new Date(Date.UTC(...timestamp)).toISOString(),
+      formName: this.parsedSubmission.formTypeId,
+      formTitle: parsedDefinition.title,
     });
 
     return true;
@@ -163,3 +169,8 @@ export class Submission {
     return promises;
   }
 }
+
+export const FormDefinitionSchema = z.object({
+  title: z.string(),
+  name: z.string(),
+});

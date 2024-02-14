@@ -22,6 +22,9 @@ export const SubmissionSchema = z.object({
   }),
   bsn: z.string().optional(),
   kvk: z.string().optional(),
+  metadata: z.object({
+    timestamp: z.array(z.number()),
+  }).passthrough(),
 });
 
 export const SubmissionPaymentSchema = z.object({
