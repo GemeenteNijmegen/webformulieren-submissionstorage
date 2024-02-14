@@ -139,7 +139,7 @@ describeIntegration('Dynamodb migration test', () => {
     const results = await dynamoDBClient.send(command);
     expect(results).toHaveProperty('Item.dateSubmitted');
     expect(results).toHaveProperty('Item.formTitle');
-    expect(results?.Item?.dateSubmitted?.S).toBe('2024-03-01T13:19:04.000Z');
+    expect(results?.Item?.dateSubmitted?.S).toBe('2024-02-01T13:19:04.000Z');
   });
 
   test('dryrun does not actually update', async() => {
