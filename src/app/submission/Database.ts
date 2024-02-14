@@ -87,13 +87,13 @@ export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData)
     pdfKey: { S: submission.pdf },
   };
   if (submission.dateSubmitted) {
-    item.dateSubmitted = { S: item.dateSubmitted };
+    item.dateSubmitted = { S: submission.dateSubmitted };
   }
   if (submission.formName) {
-    item.formName = { S: item.formName };
+    item.formName = { S: submission.formName };
   }
   if (submission.formTitle) {
-    item.formTitle = { S: item.formTitle };
+    item.formTitle = { S: submission.formTitle };
   }
   if (submission.attachments) {
     item.attachments = {
