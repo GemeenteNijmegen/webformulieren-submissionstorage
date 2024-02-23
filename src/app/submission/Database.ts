@@ -19,7 +19,6 @@ const dynamoDBStringSchema = z.object({
 const submissionTableItemSchema = z.object({
   pk: dynamoDBStringSchema,
   sk: dynamoDBStringSchema,
-  key: dynamoDBStringSchema,
   pdfKey: dynamoDBStringSchema,
   dateSubmitted: dynamoDBStringSchema,
   formName: dynamoDBStringSchema,
