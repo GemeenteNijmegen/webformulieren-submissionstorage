@@ -1,24 +1,23 @@
-import * as snsSample from '../../submission/test/samples/sns.sample.json';
 import { ListSubmissionsRequestHandler } from '../ListSubmissionsRequestHandler';
 
 const listResults = [{
-  key: 'TDL17.957',
-  pdf: 'TDL17.957/submission.pdf',
-}];
-
-const expectedListResults = [{
+  userId: '900222670',
   key: 'TDL17.957',
   pdf: 'TDL17.957/submission.pdf',
   formName: 'bingoMeldenOfLoterijvergunningAanvragen',
-  date: '2024-03-01T16:35:55.229Z',
+  dateSubmitted: '2024-03-01T16:35:55.229Z',
+  formTitle: 'Bingo melden',
 }];
 
-const getObjectMock = (file:any) => ({
-  Body: {
-    // Stringify the file to simulate the AWS getObject response
-    transformToString: () => Promise.resolve(JSON.stringify(file)),
-  },
-});
+const expectedListResults = [{
+  userId: '900222670',
+  key: 'TDL17.957',
+  pdf: 'TDL17.957/submission.pdf',
+  formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+  dateSubmitted: '2024-03-01T16:35:55.229Z',
+  formTitle: 'Bingo melden',
+}];
+
 
 jest.mock('../../submission/Database', () => {
 
@@ -27,18 +26,6 @@ jest.mock('../../submission/Database', () => {
       return {
         listSubmissions: async () => {
           return listResults;
-        },
-      };
-    }),
-  };
-});
-
-jest.mock('../../submission/Storage', () => {
-  return {
-    S3Storage: jest.fn(() => {
-      return {
-        getBatch: async () => {
-          return [getObjectMock(snsSample.Records[0].Sns)];
         },
       };
     }),
