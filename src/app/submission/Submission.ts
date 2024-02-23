@@ -28,7 +28,7 @@ export class Submission {
 
   public bsn?: string;
   public kvk?: string;
-  public pdf?: s3Object;
+  public pdf?: { bucket: string; key: string };
   public attachments?: s3Object[];
   public key?: string;
 
@@ -74,7 +74,7 @@ export class Submission {
    *
    * @returns `[s3Object]`
    */
-  async getAttachments(): Promise<{ bucket: string; key: string; originalName?: string | undefined }[]> {
+  async getAttachments(): Promise<s3Object[]> {
     const filesObjects = getSubObjectsWithKey(this.parsedSubmission!.data, 'bucketName');
     return filesObjects.map((file: any) => {
       const result = {
@@ -129,7 +129,7 @@ export class Submission {
       userId: this.userId(),
       key: this.key,
       pdf: pdfKey,
-      attachments: this.attachments,
+      attachments: this.attachments?.map(attachment => attachment.originalName),
       dateSubmitted: dateSubmitted?.toISOString(),
       formName: this.parsedSubmission.formTypeId,
       formTitle: parsedDefinition.title,

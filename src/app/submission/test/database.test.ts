@@ -15,11 +15,7 @@ describe('Save object', () => {
       key: 'TDL.1234',
       pdf: 'test.pdf',
       attachments: [
-        {
-          bucket: 'testbucket',
-          key: 'testattachment.pdf',
-          originalName: 'testattachment2.pdf',
-        },
+        'testattachment2.pdf',
       ],
       dateSubmitted: '2023-12-23T11:58:52.670Z',
       formName: 'bingoMeldenOfLoterijvergunningAanvragen',
