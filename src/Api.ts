@@ -63,7 +63,6 @@ export class Api extends Construct {
     });
     //PAste
     const plan = api.addUsagePlan('UsagePlanManagementApi', {
-      name: 'management',
       description: 'used for rate-limit and api key',
       throttle: {
         rateLimit: 5,
@@ -71,8 +70,7 @@ export class Api extends Construct {
       },
     });
     const apiKey = api.addApiKey('ApiKeyManagement', {
-      apiKeyName: 'ManagementApi',
-      description: 'gebruikt voor alle methods van management API',
+      description: 'gebruikt voor alle methods van submissions API',
     });
 
     //fix for removing/adding usage plans to workaround old bug https://github.com/aws/aws-cdk/pull/13817
