@@ -1,16 +1,36 @@
 import { DynamoDBClient, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { z } from 'zod';
 import { hashString } from './hash';
-import { s3Object } from './s3Object';
 
 export interface SubmissionData {
   userId: string;
   key: string;
   pdf: string;
-  attachments?: s3Object[];
+  attachments?: string[];
   dateSubmitted?: string;
   formName?: string;
   formTitle?: string;
 }
+
+const dynamoDBStringSchema = z.object({
+  S: z.string(),
+});
+
+const submissionTableItemSchema = z.object({
+  pk: dynamoDBStringSchema,
+  sk: dynamoDBStringSchema,
+  pdfKey: dynamoDBStringSchema,
+  dateSubmitted: dynamoDBStringSchema,
+  formName: dynamoDBStringSchema,
+  formTitle: dynamoDBStringSchema,
+  attachments: z.object({
+    L: z.array(dynamoDBStringSchema),
+  }),
+});
+
+const submissionTableItemsSchema = z.object({
+  Items: z.array(submissionTableItemSchema),
+});
 
 export interface ListSubmissionParameters {
   userId: string;
@@ -61,7 +81,7 @@ export class DynamoDBDatabase implements Database {
       KeyConditionExpression: '#pk = :id',
     });
     try {
-      const results = await this.client.send(queryCommand);
+      const results = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
       const items = results.Items?.map((item) => {
         return {
           userId: parameters.userId,
@@ -70,6 +90,7 @@ export class DynamoDBDatabase implements Database {
           dateSubmitted: item?.dateSubmitted.S ?? '',
           formName: item?.formName.S ?? '',
           formTitle: item?.formTitle.S ?? '',
+          attachments: item.attachments.L.map(attachment => attachment.S),
         };
       }) ?? [];
       return items;
@@ -98,7 +119,7 @@ export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData)
   if (submission.attachments) {
     item.attachments = {
       L: submission.attachments?.map((attachment) => {
-        return { S: attachment.originalName };
+        return { S: attachment };
       }),
     };
   };
