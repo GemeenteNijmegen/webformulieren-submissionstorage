@@ -27,6 +27,21 @@ export abstract class Statics {
   static readonly acceptanceWebformulierenAccountId = '338472043295';
   static readonly productionWebformulierenAccountId = '147064197580';
 
+  // Managed in dns-managment project:
+  static readonly accountRootHostedZonePath: string = '/gemeente-nijmegen/account/hostedzone';
+  static readonly accountRootHostedZoneId: string = '/gemeente-nijmegen/account/hostedzone/id';
+  static readonly accountRootHostedZoneName: string = '/gemeente-nijmegen/account/hostedzone/name';
+
+  // The KSM key parameters for each account
+  static readonly ssmAccountDnsSecKmsKey: string = '/gemeente-nijmegen/account/dnssec/kmskey/arn';
+
+  static readonly certificatePath: string = `${this.projectName}/certificates`;
+  static readonly certificateArn: string = `${this.projectName}/certificates/certificate-arn`;
+
+  static readonly ssmZonePath: string = `${this.projectName}/zone`;
+  static readonly ssmZoneId: string = `${this.projectName}/zone/id`;
+  static readonly ssmZoneName: string = `${this.projectName}/zone/name`;
+
 
   static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
   static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;

@@ -40,6 +40,12 @@ export interface Configuration {
    * processed.
    */
   readonly subscribeToTopicArns?: string[];
+
+  /**
+   * A list of CNAME records to register in the hosted zone
+   * Note: key should be withou domain suffix (only subdomain).
+   */
+  readonly cnameRecords?: {[key: string]: string};
 }
 
 export function getConfiguration(branchName: string): Configuration {
