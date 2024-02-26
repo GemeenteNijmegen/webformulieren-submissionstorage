@@ -20,8 +20,8 @@ export class CloudFrontDistribution extends Construct {
   constructor(scope: Construct, id: string, props: CloudfrontDistributionStackProps) {
     super(scope, id);
 
-    const distribution = this.distribution(props.apiGatewayDomain, props.domainNames, props.certificateArn, props.webAclId);
-    this.addEdgeProtectedS3Origin(distribution);
+    this.distribution(props.apiGatewayDomain, props.domainNames, props.certificateArn, props.webAclId);
+    // this.addEdgeProtectedS3Origin(distribution);
   }
 
   distribution(apiGatewayDomain: string, domainNames?: string[], certificateArn?: string, webAclId?: string) {
@@ -64,11 +64,10 @@ export class CloudFrontDistribution extends Construct {
     });
     return distribution;
   }
-
+  //@ts-ignore Commented out to test issue with deployment
   private addEdgeProtectedS3Origin(distribution: Distribution) {
     const edgeLambda = new StorageAccessControlFunction(this, 'access-control');
     const storageBucket = this.storageBucket();
-
     distribution.addBehavior(
       '/files/*',
       new S3Origin(storageBucket), {
