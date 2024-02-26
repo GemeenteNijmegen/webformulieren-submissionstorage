@@ -10,10 +10,11 @@ import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-f
 import { Statics } from './statics';
 
 export class Api extends Construct {
+  private api: RestApi;
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const api = this.createApiWithApiKey();
+    this.api = this.createApiWithApiKey();
 
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
 
@@ -33,28 +34,8 @@ export class Api extends Construct {
       encryptionKey: key,
     });
 
-    this.addListSubmissionsEndpoint(api, storageBucket, table);
-    this.addFormOverviewEndpoint(api, storageBucket, downloadBucket);
-  }
-
-  private addListSubmissionsEndpoint(api: RestApi, storageBucket: IBucket, table: ITable) {
-    const lambda = new ListSubmissionsFunction(this, 'list-submissions', {
-      environment: {
-        BUCKET_NAME: storageBucket.bucketName,
-        TABLE_NAME: table.tableName,
-      },
-    });
-    table.grantReadData(lambda);
-    storageBucket.grantRead(lambda);
-
-    const listSubmissionsEndpoint = api.root.addResource('submissions');
-    listSubmissionsEndpoint.addMethod('GET', new LambdaIntegration(lambda), {
-      apiKeyRequired: true,
-      requestParameters: {
-        'method.request.querystring.user_id': true,
-        'method.request.querystring.user_type': true,
-      },
-    });
+    this.addListSubmissionsEndpoint(storageBucket, table);
+    this.addFormOverviewEndpoint(storageBucket, downloadBucket);
   }
 
   private createApiWithApiKey() {
@@ -83,7 +64,27 @@ export class Api extends Construct {
     return api;
   }
 
-  private addFormOverviewEndpoint(api: RestApi, storageBucket: IBucket, downloadBucket: IBucket) {
+  private addListSubmissionsEndpoint(storageBucket: IBucket, table: ITable) {
+    const lambda = new ListSubmissionsFunction(this, 'list-submissions', {
+      environment: {
+        BUCKET_NAME: storageBucket.bucketName,
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadData(lambda);
+    storageBucket.grantRead(lambda);
+
+    const listSubmissionsEndpoint = this.api.root.addResource('submissions');
+    listSubmissionsEndpoint.addMethod('GET', new LambdaIntegration(lambda), {
+      apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.user_id': true,
+        'method.request.querystring.user_type': true,
+      },
+    });
+  }
+
+  private addFormOverviewEndpoint(storageBucket: IBucket, downloadBucket: IBucket) {
     const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', {
       environment: {
         BUCKET_NAME: storageBucket.bucketName,
@@ -95,9 +96,26 @@ export class Api extends Construct {
     storageBucket.grantRead(formOverviewFunction);
     downloadBucket.grantReadWrite(formOverviewFunction);
 
-    const formOverviewApi = api.root.addResource('formoverview');
+    const formOverviewApi = this.api.root.addResource('formoverview');
     formOverviewApi.addMethod('GET', new LambdaIntegration(formOverviewFunction), {
       apiKeyRequired: true,
     });
+  }
+
+
+  /**
+   * Clean and return the apigateway subdomain placeholder
+   * https://${Token[TOKEN.246]}.execute-api.eu-west-1.${Token[AWS.URLSuffix.3]}/
+   * which can't be parsed by the URL class.
+   *
+   * @returns a domain-like string cleaned of protocol and trailing slash
+   */
+  domain(): string {
+    const url = this.api.url;
+    if (!url) { return ''; }
+    let cleanedUrl = url
+      .replace(/^https?:\/\//, '') //protocol
+      .replace(/\/$/, ''); //optional trailing slash
+    return cleanedUrl;
   }
 }

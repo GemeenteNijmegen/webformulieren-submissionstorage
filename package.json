@@ -8,6 +8,8 @@
     "bundle:app/get-form-overview/getFormOverview.lambda:watch": "npx projen bundle:app/get-form-overview/getFormOverview.lambda:watch",
     "bundle:app/listSubmissions/listSubmissions.lambda": "npx projen bundle:app/listSubmissions/listSubmissions.lambda",
     "bundle:app/listSubmissions/listSubmissions.lambda:watch": "npx projen bundle:app/listSubmissions/listSubmissions.lambda:watch",
+    "bundle:app/storageAccessControl/storageAccessControl.lambda": "npx projen bundle:app/storageAccessControl/storageAccessControl.lambda",
+    "bundle:app/storageAccessControl/storageAccessControl.lambda:watch": "npx projen bundle:app/storageAccessControl/storageAccessControl.lambda:watch",
     "bundle:app/submission/submission.lambda": "npx projen bundle:app/submission/submission.lambda",
     "bundle:app/submission/submission.lambda:watch": "npx projen bundle:app/submission/submission.lambda:watch",
     "bundle:migrations/migration-2024-02-06-enrich-table.lambda": "npx projen bundle:migrations/migration-2024-02-06-enrich-table.lambda",
