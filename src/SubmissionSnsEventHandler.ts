@@ -16,6 +16,14 @@ import { Statics } from './statics';
 interface SubmissionSnsEventHandlerProps {
   topicArns: string[];
 }
+
+/**
+ * The submissionsSnsEventHandler receives form submissions
+ *
+ * This handler is subscribed to the SNS Topic(s) form submissions are
+ * submitted to. It handles receiving the submission, parsing it, saving
+ * metadata to DynamoDB and storing attachments / PDF's to S3.
+ */
 export class SubmissionSnsEventHandler extends Construct {
   private role?: Role;
   public lambda: Function;
