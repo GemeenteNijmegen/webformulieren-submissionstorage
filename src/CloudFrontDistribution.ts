@@ -1,8 +1,10 @@
 import { Duration } from 'aws-cdk-lib';
 import { Certificate, ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, HeadersFrameOption, HeadersReferrerPolicy, LambdaEdgeEventType, OriginRequestHeaderBehavior, OriginRequestPolicy, PriceClass, ResponseHeadersPolicy, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { EdgeFunction } from 'aws-cdk-lib/aws-cloudfront/lib/experimental';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Key } from 'aws-cdk-lib/aws-kms';
+import { Version } from 'aws-cdk-lib/aws-lambda';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
@@ -54,8 +56,7 @@ export class CloudFrontDistribution extends Construct {
   distribution(domainNames?: string[], certificate?: ICertificate, webAclId?: string) {
     if (!certificate) { domainNames = undefined; };
 
-
-    const edgeLambda = new StorageAccessControlFunction(this, 'access-control');
+    const edgeLambda = this.edgeLambdaFromUsEast();
     const storageBucket = this.storageBucket();
 
     const distribution = new Distribution(this, 'cf-distribution', {
@@ -68,7 +69,7 @@ export class CloudFrontDistribution extends Construct {
         edgeLambdas: [
           {
             eventType: LambdaEdgeEventType.VIEWER_REQUEST,
-            functionVersion: edgeLambda.currentVersion,
+            functionVersion: edgeLambda,
           },
         ],
         originRequestPolicy: new OriginRequestPolicy(this, 'cf-originrequestpolicy', {
@@ -100,6 +101,15 @@ export class CloudFrontDistribution extends Construct {
       defaultRootObject: '/',
     });
     return distribution;
+  }
+
+  private edgeLambdaFromUsEast() {
+    const remoteLambdaParameters = new RemoteParameters(this, 'remote-edge-lambda', {
+      path: Statics.ssmAccessEdgeLambdaPath,
+      region: 'us-east-1',
+    });
+    const edgeLambda = Version.fromVersionArn(this, 'access-control-function', remoteLambdaParameters.get(Statics.ssmAccessEdgeLambdaArn));
+    return edgeLambda;
   }
 
   private storageBucket() {

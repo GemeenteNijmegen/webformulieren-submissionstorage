@@ -5,6 +5,7 @@ import { CfnDNSSEC, CfnKeySigningKey, HostedZone, HostedZoneAttributes, IHostedZ
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
+import { StorageAccessControlFunction } from './app/storageAccessControl/storageAccessControl-function';
 import { Statics } from './statics';
 
 export interface UsEastStackProps extends StackProps {
@@ -31,6 +32,17 @@ export class UsEastStack extends Stack {
     if (props.useDnsSec) {
       this.setupDNSSEC(`${props.subdomain}-ksk`, hostedZone, accountHostedZone);
     }
+
+    this.createCloudfrontAccessControlLambda();
+  }
+
+  private createCloudfrontAccessControlLambda() {
+    const lambda = new StorageAccessControlFunction(this, 'access-control');
+
+    new StringParameter(this, 'storageaccesslambdaarn', {
+      stringValue: lambda.currentVersion.edgeArn,
+      parameterName: Statics.ssmAccessEdgeLambdaArn,
+    });
   }
 
   /**
