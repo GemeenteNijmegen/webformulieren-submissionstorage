@@ -46,12 +46,12 @@ export class UsEastStack extends Stack {
     });
 
     // Export string parameters
-    new StringParameter(this, `${subdomain}-hostedzone-id`, {
+    new StringParameter(this, 'app-hostedzone-id', {
       stringValue: zone.hostedZoneId,
       parameterName: Statics.ssmZoneId,
     });
 
-    new StringParameter(this, `${subdomain}-hostedzone-name`, {
+    new StringParameter(this, 'app-hostedzone-name', {
       stringValue: zone.zoneName,
       parameterName: Statics.ssmZoneName,
     });
