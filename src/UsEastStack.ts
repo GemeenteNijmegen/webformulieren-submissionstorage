@@ -11,6 +11,7 @@ export interface UsEastStackProps extends StackProps {
   accountHostedZoneRegion: string;
   subdomain: string;
   alternativeDomainNames?: string[];
+  useDnsSec?: boolean;
 }
 
 export class UsEastStack extends Stack {
@@ -27,7 +28,9 @@ export class UsEastStack extends Stack {
     const accountHostedZone = HostedZone.fromHostedZoneAttributes(this, 'account-hosted-zone', attributes);
     const hostedZone = this.setupProjectHostedZone(accountHostedZone);
     this.setupCertificate(hostedZone, props);
-    this.setupDNSSEC(`${props.subdomain}-ksk`, hostedZone, accountHostedZone);
+    if (props.useDnsSec) {
+      this.setupDNSSEC(`${props.subdomain}-ksk`, hostedZone, accountHostedZone);
+    }
   }
 
   /**

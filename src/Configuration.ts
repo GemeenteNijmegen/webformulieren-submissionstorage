@@ -52,6 +52,11 @@ export interface Configuration {
    * Note: key should be withou domain suffix (only subdomain).
    */
   readonly cnameRecords?: {[key: string]: string};
+
+  /**
+   * Set this boolean to setup DNSSEC
+   */
+  readonly useDnsSec?: boolean;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -91,5 +96,6 @@ const configurations: { [name: string] : Configuration } = {
     subscribeToTopicArns: [
       'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
     ],
+    useDnsSec: true,
   },
 };

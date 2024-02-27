@@ -29,6 +29,7 @@ export class ApiStage extends Stage {
       env: { region: 'us-east-1' },
       accountHostedZoneRegion: 'eu-central-1',
       subdomain: configuration.subdomain,
+      useDnsSec: configuration.useDnsSec,
     });
 
     const apiStack = new ApiStack(this, 'api', { configuration } );
