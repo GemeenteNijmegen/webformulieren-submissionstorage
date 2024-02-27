@@ -1,39 +1,77 @@
 import { Duration } from 'aws-cdk-lib';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, HeadersFrameOption, HeadersReferrerPolicy, LambdaEdgeEventType, OriginRequestHeaderBehavior, OriginRequestPolicy, PriceClass, ResponseHeadersPolicy, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
-import { HttpOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Key } from 'aws-cdk-lib/aws-kms';
+import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { StorageAccessControlFunction } from './app/storageAccessControl/storageAccessControl-function';
 import { Statics } from './statics';
 
 interface CloudfrontDistributionStackProps {
-  apiGatewayDomain: string;
+  apiGatewayDomain?: string;
   domainNames?: string[];
-  certificateArn?: string;
   webAclId?: string;
 }
 export class CloudFrontDistribution extends Construct {
   private _responseHeadersPolicy: ResponseHeadersPolicy | undefined;
-  constructor(scope: Construct, id: string, props: CloudfrontDistributionStackProps) {
+  constructor(scope: Construct, id: string, props?: CloudfrontDistributionStackProps) {
     super(scope, id);
 
-    this.distribution(props.apiGatewayDomain, props.domainNames, props.certificateArn, props.webAclId);
-    // this.addEdgeProtectedS3Origin(distribution);
+    const certificate = this.certificate();
+    const hostedZone = this.hostedZone();
+
+    const domainNames = props?.domainNames ?? [];
+    this.distribution([...domainNames, hostedZone.zoneName], certificate.certificateArn, props?.webAclId);
   }
 
-  distribution(apiGatewayDomain: string, domainNames?: string[], certificateArn?: string, webAclId?: string) {
+  /** Certificate is imported from US-East-1 */
+  private certificate() {
+    const remoteCertificateArn = new RemoteParameters(this, 'remote-certificate-arn', {
+      path: Statics.certificatePath,
+      region: 'us-east-1',
+    });
+    const certificate = Certificate.fromCertificateArn(this, 'certificate', remoteCertificateArn.get(Statics.certificateArn));
+    return certificate;
+  }
+
+  /** Hosted zone is imported from US-East-1 */
+  private hostedZone() {
+    const remoteHostedZone = new RemoteParameters(this, 'remote-hosted-zone', {
+      path: Statics.ssmZonePath,
+      region: 'us-east-1',
+    });
+    const hostedZone = HostedZone.fromHostedZoneAttributes(this, 'hosted-zone', {
+      hostedZoneId: remoteHostedZone.get(Statics.ssmZoneId),
+      zoneName: remoteHostedZone.get(Statics.ssmZoneName),
+    });
+    return hostedZone;
+  }
+
+  distribution(domainNames?: string[], certificateArn?: string, webAclId?: string) {
     const certificate = (certificateArn) ? Certificate.fromCertificateArn(this, 'certificate', certificateArn) : undefined;
     if (!certificate) { domainNames = undefined; };
+
+
+    const edgeLambda = new StorageAccessControlFunction(this, 'access-control');
+    const storageBucket = this.storageBucket();
+
     const distribution = new Distribution(this, 'cf-distribution', {
       priceClass: PriceClass.PRICE_CLASS_100,
       domainNames,
       certificate,
       webAclId,
       defaultBehavior: {
-        origin: new HttpOrigin(apiGatewayDomain),
+        origin: new S3Origin(storageBucket),
+        edgeLambdas: [
+          {
+            eventType: LambdaEdgeEventType.VIEWER_REQUEST,
+            functionVersion: edgeLambda.currentVersion,
+          },
+        ],
         originRequestPolicy: new OriginRequestPolicy(this, 'cf-originrequestpolicy', {
           originRequestPolicyName: 'cfOriginRequestPolicy',
           headerBehavior: OriginRequestHeaderBehavior.allowList(
@@ -63,26 +101,6 @@ export class CloudFrontDistribution extends Construct {
       defaultRootObject: '/',
     });
     return distribution;
-  }
-  //@ts-ignore Commented out to test issue with deployment
-  private addEdgeProtectedS3Origin(distribution: Distribution) {
-    const edgeLambda = new StorageAccessControlFunction(this, 'access-control');
-    const storageBucket = this.storageBucket();
-    distribution.addBehavior(
-      '/files/*',
-      new S3Origin(storageBucket), {
-        edgeLambdas: [
-          {
-            eventType: LambdaEdgeEventType.VIEWER_REQUEST,
-            functionVersion: edgeLambda.currentVersion,
-          },
-        ],
-        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
-        cachePolicy: CachePolicy.CACHING_DISABLED,
-        responseHeadersPolicy: this.responseHeadersPolicy(),
-      },
-    );
   }
 
   private storageBucket() {

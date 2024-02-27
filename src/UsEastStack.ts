@@ -26,7 +26,7 @@ export class UsEastStack extends Stack {
 
     const attributes = this.getZoneAttributesFromRegion(props);
     const accountHostedZone = HostedZone.fromHostedZoneAttributes(this, 'account-hosted-zone', attributes);
-    const hostedZone = this.setupProjectHostedZone(accountHostedZone);
+    const hostedZone = this.setupSubHostedZone(accountHostedZone, 'api');
     this.setupCertificate(hostedZone, props);
     if (props.useDnsSec) {
       this.setupDNSSEC(`${props.subdomain}-ksk`, hostedZone, accountHostedZone);
@@ -38,20 +38,20 @@ export class UsEastStack extends Stack {
    * @param accountHostedZone
    * @returns
    */
-  private setupProjectHostedZone(accountHostedZone: IHostedZone) {
+  private setupSubHostedZone(accountHostedZone: IHostedZone, subdomain: string) {
 
     // Create hosted zone
-    const zone = new HostedZone(this, 'managment-csp', {
-      zoneName: `${this.subdomain}.${accountHostedZone.zoneName}`,
+    const zone = new HostedZone(this, `${subdomain}`, {
+      zoneName: `${subdomain}.${accountHostedZone.zoneName}`,
     });
 
     // Export string parameters
-    new StringParameter(this, 'hostedzone-id', {
+    new StringParameter(this, `${subdomain}-hostedzone-id`, {
       stringValue: zone.hostedZoneId,
       parameterName: Statics.ssmZoneId,
     });
 
-    new StringParameter(this, 'hostedzone-name', {
+    new StringParameter(this, `${subdomain}-hostedzone-name`, {
       stringValue: zone.zoneName,
       parameterName: Statics.ssmZoneName,
     });
@@ -63,7 +63,7 @@ export class UsEastStack extends Stack {
     new NsRecord(this, 'ns-record', {
       zone: accountHostedZone,
       values: zone.hostedZoneNameServers,
-      recordName: this.subdomain,
+      recordName: subdomain,
     });
 
     return zone;

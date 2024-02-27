@@ -73,7 +73,7 @@ export function getConfiguration(branchName: string): Configuration {
 const configurations: { [name: string] : Configuration } = {
   development: {
     branchName: 'development',
-    subdomain: 'dev',
+    subdomain: 'api',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
@@ -86,7 +86,7 @@ const configurations: { [name: string] : Configuration } = {
   },
   production: {
     branchName: 'main',
-    subdomain: 'prod',
+    subdomain: 'api',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
