@@ -112,6 +112,10 @@
       "type": "runtime"
     },
     {
+      "name": "@gemeentenijmegen/dnssec-record",
+      "type": "runtime"
+    },
+    {
       "name": "@gemeentenijmegen/utils",
       "type": "runtime"
     },
