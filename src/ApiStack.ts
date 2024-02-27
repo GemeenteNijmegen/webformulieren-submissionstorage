@@ -2,7 +2,7 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Api } from './Api';
-import { CloudFrontDistribution } from './CloudFrontDistribution';
+// import { CloudFrontDistribution } from './CloudFrontDistribution';
 import { Configurable } from './Configuration';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 import { SubmissionsTopic } from './SubmissionsTopic';
@@ -26,7 +26,7 @@ export class ApiStack extends Stack {
       topicArns: topicArns,
     });
 
-    const api = new Api(this, 'api');
+    new Api(this, 'api');
     // const distribution = new CloudFrontDistribution(this, 'cfdistribution', {
     //   apiGatewayDomain: api.domain(),
     // });

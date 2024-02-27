@@ -5,10 +5,6 @@
       "type": "build"
     },
     {
-      "name": "@gemeentenijmegen/dnssec-record",
-      "type": "build"
-    },
-    {
       "name": "@gemeentenijmegen/projen-project-type",
       "type": "build"
     },
