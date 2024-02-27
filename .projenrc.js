@@ -13,6 +13,7 @@ const project = new GemeenteNijmegenCdkApp({
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
+    '@gemeentenijmegen/dnssec-record',
     '@gemeentenijmegen/utils',
     '@gemeentenijmegen/apigateway-http',
     '@types/aws-lambda',
@@ -22,6 +23,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@aws-sdk/client-dynamodb',
     'axios',
     'dotenv',
+    'cdk-remote-stack',
   ],
   jestOptions: {
     jestConfig: {

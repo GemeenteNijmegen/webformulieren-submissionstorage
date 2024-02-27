@@ -40,6 +40,18 @@ export interface Configuration {
    * processed.
    */
   readonly subscribeToTopicArns?: string[];
+
+  /**
+   * The subdomain of our main subdomain (`account`.csp-nijmegen.nl) this
+   * API will be accessible at.
+   */
+  readonly subdomain: string;
+
+  /**
+   * A list of CNAME records to register in the hosted zone
+   * Note: key should be withou domain suffix (only subdomain).
+   */
+  readonly cnameRecords?: {[key: string]: string};
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -56,6 +68,7 @@ export function getConfiguration(branchName: string): Configuration {
 const configurations: { [name: string] : Configuration } = {
   development: {
     branchName: 'development',
+    subdomain: 'dev',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
@@ -68,6 +81,7 @@ const configurations: { [name: string] : Configuration } = {
   },
   production: {
     branchName: 'main',
+    subdomain: 'prod',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,

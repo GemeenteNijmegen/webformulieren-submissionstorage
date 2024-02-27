@@ -5,6 +5,10 @@
       "type": "build"
     },
     {
+      "name": "@gemeentenijmegen/dnssec-record",
+      "type": "build"
+    },
+    {
       "name": "@gemeentenijmegen/projen-project-type",
       "type": "build"
     },
@@ -108,6 +112,10 @@
       "type": "runtime"
     },
     {
+      "name": "@gemeentenijmegen/dnssec-record",
+      "type": "runtime"
+    },
+    {
       "name": "@gemeentenijmegen/utils",
       "type": "runtime"
     },
@@ -122,6 +130,10 @@
     },
     {
       "name": "axios",
+      "type": "runtime"
+    },
+    {
+      "name": "cdk-remote-stack",
       "type": "runtime"
     },
     {
