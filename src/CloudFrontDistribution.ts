@@ -1,5 +1,5 @@
 import { Duration } from 'aws-cdk-lib';
-import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { Certificate, ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, HeadersFrameOption, HeadersReferrerPolicy, LambdaEdgeEventType, OriginRequestHeaderBehavior, OriginRequestPolicy, PriceClass, ResponseHeadersPolicy, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Key } from 'aws-cdk-lib/aws-kms';
@@ -25,7 +25,7 @@ export class CloudFrontDistribution extends Construct {
     const hostedZone = this.hostedZone();
 
     const domainNames = props?.domainNames ?? [];
-    this.distribution([...domainNames, hostedZone.zoneName], certificate.certificateArn, props?.webAclId);
+    this.distribution([...domainNames, hostedZone.zoneName], certificate, props?.webAclId);
   }
 
   /** Certificate is imported from US-East-1 */
@@ -51,8 +51,7 @@ export class CloudFrontDistribution extends Construct {
     return hostedZone;
   }
 
-  distribution(domainNames?: string[], certificateArn?: string, webAclId?: string) {
-    const certificate = (certificateArn) ? Certificate.fromCertificateArn(this, 'certificate', certificateArn) : undefined;
+  distribution(domainNames?: string[], certificate?: ICertificate, webAclId?: string) {
     if (!certificate) { domainNames = undefined; };
 
 

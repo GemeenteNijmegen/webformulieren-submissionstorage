@@ -27,7 +27,6 @@ export class ApiStack extends Stack {
     });
 
     new Api(this, 'api');
-    const distribution = new CloudFrontDistribution(this, 'cfdistribution');
-    // distribution.node.addDependency(api);
+    new CloudFrontDistribution(this, 'cfdistribution');
   }
 }
