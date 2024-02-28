@@ -1,11 +1,12 @@
 import { Duration } from 'aws-cdk-lib';
 import { Certificate, ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, HeadersFrameOption, HeadersReferrerPolicy, LambdaEdgeEventType, OriginRequestHeaderBehavior, OriginRequestPolicy, PriceClass, ResponseHeadersPolicy, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, HeadersFrameOption, HeadersReferrerPolicy, LambdaEdgeEventType, OriginAccessIdentity, OriginRequestHeaderBehavior, OriginRequestPolicy, PriceClass, ResponseHeadersPolicy, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Version } from 'aws-cdk-lib/aws-lambda';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
-import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, IBucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
@@ -56,6 +57,8 @@ export class CloudFrontDistribution extends Construct {
 
     const edgeLambda = this.edgeLambdaFromUsEast();
     const storageBucket = this.storageBucket();
+    const originAccessIdentity = new OriginAccessIdentity(this, 'publicresourcesbucket-oia');
+    this.allowOriginAccessIdentityAccessToBucket(originAccessIdentity, storageBucket);
 
     const distribution = new Distribution(this, 'cf-distribution', {
       priceClass: PriceClass.PRICE_CLASS_100,
@@ -63,7 +66,9 @@ export class CloudFrontDistribution extends Construct {
       certificate,
       webAclId,
       defaultBehavior: {
-        origin: new S3Origin(storageBucket),
+        origin: new S3Origin(storageBucket, {
+          originAccessIdentity: originAccessIdentity,
+        }),
         edgeLambdas: [
           {
             eventType: LambdaEdgeEventType.VIEWER_REQUEST,
@@ -177,5 +182,33 @@ export class CloudFrontDistribution extends Construct {
       ],
     });
     return cfLogBucket;
+  }
+
+
+  /**
+   * Allow listBucket to the origin access identity
+   *
+   * Necessary so cloudfront receives 404's as 404 instead of 403. This also allows
+   * a listing of the bucket if no /index.html is present in the bucket.
+   *
+   * @param originAccessIdentity
+   * @param bucket
+   */
+  allowOriginAccessIdentityAccessToBucket(originAccessIdentity: OriginAccessIdentity, bucket: IBucket) {
+    if (!bucket.addToResourcePolicy(new PolicyStatement({
+      resources: [
+        `${bucket.bucketArn}`,
+        `${bucket.bucketArn}/*`,
+      ],
+      actions: [
+        's3:GetObject',
+        's3:ListBucket',
+      ],
+      effect: Effect.ALLOW,
+      principals: [originAccessIdentity.grantPrincipal],
+    }),
+    )) {
+      throw Error('Bucket policy not appended');
+    };
   }
 }
