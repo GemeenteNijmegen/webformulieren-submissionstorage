@@ -1,7 +1,6 @@
 import { Duration } from 'aws-cdk-lib';
 import { Certificate, ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, HeadersFrameOption, HeadersReferrerPolicy, LambdaEdgeEventType, OriginRequestHeaderBehavior, OriginRequestPolicy, PriceClass, ResponseHeadersPolicy, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
-import { EdgeFunction } from 'aws-cdk-lib/aws-cloudfront/lib/experimental';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Version } from 'aws-cdk-lib/aws-lambda';
@@ -10,7 +9,6 @@ import { BlockPublicAccess, Bucket, BucketEncryption, ObjectOwnership } from 'aw
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
-import { StorageAccessControlFunction } from './app/storageAccessControl/storageAccessControl-function';
 import { Statics } from './statics';
 
 interface CloudfrontDistributionStackProps {
