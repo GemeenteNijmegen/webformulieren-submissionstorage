@@ -39,8 +39,8 @@ export abstract class Statics {
   static readonly certificateArn: string = `/${this.certificatePath}/certificate-arn`;
 
   static readonly ssmZonePath: string = `/${this.projectName}/zone`;
-  static readonly ssmZoneId: string = `/${this.ssmZonePath}/id`;
-  static readonly ssmZoneName: string = `/${this.ssmZonePath}/name`;
+  static readonly ssmZoneId: string = `${this.ssmZonePath}/id`;
+  static readonly ssmZoneName: string = `${this.ssmZonePath}/name`;
 
   static readonly ssmAccessEdgeLambdaPath: string = `/${this.projectName}/accesslambda`;
   static readonly ssmAccessEdgeLambdaArn: string = `${this.ssmAccessEdgeLambdaPath}/arn`;
