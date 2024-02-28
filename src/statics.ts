@@ -36,7 +36,7 @@ export abstract class Statics {
   static readonly ssmAccountDnsSecKmsKey: string = '/gemeente-nijmegen/account/dnssec/kmskey/arn';
 
   static readonly certificatePath: string = `/${this.projectName}/certificates`;
-  static readonly certificateArn: string = `/${this.certificatePath}/certificate-arn`;
+  static readonly certificateArn: string = `${this.certificatePath}/certificate-arn`;
 
   static readonly ssmZonePath: string = `/${this.projectName}/zone`;
   static readonly ssmZoneId: string = `${this.ssmZonePath}/id`;
