@@ -1,4 +1,3 @@
-import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { parsedEvent } from './parsedEvent';
 import { S3Storage } from '../submission/Storage';
