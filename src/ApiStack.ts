@@ -2,7 +2,6 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Api } from './Api';
-import { CloudFrontDistribution } from './CloudFrontDistribution';
 import { Configurable } from './Configuration';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 import { SubmissionsTopic } from './SubmissionsTopic';
@@ -27,6 +26,5 @@ export class ApiStack extends Stack {
     });
 
     new Api(this, 'api');
-    new CloudFrontDistribution(this, 'cfdistribution');
   }
 }

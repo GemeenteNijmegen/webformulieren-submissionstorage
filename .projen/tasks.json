@@ -55,9 +55,6 @@
           "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
         },
         {
-          "spawn": "bundle:app/storageAccessControl/storageAccessControl.lambda"
-        },
-        {
           "spawn": "bundle:app/submission/submission.lambda"
         },
         {
@@ -116,24 +113,6 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
-        }
-      ]
-    },
-    "bundle:app/storageAccessControl/storageAccessControl.lambda": {
-      "name": "bundle:app/storageAccessControl/storageAccessControl.lambda",
-      "description": "Create a JavaScript bundle from src/app/storageAccessControl/storageAccessControl.lambda.ts",
-      "steps": [
-        {
-          "exec": "esbuild --bundle src/app/storageAccessControl/storageAccessControl.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/storageAccessControl/storageAccessControl.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
-        }
-      ]
-    },
-    "bundle:app/storageAccessControl/storageAccessControl.lambda:watch": {
-      "name": "bundle:app/storageAccessControl/storageAccessControl.lambda:watch",
-      "description": "Continuously update the JavaScript bundle from src/app/storageAccessControl/storageAccessControl.lambda.ts",
-      "steps": [
-        {
-          "exec": "esbuild --bundle src/app/storageAccessControl/storageAccessControl.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/storageAccessControl/storageAccessControl.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },

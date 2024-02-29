@@ -5,7 +5,6 @@ import { CfnDNSSEC, CfnKeySigningKey, HostedZone, HostedZoneAttributes, IHostedZ
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
-import { CloudfrontAccessControlLambda } from './CloudfrontAccessControlLambda';
 import { Statics } from './statics';
 
 export interface UsEastStackProps extends StackProps {
@@ -32,8 +31,6 @@ export class UsEastStack extends Stack {
     if (props.useDnsSec) {
       this.setupDNSSEC(`${props.subdomain}-ksk`, hostedZone, accountHostedZone);
     }
-
-    new CloudfrontAccessControlLambda(this, 'access-edge-lambda');
   }
 
   /**

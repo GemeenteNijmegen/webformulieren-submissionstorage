@@ -150,7 +150,6 @@
           "src/app/download/download.lambda.ts",
           "src/app/get-form-overview/getFormOverview.lambda.ts",
           "src/app/listSubmissions/listSubmissions.lambda.ts",
-          "src/app/storageAccessControl/storageAccessControl.lambda.ts",
           "src/app/submission/submission.lambda.ts",
           "src/migrations/migration-2024-02-06-enrich-table.lambda.ts"
         ],
