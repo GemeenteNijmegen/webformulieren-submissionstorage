@@ -45,6 +45,9 @@ export abstract class Statics {
   static readonly ssmAccessEdgeLambdaPath: string = `/${this.projectName}/accesslambda`;
   static readonly ssmAccessEdgeLambdaArn: string = `${this.ssmAccessEdgeLambdaPath}/arn`;
 
+
+  static ssmOriginAccessIdentityId: string = `/${this.projectName}/originaccessidentityId`;
+
   static ssmDataKeyArn: string = `/${this.projectName}/dataKeyArn`;
   static ssmSubmissionBucketArn: string = `/${this.projectName}/submissionBucketArn`;
   static ssmDownloadBucketArn: string = `/${this.projectName}/downloadBucketArn`;

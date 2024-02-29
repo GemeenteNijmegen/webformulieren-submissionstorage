@@ -7,8 +7,8 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { Configurable } from './Configuration';
 import { Migration20240206EnrichTableFunction } from './migrations/migration-2024-02-06-enrich-table-function';
+import { OriginAccessForS3 } from './OriginAccessForS3';
 import { Statics } from './statics';
-
 
 interface StorageStackProps extends StackProps, Configurable {};
 
@@ -38,6 +38,10 @@ export class StorageStack extends Stack {
     });
     this.addArnToParameterStore('bucketParam', storageBucket.bucketArn, Statics.ssmSubmissionBucketArn);
     this.addArnToParameterStore('bucketNameParam', storageBucket.bucketName, Statics.ssmSubmissionBucketName);
+
+    // We add the cloudfront origin access identity here, and store it in a parameter. We then use it in
+    // the cloudfront stack. This is the only place we can modify the bucket policy.
+    new OriginAccessForS3(this, 'oai', { bucket: storageBucket });
 
     /**
      * This bucket will receive submission attachments
