@@ -97,8 +97,11 @@ export class Api extends Construct {
     storageBucket.grantRead(downloadFunction);
 
     const downloadEndpoint = this.api.root.addResource('download');
-    downloadEndpoint.addResource('{key}').addMethod('GET', new LambdaIntegration(downloadFunction), {
+    downloadEndpoint.addMethod('GET', new LambdaIntegration(downloadFunction), {
       apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.key': true,
+      },
     });
   }
 
