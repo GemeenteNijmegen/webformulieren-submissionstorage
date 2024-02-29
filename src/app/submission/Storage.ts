@@ -157,7 +157,7 @@ export class S3Storage implements Storage {
 
   public getPresignedUrl(key: string) {
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
-    return getSignedUrl(this.clients.default, command, { expiresIn: 3600 });
+    return getSignedUrl(this.clients.default, command, { expiresIn: 5 });
   }
 
   private clientForRegion(region: string): S3Client {

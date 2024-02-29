@@ -16,14 +16,14 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGateway
         headers: {
           Location: await storage.getPresignedUrl(params.key),
         },
-        statusCode: 301,
+        statusCode: 302,
       };
     } else {
       return {
         statusCode: 403,
       };
     }
-  } catch {
+  } catch (error: any) {
     return {
       statusCode: 500,
     };
