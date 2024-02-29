@@ -1,5 +1,5 @@
 import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 import { parsedEvent } from './parsedEvent';
 import { S3Storage } from '../submission/Storage';
 
@@ -8,21 +8,12 @@ if (!process.env.BUCKET_NAME) {
 }
 const storage = new S3Storage(process.env.BUCKET_NAME);
 
-export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGatewayV2Response> {
+export async function handler(event: APIGatewayProxyEvent): Promise<any> {
   try {
     const params = parsedEvent(event);
-    if (params.key.includes('APV18')) {
-      return {
-        headers: {
-          Location: await storage.getPresignedUrl(params.key),
-        },
-        statusCode: 302,
-      };
-    } else {
-      return {
-        statusCode: 403,
-      };
-    }
+    return Response.json({
+      downloadUrl: await storage.getPresignedUrl(params.key),
+    });
   } catch (error: any) {
     return {
       statusCode: 500,

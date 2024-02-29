@@ -1,4 +1,4 @@
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 import { z } from 'zod';
 
 const EventParametersSchema = z.object({
@@ -6,7 +6,7 @@ const EventParametersSchema = z.object({
 });
 export type EventParameters = z.infer<typeof EventParametersSchema>;
 
-export function parsedEvent(event: APIGatewayProxyEventV2): EventParameters {
+export function parsedEvent(event: APIGatewayProxyEvent): EventParameters {
   return EventParametersSchema.passthrough().parse({
     key: event.queryStringParameters?.key,
   });
