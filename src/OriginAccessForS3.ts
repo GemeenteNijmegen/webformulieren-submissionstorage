@@ -19,9 +19,10 @@ export class OriginAccessForS3 extends Construct {
     super(scope, id);
     const originAccessIdentity = props.originAccessIdentity ?? new OriginAccessIdentity(this, 'publicresourcesbucket-oai');
     this.allowOriginAccessIdentityAccessToBucket(originAccessIdentity, props.bucket);
+    this.addOriginAccessIdentityToParameter(originAccessIdentity);
   }
 
-  originAccessIdentityToParameter(originAccessIdentity: OriginAccessIdentity) {
+  addOriginAccessIdentityToParameter(originAccessIdentity: OriginAccessIdentity) {
     new StringParameter(this, 'oai', {
       stringValue: originAccessIdentity.originAccessIdentityId,
       parameterName: Statics.ssmSourceKeyArn,
