@@ -8,6 +8,9 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import {
+  getSignedUrl,
+} from '@aws-sdk/s3-request-presigner';
 export interface Storage {
   store(key: string, contents: string): Promise<boolean>;
   copy(
@@ -152,6 +155,10 @@ export class S3Storage implements Storage {
     return allKeys;
   }
 
+  public getPresignedUrl(key: string) {
+    const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
+    return getSignedUrl(this.clients.default, command, { expiresIn: 3600 });
+  }
 
   private clientForRegion(region: string): S3Client {
     if (!this.clients[region]) {

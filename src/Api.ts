@@ -5,6 +5,7 @@ import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
+import { DownloadFunction } from './app/download/download-function';
 import { GetFormOverviewFunction } from './app/get-form-overview/getFormOverview-function';
 import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
 import { Statics } from './statics';
@@ -36,6 +37,7 @@ export class Api extends Construct {
 
     this.addListSubmissionsEndpoint(storageBucket, table);
     this.addFormOverviewEndpoint(storageBucket, downloadBucket);
+    this.addDownloadEndpoint(storageBucket);
   }
 
   private createApiWithApiKey() {
@@ -81,6 +83,22 @@ export class Api extends Construct {
         'method.request.querystring.user_id': true,
         'method.request.querystring.user_type': true,
       },
+    });
+  }
+
+  private addDownloadEndpoint(storageBucket: IBucket) {
+    const downloadFunction = new DownloadFunction(this, 'download', {
+      environment: {
+        BUCKET_NAME: storageBucket.bucketName,
+      },
+      timeout: Duration.minutes(10),
+      memorySize: 1024,
+    });
+    storageBucket.grantRead(downloadFunction);
+
+    const downloadEndpoint = this.api.root.addResource('formoverview');
+    downloadEndpoint.addMethod('GET', new LambdaIntegration(downloadFunction), {
+      apiKeyRequired: true,
     });
   }
 

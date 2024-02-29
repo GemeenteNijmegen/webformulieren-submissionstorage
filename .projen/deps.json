@@ -9,6 +9,10 @@
       "type": "build"
     },
     {
+      "name": "@testcontainers/localstack",
+      "type": "build"
+    },
+    {
       "name": "@types/jest",
       "type": "build"
     },
@@ -97,6 +101,10 @@
     },
     {
       "name": "@aws-sdk/client-s3",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/s3-request-presigner",
       "type": "runtime"
     },
     {

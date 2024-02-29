@@ -59,6 +59,7 @@ junit.xml
 /cdk.out/
 .cdk.staging/
 .parcel-cache/
+!/src/app/download/download-function.ts
 !/src/app/get-form-overview/getFormOverview-function.ts
 !/src/app/listSubmissions/listSubmissions-function.ts
 !/src/app/storageAccessControl/storageAccessControl-function.ts

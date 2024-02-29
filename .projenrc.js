@@ -10,6 +10,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/sns-validator',
     'aws-sdk-client-mock',
     'testcontainers',
+    '@testcontainers/localstack',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
@@ -21,6 +22,7 @@ const project = new GemeenteNijmegenCdkApp({
     'zod',
     '@aws-sdk/client-s3',
     '@aws-sdk/client-dynamodb',
+    '@aws-sdk/s3-request-presigner',
     'axios',
     'dotenv',
     'cdk-remote-stack',

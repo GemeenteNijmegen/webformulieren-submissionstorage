@@ -42,7 +42,7 @@ jest.mock('../../app/submission/Storage', () => {
 
 describeIntegration('Dynamodb migration test', () => {
   const composeFilePath = '/Users/joostvanderborg/Developer/webformulieren-submissionstorage/src/app/submission/test/';
-  const composeFile = 'docker-compose.yml';
+  const composeFile = 'docker-compose-dynamodb.yml';
   let environment: StartedDockerComposeEnvironment;
 
   const dynamoDBClient = new DynamoDBClient({
