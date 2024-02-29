@@ -8,6 +8,6 @@ export type EventParameters = z.infer<typeof EventParametersSchema>;
 
 export function parsedEvent(event: APIGatewayProxyEventV2): EventParameters {
   return EventParametersSchema.passthrough().parse({
-    key: event.pathParameters?.key,
+    key: event.queryStringParameters?.key,
   });
 }
