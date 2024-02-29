@@ -25,7 +25,7 @@ export class OriginAccessForS3 extends Construct {
   addOriginAccessIdentityToParameter(originAccessIdentity: OriginAccessIdentity) {
     new StringParameter(this, 'oai', {
       stringValue: originAccessIdentity.originAccessIdentityId,
-      parameterName: Statics.ssmSourceKeyArn,
+      parameterName: Statics.ssmOriginAccessIdentityId,
       description: 'Cloudfront User ID for the origin access identity',
     });
   }
