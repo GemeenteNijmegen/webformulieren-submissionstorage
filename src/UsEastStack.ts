@@ -29,7 +29,7 @@ export class UsEastStack extends Stack {
     const hostedZone = this.setupSubHostedZone(accountHostedZone, 'api');
     this.setupCertificate(hostedZone, props);
     if (props.useDnsSec) {
-      this.setupDNSSEC(`${props.subdomain}-ksk`, hostedZone, accountHostedZone);
+      this.setupDNSSEC('api_ksk', hostedZone, accountHostedZone);
     }
   }
 
