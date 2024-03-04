@@ -16,6 +16,7 @@
     ".projen/tasks.json",
     "cdk.json",
     "LICENSE",
+    "src/app/download/download-function.ts",
     "src/app/get-form-overview/getFormOverview-function.ts",
     "src/app/listSubmissions/listSubmissions-function.ts",
     "src/app/submission/submission-function.ts",

@@ -9,7 +9,6 @@ import { Configurable } from './Configuration';
 import { Migration20240206EnrichTableFunction } from './migrations/migration-2024-02-06-enrich-table-function';
 import { Statics } from './statics';
 
-
 interface StorageStackProps extends StackProps, Configurable {};
 
 /**

@@ -5,6 +5,7 @@ import { Configuration } from '../src/Configuration';
 import { PipelineStack } from '../src/PipelineStack';
 
 const configuration: Configuration = {
+  subdomain: 'test',
   branchName: 'stacktest',
   deployFromEnvironment: {
     account: '12345678',
