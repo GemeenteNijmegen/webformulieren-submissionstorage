@@ -1,4 +1,5 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
+import { LocalstackContainer } from '@testcontainers/localstack';
 import { MockStorage } from './MockStorage';
 import { describeIntegration } from '../../test-utils/describeIntegration';
 import { S3Storage } from '../Storage';
@@ -24,15 +25,31 @@ describe('Storage methods', () => {
 });
 
 describeIntegration('S3 integration tests', () => {
-  const client = new S3Client({
-    endpoint: 'http://localhost:4566',
-    credentials: {
-      accessKeyId: 'test',
-      secretAccessKey: 'test',
-    },
-    forcePathStyle: true,
+  let localS3Storage: S3Storage;
+  let client: S3Client;
+  const bucketCommandInput = {
+    Bucket: 'test-bucket',
+  };
+  beforeAll(async() => {
+    const container = await new LocalstackContainer().start();
+    console.debug('container url', container.getConnectionUri());
+    client = new S3Client({
+      endpoint: container.getConnectionUri(),
+      credentials: {
+        accessKeyId: 'test',
+        secretAccessKey: 'test',
+      },
+      forcePathStyle: true,
+    });
+    localS3Storage = new S3Storage('test-bucket', { client });
+
+
+    const command = new CreateBucketCommand(bucketCommandInput);
+
+    const createBucketResponse = await client.send(command);
+    expect(createBucketResponse.$metadata.httpStatusCode).toEqual(200);
   });
-  const localS3Storage = new S3Storage('test-bucket', { client });
+
 
   beforeEach(async () => {
     await localS3Storage.store('alwaysPresentObjectKey', 'textcontents');
@@ -54,6 +71,11 @@ describeIntegration('S3 integration tests', () => {
 
     const resultWithMissing = await localS3Storage.getBatch(['alwaysPresentObjectKey', 'nonexistentkey']);
     expect(resultWithMissing).toHaveLength(1);
+  });
+
+  test('Create presigned url for object', async() => {
+    const result = await localS3Storage.getPresignedUrl('alwaysPresentObjectKey');
+    expect(result).toMatch(/X-Amz-Signature=/);
   });
 
 });

@@ -40,6 +40,23 @@ export interface Configuration {
    * processed.
    */
   readonly subscribeToTopicArns?: string[];
+
+  /**
+   * The subdomain of our main subdomain (`account`.csp-nijmegen.nl) this
+   * API will be accessible at.
+   */
+  readonly subdomain: string;
+
+  /**
+   * A list of CNAME records to register in the hosted zone
+   * Note: key should be withou domain suffix (only subdomain).
+   */
+  readonly cnameRecords?: {[key: string]: string};
+
+  /**
+   * Set this boolean to setup DNSSEC
+   */
+  readonly useDnsSec?: boolean;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -56,6 +73,7 @@ export function getConfiguration(branchName: string): Configuration {
 const configurations: { [name: string] : Configuration } = {
   development: {
     branchName: 'development',
+    subdomain: 'api',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
@@ -68,6 +86,7 @@ const configurations: { [name: string] : Configuration } = {
   },
   production: {
     branchName: 'main',
+    subdomain: 'api',
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
@@ -77,5 +96,6 @@ const configurations: { [name: string] : Configuration } = {
     subscribeToTopicArns: [
       'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
     ],
+    useDnsSec: true,
   },
 };

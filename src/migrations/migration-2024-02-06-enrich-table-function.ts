@@ -17,7 +17,7 @@ export class Migration20240206EnrichTableFunction extends lambda.Function {
     super(scope, id, {
       description: 'src/migrations/migration-2024-02-06-enrich-table.lambda.ts',
       ...props,
-      runtime: new lambda.Runtime('nodejs18.x', lambda.RuntimeFamily.NODEJS),
+      runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS),
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../assets/migrations/migration-2024-02-06-enrich-table.lambda')),
     });

@@ -46,6 +46,9 @@
       "description": "Prepare assets",
       "steps": [
         {
+          "spawn": "bundle:app/download/download.lambda"
+        },
+        {
           "spawn": "bundle:app/get-form-overview/getFormOverview.lambda"
         },
         {
@@ -59,12 +62,30 @@
         }
       ]
     },
+    "bundle:app/download/download.lambda": {
+      "name": "bundle:app/download/download.lambda",
+      "description": "Create a JavaScript bundle from src/app/download/download.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/download/download.lambda:watch": {
+      "name": "bundle:app/download/download.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/download/download.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
     "bundle:app/get-form-overview/getFormOverview.lambda": {
       "name": "bundle:app/get-form-overview/getFormOverview.lambda",
       "description": "Create a JavaScript bundle from src/app/get-form-overview/getFormOverview.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -73,7 +94,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/get-form-overview/getFormOverview.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/get-form-overview/getFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/get-form-overview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -82,7 +103,7 @@
       "description": "Create a JavaScript bundle from src/app/listSubmissions/listSubmissions.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -91,7 +112,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/listSubmissions/listSubmissions.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -100,7 +121,7 @@
       "description": "Create a JavaScript bundle from src/app/submission/submission.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -109,7 +130,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/submission/submission.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -118,7 +139,7 @@
       "description": "Create a JavaScript bundle from src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -127,7 +148,7 @@
       "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node18\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -363,13 +384,13 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/node,@types/sns-validator,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,projen,standard-version,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/utils,@types/aws-lambda,aws-cdk-lib,axios,constructs,dotenv,sns-validator,zod"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-s3,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen standard-version testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-s3 @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios constructs dotenv sns-validator zod"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @testcontainers/localstack @types/jest @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen standard-version testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv sns-validator zod"
         },
         {
           "exec": "npx projen"

@@ -5,6 +5,7 @@ import { ApiStack } from './ApiStack';
 import { Configurable } from './Configuration';
 import { Statics } from './statics';
 import { StorageStack } from './StorageStack';
+import { UsEastStack } from './UsEastStack';
 
 interface ApiStageProps extends StageProps, Configurable { }
 
@@ -24,7 +25,15 @@ export class ApiStage extends Stage {
 
     const storageStack = new StorageStack(this, 'storage', { configuration });
 
+    const usEastStack = new UsEastStack(this, 'us-east', {
+      env: { region: 'us-east-1' },
+      accountHostedZoneRegion: 'eu-central-1',
+      subdomain: configuration.subdomain,
+      useDnsSec: configuration.useDnsSec,
+    });
+
     const apiStack = new ApiStack(this, 'api', { configuration } );
     apiStack.addDependency(storageStack);
+    apiStack.addDependency(usEastStack);
   }
 }
