@@ -84,6 +84,13 @@ export class Api extends Construct {
         'method.request.querystring.user_type': true,
       },
     });
+    listSubmissionsEndpoint.addResource('{key}').addMethod('GET', new LambdaIntegration(lambda), {
+      apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.user_id': true,
+        'method.request.querystring.user_type': true,
+      },
+    });
   }
 
   private addDownloadEndpoint(storageBucket: IBucket) {

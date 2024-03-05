@@ -1,4 +1,4 @@
-import { DynamoDBClient, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { z } from 'zod';
 import { hashString } from './hash';
 
@@ -36,9 +36,15 @@ export interface ListSubmissionParameters {
   userId: string;
 }
 
+export interface GetSubmissionParameters {
+  userId: string;
+  key: string;
+}
+
 export interface Database {
   storeSubmission(submission: SubmissionData): Promise<boolean>;
   listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]>;
+  getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false>;
 }
 
 export class DynamoDBDatabase implements Database {
@@ -50,7 +56,43 @@ export class DynamoDBDatabase implements Database {
     this.client = config?.dynamoDBClient ?? new DynamoDBClient({});
   }
 
-  async storeSubmission(submission: SubmissionData): Promise<any> {
+  async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false> {
+    const hashedId = hashString(parameters.userId);
+    const command = new GetItemCommand({
+      TableName: this.table,
+      Key: {
+        pk: {
+          S: `USER#${hashedId}`,
+        },
+        sk: {
+          S: parameters.key,
+        },
+      },
+    });
+    console.debug(JSON.stringify(command));
+    try {
+      const result = await this.client.send(command);
+      if (result.Item) {
+        const item = submissionTableItemSchema.parse(result.Item);
+        return {
+          userId: parameters.userId,
+          key: item?.sk.S ?? '',
+          pdf: item?.pdfKey.S ?? '',
+          dateSubmitted: item?.dateSubmitted.S ?? '',
+          formName: item?.formName.S ?? '',
+          formTitle: item?.formTitle.S ?? '',
+          attachments: item.attachments.L.map(attachment => attachment.S),
+        };
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error('Error getting data from DynamoDB: ' + err);
+      throw err;
+    }
+  }
+
+  async storeSubmission(submission: SubmissionData): Promise<boolean> {
     const hashedId = hashString(submission.userId);
     console.debug(`Storing object to table ${this.table} with primary key USER#${hashedId}`);
     const pk = `USER#${hashedId}`;
