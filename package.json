@@ -69,7 +69,7 @@
     "@gemeentenijmegen/aws-constructs": "^0.0.5",
     "@gemeentenijmegen/dnssec-record": "^0.0.8",
     "@gemeentenijmegen/utils": "^0.0.6",
-    "@types/aws-lambda": "^8.10.134",
+    "@types/aws-lambda": "^8.10.136",
     "aws-cdk-lib": "^2.1.0",
     "axios": "^1.6.7",
     "cdk-remote-stack": "^2.0.101",
