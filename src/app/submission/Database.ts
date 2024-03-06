@@ -126,6 +126,7 @@ export class DynamoDBDatabase implements Database {
       const results = await this.client.send(queryCommand);
       if (results.Items) {
         const parsedResults = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
+        console.log(`${parsedResults.Items} items found`);
         const items = parsedResults.Items?.map((item) => {
           return {
             userId: parameters.userId,
@@ -139,6 +140,7 @@ export class DynamoDBDatabase implements Database {
         });
         return items;
       }
+      console.log('No items found');
       return false;
     } catch (err) {
       console.error('Error getting data from DynamoDB: ' + err);
