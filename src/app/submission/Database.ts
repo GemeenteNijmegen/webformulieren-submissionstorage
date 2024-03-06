@@ -43,7 +43,7 @@ export interface GetSubmissionParameters {
 
 export interface Database {
   storeSubmission(submission: SubmissionData): Promise<boolean>;
-  listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]>;
+  listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false>;
   getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false>;
 }
 
@@ -108,7 +108,7 @@ export class DynamoDBDatabase implements Database {
     return true;
   }
 
-  async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]> {
+  async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false> {
     const hashedId = hashString(parameters.userId);
     const queryCommand = new QueryCommand({
       TableName: this.table,
