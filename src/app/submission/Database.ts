@@ -123,19 +123,23 @@ export class DynamoDBDatabase implements Database {
       KeyConditionExpression: '#pk = :id',
     });
     try {
-      const results = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
-      const items = results.Items?.map((item) => {
-        return {
-          userId: parameters.userId,
-          key: item?.sk.S ?? '',
-          pdf: item?.pdfKey.S ?? '',
-          dateSubmitted: item?.dateSubmitted.S ?? '',
-          formName: item?.formName.S ?? '',
-          formTitle: item?.formTitle.S ?? '',
-          attachments: item.attachments.L.map(attachment => attachment.S),
-        };
-      }) ?? [];
-      return items;
+      const results = await this.client.send(queryCommand);
+      if (results.Items) {
+        const parsedResults = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
+        const items = parsedResults.Items?.map((item) => {
+          return {
+            userId: parameters.userId,
+            key: item?.sk.S ?? '',
+            pdf: item?.pdfKey.S ?? '',
+            dateSubmitted: item?.dateSubmitted.S ?? '',
+            formName: item?.formName.S ?? '',
+            formTitle: item?.formTitle.S ?? '',
+            attachments: item.attachments.L.map(attachment => attachment.S),
+          };
+        });
+        return items;
+      }
+      return false;
     } catch (err) {
       console.error('Error getting data from DynamoDB: ' + err);
       throw err;
