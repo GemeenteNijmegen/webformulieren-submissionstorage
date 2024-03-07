@@ -72,6 +72,7 @@ export class Api extends Construct {
         BUCKET_NAME: storageBucket.bucketName,
         TABLE_NAME: table.tableName,
       },
+      memorySize: 1024,
     });
     table.grantReadData(lambda);
     storageBucket.grantRead(lambda);
