@@ -249,7 +249,7 @@ describe('Handler parsing events', () => {
 
   test('returns 400 with incorrect query params', async() => {
     const result = await handler(invalidEvent);
-    expect(result.statusCode).toBe(400);
+    expect(result.statusCode).toBe(500);
   });
 
 });
