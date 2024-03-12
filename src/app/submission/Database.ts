@@ -20,9 +20,9 @@ const submissionTableItemSchema = z.object({
   pk: dynamoDBStringSchema,
   sk: dynamoDBStringSchema,
   pdfKey: dynamoDBStringSchema,
-  dateSubmitted: dynamoDBStringSchema,
-  formName: dynamoDBStringSchema,
-  formTitle: dynamoDBStringSchema,
+  dateSubmitted: dynamoDBStringSchema.optional(),
+  formName: dynamoDBStringSchema.optional(),
+  formTitle: dynamoDBStringSchema.optional(),
   attachments: z.object({
     L: z.array(dynamoDBStringSchema),
   }),
@@ -78,9 +78,9 @@ export class DynamoDBDatabase implements Database {
           userId: parameters.userId,
           key: item?.sk.S ?? '',
           pdf: item?.pdfKey.S ?? '',
-          dateSubmitted: item?.dateSubmitted.S ?? '',
-          formName: item?.formName.S ?? '',
-          formTitle: item?.formTitle.S ?? '',
+          dateSubmitted: item.dateSubmitted?.S ?? '',
+          formName: item.formName?.S ?? 'onbekend',
+          formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
           attachments: item.attachments.L.map(attachment => attachment.S),
         };
       } else {
@@ -126,15 +126,15 @@ export class DynamoDBDatabase implements Database {
       const results = await this.client.send(queryCommand);
       if (results.Items) {
         const parsedResults = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
-        console.log(`${parsedResults.Items} items found`);
+        console.log(`${parsedResults.Items.length} items found`);
         const items = parsedResults.Items?.map((item) => {
           return {
             userId: parameters.userId,
             key: item?.sk.S ?? '',
             pdf: item?.pdfKey.S ?? '',
-            dateSubmitted: item?.dateSubmitted.S ?? '',
-            formName: item?.formName.S ?? '',
-            formTitle: item?.formTitle.S ?? '',
+            dateSubmitted: item.dateSubmitted?.S ?? '',
+            formName: item.formName?.S ?? 'onbekend',
+            formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
             attachments: item.attachments.L.map(attachment => attachment.S),
           };
         });
