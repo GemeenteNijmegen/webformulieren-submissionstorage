@@ -25,7 +25,7 @@ const submissionTableItemSchema = z.object({
   formTitle: dynamoDBStringSchema.optional(),
   attachments: z.object({
     L: z.array(dynamoDBStringSchema),
-  }),
+  }).optional(),
 });
 
 const submissionTableItemsSchema = z.object({
@@ -81,7 +81,7 @@ export class DynamoDBDatabase implements Database {
           dateSubmitted: item.dateSubmitted?.S ?? '',
           formName: item.formName?.S ?? 'onbekend',
           formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
-          attachments: item.attachments.L.map(attachment => attachment.S),
+          attachments: item.attachments?.L.map(attachment => attachment.S) ?? [],
         };
       } else {
         return false;
@@ -135,7 +135,7 @@ export class DynamoDBDatabase implements Database {
             dateSubmitted: item.dateSubmitted?.S ?? new Date(1970, 0, 0).toISOString(),
             formName: item.formName?.S ?? 'onbekend',
             formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
-            attachments: item.attachments.L.map(attachment => attachment.S),
+            attachments: item.attachments?.L.map(attachment => attachment.S) ?? [],
           };
         });
         return items;
