@@ -72,12 +72,20 @@ export class Api extends Construct {
         BUCKET_NAME: storageBucket.bucketName,
         TABLE_NAME: table.tableName,
       },
+      memorySize: 1024,
     });
     table.grantReadData(lambda);
     storageBucket.grantRead(lambda);
 
     const listSubmissionsEndpoint = this.api.root.addResource('submissions');
     listSubmissionsEndpoint.addMethod('GET', new LambdaIntegration(lambda), {
+      apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.user_id': true,
+        'method.request.querystring.user_type': true,
+      },
+    });
+    listSubmissionsEndpoint.addResource('{key}').addMethod('GET', new LambdaIntegration(lambda), {
       apiKeyRequired: true,
       requestParameters: {
         'method.request.querystring.user_id': true,
