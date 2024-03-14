@@ -132,7 +132,7 @@ export class DynamoDBDatabase implements Database {
             userId: parameters.userId,
             key: item?.sk.S ?? '',
             pdf: item?.pdfKey.S ?? '',
-            dateSubmitted: item.dateSubmitted?.S ?? '',
+            dateSubmitted: item.dateSubmitted?.S ?? new Date(1970, 0, 0).toISOString(),
             formName: item.formName?.S ?? 'onbekend',
             formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
             attachments: item.attachments.L.map(attachment => attachment.S),
