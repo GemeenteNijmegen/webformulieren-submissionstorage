@@ -25,15 +25,17 @@ export class ApiStage extends Stage {
 
     const storageStack = new StorageStack(this, 'storage', { configuration });
 
-    const usEastStack = new UsEastStack(this, 'us-east', {
-      env: { region: 'us-east-1' },
-      accountHostedZoneRegion: 'eu-central-1',
-      subdomain: configuration.subdomain,
-      useDnsSec: configuration.useDnsSec,
-    });
 
     const apiStack = new ApiStack(this, 'api', { configuration } );
     apiStack.addDependency(storageStack);
-    apiStack.addDependency(usEastStack);
+    if (configuration.subdomain) {
+      const usEastStack = new UsEastStack(this, 'us-east', {
+        env: { region: 'us-east-1' },
+        accountHostedZoneRegion: 'eu-central-1',
+        subdomain: configuration.subdomain,
+        useDnsSec: configuration.useDnsSec,
+      });
+      apiStack.addDependency(usEastStack);
+    }
   }
 }
