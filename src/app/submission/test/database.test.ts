@@ -1,4 +1,5 @@
 import { CreateTableCommand, DeleteTableCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
 import { MockDatabase } from './MockDatabase';
 import { describeIntegration } from '../../test-utils/describeIntegration';
 import { DynamoDBDatabase } from '../Database';
@@ -32,10 +33,29 @@ describe('Save object', () => {
 });
 
 describeIntegration('Dynamodb integration tests', () => {
-  const tableName = 'Test';
-  const dynamoDBClient = new DynamoDBClient({ endpoint: 'http://localhost:8000' });
+  console.debug('running integration tests');
+  const composeFilePath = '/Users/joostvanderborg/Developer/webformulieren-submissionstorage/src/app/submission/test/';
+  const composeFile = 'docker-compose-dynamodb.yml';
+  let environment: StartedDockerComposeEnvironment;
+
+  const dynamoDBClient = new DynamoDBClient({
+    endpoint: 'http://localhost:8000',
+    credentials: {
+      accessKeyId: 'dummy',
+      secretAccessKey: 'dummy',
+    },
+  });
+
+  const tableName = 'submissions-local';
   const database = new DynamoDBDatabase(tableName, { dynamoDBClient });
+
   beforeAll(async() => {
+    environment = await new DockerComposeEnvironment(composeFilePath, composeFile)
+      .withWaitStrategy('dynamodb-local', Wait.forLogMessage('CorsParams: null'))
+      .up();
+
+  }, 60000);
+  beforeEach(async() => {
     const command = new CreateTableCommand({
       TableName: tableName,
       AttributeDefinitions: [
@@ -62,9 +82,33 @@ describeIntegration('Dynamodb integration tests', () => {
         WriteCapacityUnits: 1,
       },
     });
+    await dynamoDBClient.send(command);
+    await database.storeSubmission({
+      key: 'TDL1.234',
+      pdf: 'submission.pdf',
+      userId: '900222670',
+      dateSubmitted: '2023-12-12T00:00:00.670Z',
+      formName: 'altijdAanwezigFormulier',
+      formTitle: 'Altijd aanwezig formulier',
+      attachments: [],
+    });
 
-    console.debug(await dynamoDBClient.send(command));
   });
+
+  afterEach(async() => {
+    const command = new DeleteTableCommand({
+      TableName: tableName,
+    });
+    console.debug('removing table');
+    await dynamoDBClient.send(command);
+  });
+
+  afterAll(async() => {
+    console.debug('bringing environment down');
+    await environment.down({ timeout: 10000 });
+  });
+
+
   test('Add submissions to table', async() => {
     await database.storeSubmission({
       key: 'TDL10.002',
@@ -73,6 +117,7 @@ describeIntegration('Dynamodb integration tests', () => {
       dateSubmitted: '2023-12-23T11:58:52.670Z',
       formName: 'bingoMeldenOfLoterijvergunningAanvragen',
       formTitle: 'Bingo melden of loterijvergunning aanvragen',
+      attachments: [],
     });
     expect(await database.storeSubmission({
       key: 'TDL10.001',
@@ -81,21 +126,29 @@ describeIntegration('Dynamodb integration tests', () => {
       dateSubmitted: '2023-12-23T11:58:52.670Z',
       formName: 'bingoMeldenOfLoterijvergunningAanvragen',
       formTitle: 'Bingo melden of loterijvergunning aanvragen',
+      attachments: [],
     })).toBeTruthy();
   });
 
-  test('Retrieve submission from table', async() => {
+  test('Retrieve submissions from table', async() => {
+    await database.storeSubmission({
+      key: 'TDL10.002',
+      pdf: 'submission.pdf',
+      userId: '900222670',
+      dateSubmitted: '2023-12-23T11:58:52.670Z',
+      formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+      formTitle: 'Bingo melden of loterijvergunning aanvragen',
+      attachments: [],
+    });
     expect(await database.listSubmissions({
       userId: '900222670',
     })).toHaveLength(2);
   });
 
-  afterAll(async () => {
-    const command = new DeleteTableCommand({
-      TableName: tableName,
-    });
-
-    const response = await dynamoDBClient.send(command);
-    return response;
+  test('Retrieve submission from table', async() => {
+    expect(await database.getSubmission({
+      userId: '900222670',
+      key: 'TDL1.234',
+    })).toHaveProperty('formName');
   });
 });

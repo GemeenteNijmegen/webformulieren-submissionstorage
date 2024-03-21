@@ -45,7 +45,7 @@ export interface Configuration {
    * The subdomain of our main subdomain (`account`.csp-nijmegen.nl) this
    * API will be accessible at.
    */
-  readonly subdomain: string;
+  readonly subdomain?: string;
 
   /**
    * A list of CNAME records to register in the hosted zone
@@ -84,6 +84,19 @@ const configurations: { [name: string] : Configuration } = {
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
   },
+  // acceptance: {
+  //   branchName: 'acceptance',
+  //   subdomain: 'api',
+  //   deployFromEnvironment: Statics.gnBuildEnvironment,
+  //   deployToEnvironment: Statics.appAcceptanceEnvironment,
+  //   includePipelineValidationChecks: false,
+  //   allowedAccountIdsToPublishToSNS: [
+  //     Statics.acceptanceWebformulierenAccountId,
+  //   ],
+  //   subscribeToTopicArns: [
+  //     'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
+  //   ],
+  // },
   production: {
     branchName: 'main',
     subdomain: 'api',

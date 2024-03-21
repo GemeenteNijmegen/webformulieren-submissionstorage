@@ -19,6 +19,18 @@ const expectedListResults = [{
 }];
 
 
+const getResult = {
+  userId: '900222670',
+  key: 'TST.012',
+  pdf: 'TST.012/TST.012.pdf',
+  dateSubmitted: '2024-02-28T15:15:20.000Z',
+  formName: 'bingoMeldenOfLoterijvergunningAanvragen',
+  formTitle: 'Bing melden of Loterijvergunning aanvragen',
+  attachments: [
+    'test.pdf',
+  ],
+};
+
 jest.mock('../../submission/Database', () => {
 
   return {
@@ -26,6 +38,9 @@ jest.mock('../../submission/Database', () => {
       return {
         listSubmissions: async () => {
           return listResults;
+        },
+        getSubmission: async () => {
+          return getResult;
         },
       };
     }),
@@ -47,6 +62,11 @@ describe('Request Handler', () => {
   test('Handler correctly returns', async() => {
     const result = await handler.handleRequest({ userId: '900222670', userType: 'person' });
     expect(result.body).toBe(JSON.stringify(expectedListResults));
+  });
+
+  test('Handler correctly returns getSubmission', async() => {
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey' });
+    expect(result.body).toBe(JSON.stringify(getResult));
   });
 
 });

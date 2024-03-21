@@ -11,6 +11,6 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGateway
     return await requestHandler.handleRequest(params);
   } catch (error: any) {
     console.error(error);
-    return Response.error(400);
+    return Response.error(500);
   }
 }

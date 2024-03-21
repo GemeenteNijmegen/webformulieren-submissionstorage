@@ -1,4 +1,4 @@
-import { DynamoDBClient, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { z } from 'zod';
 import { hashString } from './hash';
 
@@ -20,12 +20,12 @@ const submissionTableItemSchema = z.object({
   pk: dynamoDBStringSchema,
   sk: dynamoDBStringSchema,
   pdfKey: dynamoDBStringSchema,
-  dateSubmitted: dynamoDBStringSchema,
-  formName: dynamoDBStringSchema,
-  formTitle: dynamoDBStringSchema,
+  dateSubmitted: dynamoDBStringSchema.optional(),
+  formName: dynamoDBStringSchema.optional(),
+  formTitle: dynamoDBStringSchema.optional(),
   attachments: z.object({
     L: z.array(dynamoDBStringSchema),
-  }),
+  }).optional(),
 });
 
 const submissionTableItemsSchema = z.object({
@@ -36,9 +36,15 @@ export interface ListSubmissionParameters {
   userId: string;
 }
 
+export interface GetSubmissionParameters {
+  userId: string;
+  key: string;
+}
+
 export interface Database {
   storeSubmission(submission: SubmissionData): Promise<boolean>;
-  listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]>;
+  listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false>;
+  getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false>;
 }
 
 export class DynamoDBDatabase implements Database {
@@ -50,7 +56,43 @@ export class DynamoDBDatabase implements Database {
     this.client = config?.dynamoDBClient ?? new DynamoDBClient({});
   }
 
-  async storeSubmission(submission: SubmissionData): Promise<any> {
+  async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false> {
+    const hashedId = hashString(parameters.userId);
+    const command = new GetItemCommand({
+      TableName: this.table,
+      Key: {
+        pk: {
+          S: `USER#${hashedId}`,
+        },
+        sk: {
+          S: parameters.key,
+        },
+      },
+    });
+    console.debug(JSON.stringify(command));
+    try {
+      const result = await this.client.send(command);
+      if (result.Item) {
+        const item = submissionTableItemSchema.parse(result.Item);
+        return {
+          userId: parameters.userId,
+          key: item?.sk.S ?? '',
+          pdf: item?.pdfKey.S ?? '',
+          dateSubmitted: item.dateSubmitted?.S ?? '',
+          formName: item.formName?.S ?? 'onbekend',
+          formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
+          attachments: item.attachments?.L.map(attachment => attachment.S) ?? [],
+        };
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error('Error getting data from DynamoDB: ' + err);
+      throw err;
+    }
+  }
+
+  async storeSubmission(submission: SubmissionData): Promise<boolean> {
     const hashedId = hashString(submission.userId);
     console.debug(`Storing object to table ${this.table} with primary key USER#${hashedId}`);
     const pk = `USER#${hashedId}`;
@@ -66,7 +108,7 @@ export class DynamoDBDatabase implements Database {
     return true;
   }
 
-  async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]> {
+  async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false> {
     const hashedId = hashString(parameters.userId);
     const queryCommand = new QueryCommand({
       TableName: this.table,
@@ -81,19 +123,25 @@ export class DynamoDBDatabase implements Database {
       KeyConditionExpression: '#pk = :id',
     });
     try {
-      const results = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
-      const items = results.Items?.map((item) => {
-        return {
-          userId: parameters.userId,
-          key: item?.sk.S ?? '',
-          pdf: item?.pdfKey.S ?? '',
-          dateSubmitted: item?.dateSubmitted.S ?? '',
-          formName: item?.formName.S ?? '',
-          formTitle: item?.formTitle.S ?? '',
-          attachments: item.attachments.L.map(attachment => attachment.S),
-        };
-      }) ?? [];
-      return items;
+      const results = await this.client.send(queryCommand);
+      if (results.Items) {
+        const parsedResults = submissionTableItemsSchema.parse(await this.client.send(queryCommand));
+        console.log(`${parsedResults.Items.length} items found`);
+        const items = parsedResults.Items?.map((item) => {
+          return {
+            userId: parameters.userId,
+            key: item?.sk.S ?? '',
+            pdf: item?.pdfKey.S ?? '',
+            dateSubmitted: item.dateSubmitted?.S ?? new Date(1970, 0, 0).toISOString(),
+            formName: item.formName?.S ?? 'onbekend',
+            formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
+            attachments: item.attachments?.L.map(attachment => attachment.S) ?? [],
+          };
+        });
+        return items;
+      }
+      console.log('No items found');
+      return false;
     } catch (err) {
       console.error('Error getting data from DynamoDB: ' + err);
       throw err;

@@ -5,7 +5,6 @@ import { Configuration } from '../src/Configuration';
 import { PipelineStack } from '../src/PipelineStack';
 
 const configuration: Configuration = {
-  subdomain: 'test',
   branchName: 'stacktest',
   deployFromEnvironment: {
     account: '12345678',
@@ -33,4 +32,26 @@ test('Api Stack', () => {
   const apiStack = new ApiStack(app, 'api', { configuration });
   const template = Template.fromStack(apiStack);
   expect(template.hasResource('AWS::SNS::Subscription', {}));
+});
+
+test('Api Gateway', () => {
+  const app = new App();
+
+  const apiStack = new ApiStack(app, 'api', { configuration });
+  const template = Template.fromStack(apiStack);
+  // console.debug(JSON.stringify(template, null, 2));
+  expect(template.hasResource('AWS::ApiGateway::RestApi', {}));
+  expect(template.resourceCountIs('AWS::ApiGateway::DomainName', 0));
+});
+
+test('Api Gateway with custom domain', () => {
+  const app = new App();
+  const subdomainConfiguration = {
+    ...configuration,
+    subdomain: 'test',
+  } as Configuration;
+  const apiStack = new ApiStack(app, 'api', { configuration: subdomainConfiguration });
+  const template = Template.fromStack(apiStack);
+  // console.debug(JSON.stringify(template, null, 2));
+  expect(template.hasResource('AWS::ApiGateway::DomainName', {}));
 });
