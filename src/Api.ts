@@ -53,7 +53,7 @@ export class Api extends Construct {
     let domainNameProps;
     if (subdomain) {
       this.hostedZone = this.getHostedZone();
-      domainNameProps = this.apiGatewayDomainNameProps(this.hostedZone, subdomain);
+      domainNameProps = this.apiGatewayDomainNameProps(this.hostedZone);
     }
 
     const api = new RestApi(this, 'api', {
@@ -103,16 +103,13 @@ export class Api extends Construct {
     return this.hostedZone;
   }
 
-  apiGatewayDomainNameProps(hostedZone: IHostedZone, subdomain?: string) {
-    if (subdomain) {
-      return {
-        certificate: this.certificate(),
-        domainName: `${subdomain}.${hostedZone.zoneName}`,
-        endpointType: EndpointType.EDGE,
-        securityPolicy: SecurityPolicy.TLS_1_2,
-      } as DomainNameOptions;
-    }
-    return;
+  apiGatewayDomainNameProps(hostedZone: IHostedZone) {
+    return {
+      certificate: this.certificate(),
+      domainName: hostedZone.zoneName,
+      endpointType: EndpointType.EDGE,
+      securityPolicy: SecurityPolicy.TLS_1_2,
+    } as DomainNameOptions;
   }
 
   private addListSubmissionsEndpoint(storageBucket: IBucket, table: ITable) {
