@@ -52,14 +52,8 @@ export class Api extends Construct {
   private createApiWithApiKey(subdomain?: string) {
     let domainNameProps;
     if (subdomain) {
-      const zoneName = StringParameter.fromStringParameterName(this, 'zonename', Statics.ssmZoneName).stringValue;
-      const hostedZoneId = StringParameter.fromStringParameterName(this, 'zoneid', Statics.ssmZoneId).stringValue;
-      this.hostedZone = HostedZone.fromHostedZoneAttributes(this, 'hostedzone', {
-        hostedZoneId,
-        zoneName,
-      });
+      this.hostedZone = this.getHostedZone();
       domainNameProps = this.apiGatewayDomainNameProps(this.hostedZone, subdomain);
-      console.debug(domainNameProps);
     }
 
     const api = new RestApi(this, 'api', {
@@ -93,6 +87,22 @@ export class Api extends Construct {
 
     return api;
   }
+  private getHostedZone() {
+    if (!this.hostedZone) {
+      const parameters = new RemoteParameters(this, 'hostedzone-params', {
+        path: `${Statics.ssmZonePath}/`,
+        region: 'us-east-1',
+      });
+      const zoneName = parameters.get(Statics.ssmZoneName);
+      const hostedZoneId = parameters.get(Statics.ssmZoneId);
+      this.hostedZone = HostedZone.fromHostedZoneAttributes(this, 'hostedzone', {
+        hostedZoneId,
+        zoneName,
+      });
+    }
+    return this.hostedZone;
+  }
+
   apiGatewayDomainNameProps(hostedZone: IHostedZone, subdomain?: string) {
     if (subdomain) {
       return {
