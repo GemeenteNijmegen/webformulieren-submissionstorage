@@ -3,6 +3,8 @@ import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPo
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
+import { ARecord, HostedZone, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
@@ -13,10 +15,12 @@ import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-f
 import { Statics } from './statics';
 
 interface ApiProps {
-  subdomain: string;
+  subdomain?: string;
 }
 export class Api extends Construct {
   private api: RestApi;
+  private hostedZone?: IHostedZone;
+
   constructor(scope: Construct, id: string, props: ApiProps) {
     super(scope, id);
 
@@ -46,8 +50,18 @@ export class Api extends Construct {
   }
 
   private createApiWithApiKey(subdomain?: string) {
+    let domainNameProps;
+    if (subdomain) {
+      const zoneName = StringParameter.fromStringParameterName(this, 'zonename', Statics.ssmZoneName).stringValue;
+      const hostedZoneId = StringParameter.fromStringParameterName(this, 'zoneid', Statics.ssmZoneId).stringValue;
+      this.hostedZone = HostedZone.fromHostedZoneAttributes(this, 'hostedzone', {
+        hostedZoneId,
+        zoneName,
+      });
+      domainNameProps = this.apiGatewayDomainNameProps(this.hostedZone, subdomain);
+      console.debug(domainNameProps);
+    }
 
-    const domainNameProps = this.apiGatewayDomainNameProps(subdomain);
     const api = new RestApi(this, 'api', {
       description: 'api endpoints om submission storage data op te halen',
       domainName: domainNameProps,
@@ -70,14 +84,20 @@ export class Api extends Construct {
       stage: api.deploymentStage,
     });
 
+    if (subdomain && this.hostedZone) {
+      new ARecord(this, 'api-dns', {
+        target: RecordTarget.fromAlias(new ApiGateway(api)),
+        zone: this.hostedZone,
+      } );
+    }
+
     return api;
   }
-  apiGatewayDomainNameProps(subdomain?: string) {
+  apiGatewayDomainNameProps(hostedZone: IHostedZone, subdomain?: string) {
     if (subdomain) {
-      const zoneName = StringParameter.fromStringParameterName(this, 'zonename', Statics.accountRootHostedZoneName).stringValue;
       return {
         certificate: this.certificate(),
-        domainName: `${subdomain}.${zoneName}`,
+        domainName: `${subdomain}.${hostedZone.zoneName}`,
         endpointType: EndpointType.EDGE,
         securityPolicy: SecurityPolicy.TLS_1_2,
       } as DomainNameOptions;

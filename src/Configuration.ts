@@ -45,7 +45,7 @@ export interface Configuration {
    * The subdomain of our main subdomain (`account`.csp-nijmegen.nl) this
    * API will be accessible at.
    */
-  readonly subdomain: string;
+  readonly subdomain?: string;
 
   /**
    * A list of CNAME records to register in the hosted zone
