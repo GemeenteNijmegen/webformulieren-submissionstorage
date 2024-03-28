@@ -6,7 +6,7 @@ import { S3Storage, Storage } from '../submission/Storage';
 export class FormOverviewRequestHandler {
   private storage!: Storage;
   private downloadStorage!: Storage;
-  private searchKey = 'PU2';
+  private searchKey = 'DMS';
 
   constructor() {
     this.setup();
@@ -51,37 +51,20 @@ export class FormOverviewRequestHandler {
 
   async compileCsvFile(bucketObjects: GetObjectCommandOutput[]): Promise<string> {
     const csvArray = [];
-    const csvHeaders = ['Tijd', 'BSN', 'Naam', 'Voornamen', 'Achternaam', 'GeboorteDatum', 'NederlandseNationaliteit', 'Gemeente', 'Woonplaats', 'Adres'];
+    const csvHeaders = ['Formuliernaam', 'DatumTijdOntvangen', 'Kenmerk'];
     csvArray.push(csvHeaders);
     const failedCsvProcessing = [];
-    console.debug('objects', bucketObjects);
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
         const jsonData = JSON.parse(bodyString);
-        const formData = JSON.parse(jsonData.Message);
+        const csvData = [
+          jsonData.Message.formTypeId,
+          jsonData.Timestamp,
+          jsonData.Message.reference,
+        ];
+        csvArray.push(csvData);
 
-        if (formData.formTypeId === 'ondersteuneninleidendverzoekreferendumjanuari2024' && !!formData.brpData) {
-
-          const persoonsGegevens = formData.brpData.Persoon.Persoonsgegevens;
-          const adresGegevens = formData.brpData.Persoon.Adres;
-          console.log('Parsing csv for object', formData.reference);
-          const csvData = [
-            jsonData.Timestamp,
-            formData.bsn,
-            persoonsGegevens.Naam,
-            persoonsGegevens.Voornamen,
-            persoonsGegevens.Achternaam,
-            persoonsGegevens.Geboortedatum,
-            persoonsGegevens.NederlandseNationaliteit,
-            adresGegevens.Gemeente,
-            adresGegevens.Woonplaats,
-            `${adresGegevens.Straat} ${adresGegevens.Huisnummer} ${adresGegevens.Postcode}`,
-          ];
-          csvArray.push(csvData);
-        } else {
-          failedCsvProcessing.push(`${formData.reference}: FormTypeId: ${formData.formTypeId}, Has BRP Data: ${formData.brpData ? 'yes' : 'no'}`);
-        }
       } else {
         failedCsvProcessing.push(`Geen body. Mogelijk metadata requestId: ${bucketObject.$metadata.requestId}`);
       }
@@ -95,7 +78,6 @@ export class FormOverviewRequestHandler {
     console.log('Failed csv transformations. Count: ', failedCsvProcessing.length, ' Objects failed: ', failedCsvProcessing);
 
     return csvContent;
-
   }
 
 }
