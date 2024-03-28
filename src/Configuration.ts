@@ -84,19 +84,19 @@ const configurations: { [name: string] : Configuration } = {
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
   },
-  // acceptance: {
-  //   branchName: 'acceptance',
-  //   subdomain: 'api',
-  //   deployFromEnvironment: Statics.gnBuildEnvironment,
-  //   deployToEnvironment: Statics.appAcceptanceEnvironment,
-  //   includePipelineValidationChecks: false,
-  //   allowedAccountIdsToPublishToSNS: [
-  //     Statics.acceptanceWebformulierenAccountId,
-  //   ],
-  //   subscribeToTopicArns: [
-  //     'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
-  //   ],
-  // },
+  acceptance: {
+    branchName: 'acceptance',
+    subdomain: 'api',
+    deployFromEnvironment: Statics.gnBuildEnvironment,
+    deployToEnvironment: Statics.appAccpEnvironment,
+    includePipelineValidationChecks: false,
+    allowedAccountIdsToPublishToSNS: [
+      Statics.acceptanceWebformulierenAccountId,
+    ],
+    subscribeToTopicArns: [
+      'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
+    ],
+  },
   production: {
     branchName: 'main',
     subdomain: 'api',
