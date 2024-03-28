@@ -58,10 +58,11 @@ export class FormOverviewRequestHandler {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
         const jsonData = JSON.parse(bodyString);
+        const jsonMessage = JSON.parse(jsonData.Message);
         const csvData = [
-          jsonData.Message.formTypeId,
+          jsonMessage.formTypeId,
           jsonData.Timestamp,
-          jsonData.Message.reference,
+          jsonMessage.reference,
         ];
         csvArray.push(csvData);
 
