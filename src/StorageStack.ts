@@ -65,6 +65,11 @@ export class StorageStack extends Stack {
       encryptionKey: key,
       encryption: TableEncryption.CUSTOMER_MANAGED,
     });
+    table.addGlobalSecondaryIndex({
+      indexName: 'formNameIndex',
+      partitionKey: { name: 'formName', type: AttributeType.STRING },
+      sortKey: { name: 'dateSubmitted', type: AttributeType.STRING },
+    });
     this.addArnToParameterStore('tableParam', table.tableArn, Statics.ssmSubmissionTableArn);
     this.addArnToParameterStore('tableNameParam', table.tableName, Statics.ssmSubmissionTableName);
 
