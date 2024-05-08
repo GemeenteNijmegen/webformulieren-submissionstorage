@@ -48,7 +48,7 @@
     "@typescript-eslint/parser": "^6",
     "aws-cdk": "^2.1.0",
     "aws-sdk-client-mock": "^3.1.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.21.1",
     "eslint": "^8",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
@@ -76,7 +76,7 @@
     "constructs": "^10.0.5",
     "dotenv": "^16.4.5",
     "sns-validator": "^0.3.5",
-    "zod": "^3.23.6"
+    "zod": "^3.23.7"
   },
   "license": "EUPL-1.2",
   "version": "0.0.0",
