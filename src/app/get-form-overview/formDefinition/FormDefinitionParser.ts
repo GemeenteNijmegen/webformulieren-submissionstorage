@@ -10,6 +10,13 @@ export type FormDefinitionComponents = {
   parentKey?: string;
 };
 
+export interface ParsedFormDefinition {
+  name: string;
+  title: string;
+  created: string;
+  modified: string;
+  includedFormDefinitionComponents: FormDefinitionComponents[];
+}
 /**
  * This class parses a form definition object and extracts relevant information
  * for further processing. It provides methods to access both the parsed
@@ -59,7 +66,15 @@ export class FormDefinitionParser {
       includedFormDataTypes.includes(component.type),
     );
   }
-
+  getParsedFormDefinition(): ParsedFormDefinition {
+    return {
+      name: this.formName,
+      title: this.formTitle,
+      created: this.createdDate,
+      modified: this.modifiedDate,
+      includedFormDefinitionComponents: this.getIncludedFormDefinitionComponents(),
+    };
+  }
   /**
    * For development and debug purposes
    * Provides an overview of all form component types encountered during parsing.
