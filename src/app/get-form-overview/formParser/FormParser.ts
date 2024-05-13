@@ -29,7 +29,7 @@ export class FormParser {
       } else {
         header = component.key;
       }
-
+      console.log(header, 'check if already in headerArray');
 
     });
   }

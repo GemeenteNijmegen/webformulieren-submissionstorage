@@ -3,20 +3,18 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { mockClient } from 'aws-sdk-client-mock';
 import * as snsSample from './samples/sns.sample.json';
-// import { FormIoFormConnector } from '../FormConnector';
 import { SubmissionHandler } from '../SubmissionHandler';
 
-// Mock FormConnector clas, which is instantiated in the SubmissionHandler and requires a response with title and name to be able to use FormDefinitionSchema.parse() later on
-// let mockDefinition = jest.fn().mockResolvedValue({ title: 'testTitel', name: 'testName' });
-// jest.mock('../FormConnector', () => {
-//   return {
-//     FormIoFormConnector: jest.fn(() => {
-//       return {
-//         definition: mockDefinition,
-//       };
-//     }),
-//   };
-// });
+let mockDefinition = jest.fn().mockResolvedValue({ title: 'testTitel', name: 'testName' });
+jest.mock('../FormConnector', () => {
+  return {
+    FormIoFormConnector: jest.fn(() => {
+      return {
+        definition: mockDefinition,
+      };
+    }),
+  };
+});
 
 
 const secretsMock = mockClient(SecretsManagerClient);
@@ -45,7 +43,7 @@ describe('Submission', () => {
     expect(new SubmissionHandler()).toBeTruthy();
   });
 
-  xtest('calling succeeds', async () => {
+  test('calling succeeds', async () => {
     const handler = new SubmissionHandler();
     await handler.handleRequest(message);
   });
