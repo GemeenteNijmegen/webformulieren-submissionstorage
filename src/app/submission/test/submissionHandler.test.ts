@@ -4,6 +4,18 @@ import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-sec
 import { mockClient } from 'aws-sdk-client-mock';
 import * as snsSample from './samples/sns.sample.json';
 import { SubmissionHandler } from '../SubmissionHandler';
+
+let mockDefinition = jest.fn().mockResolvedValue({ title: 'testTitel', name: 'testName' });
+jest.mock('../FormConnector', () => {
+  return {
+    FormIoFormConnector: jest.fn(() => {
+      return {
+        definition: mockDefinition,
+      };
+    }),
+  };
+});
+
 const secretsMock = mockClient(SecretsManagerClient);
 const dbMock = mockClient(DynamoDBClient);
 const s3Mock = mockClient(S3Client);
