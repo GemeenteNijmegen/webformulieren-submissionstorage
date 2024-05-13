@@ -8,5 +8,8 @@ import { ParsedFormDefinition } from '../formDefinition/FormDefinitionParser';
 export class FormParser {
   constructor(parsedFormDefinition: ParsedFormDefinition) {
     console.log('Parse forms with name: ', parsedFormDefinition.name);
+
+    //TODO: standaardvelden ophalen          Message.formTypeId, Message.Data.Timestamp, Message.reference,
+
   }
 }

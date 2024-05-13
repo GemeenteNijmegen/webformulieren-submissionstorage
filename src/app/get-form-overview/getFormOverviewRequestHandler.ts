@@ -29,6 +29,15 @@ export class FormOverviewRequestHandler {
 
   async handleRequest(message: any): Promise<APIGatewayProxyResult> {
     console.log(`Message not used yet ${message}, using constant searchKey ${this.searchKey}`);
+    // Message formuliernaam (later ook begin en einddatum)
+    // Zoeken naar inzendingenin database met getSubmissionsByFormName - foutmelding indien niks aanwezig
+    // Ophalen bestanden uit storage met storage.getBatch (submission.json staat in de keys)
+    // Formdefinitie ophalen en included fields ophalen (uit storage of uit live versie)
+    // FormParser met included component types en alle submission.jsons
+    // Resultaat arrays met data en header array
+    // Converteer naar csv met aparte class die duidelijke foutmeldingen geeft
+
+
     const storage = this.storage;
     const allKeys = await storage.searchAllObjectsByShortKey(this.searchKey);
     const bucketObjects = await this.getSubmissionsFromKeys(allKeys);

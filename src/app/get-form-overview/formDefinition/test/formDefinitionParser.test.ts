@@ -5,10 +5,10 @@ describe('Form Definition Parser Tests', ()=> {
   const formDefinitionMockSportAanmelden = JSON.parse(fs.readFileSync(__dirname + '/mockFormDefinitionAanmeldenSport.json', 'utf-8'));
 
 
-  xdescribe('Development tests - disable after use to prevent logging', () => {
+  describe('Development tests - disable after use to prevent logging', () => {
     test('should show logs to enable development with logged outputs', ()=> {
-      // const parsedFormDefinition = new FormDefinitionParser(formDefinitionMockSportAanmelden);
-      const parsedFormDefinition = new FormDefinitionParser(formDefinitionMock01);
+      const parsedFormDefinition = new FormDefinitionParser(formDefinitionMockSportAanmelden);
+      // const parsedFormDefinition = new FormDefinitionParser(formDefinitionMock01);
 
       // Logging of parsed components for development purposes
       console.log('All FormDefintionComponents: ', parsedFormDefinition.getAllFormDefinitionComponents());
