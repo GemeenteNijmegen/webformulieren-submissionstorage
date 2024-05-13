@@ -72,7 +72,7 @@
   },
   "Timestamp": "2024-05-13T08:09:40.956Z",
   "SignatureVersion": "1",
-  "Signature": "B8e6IErxH0utJQ27himbtUEbl72G4nAZjlK7qTiaX9B8YMJ+TY0yL0HvTf1otYH6sOIEjhPkmZ461hshjCw0MbBdXoxBjMs/lt8ZNF/0R4AA/BRzN7hxrZV2daGGBajSbVccyrRKcRnUqtmBIo4azBRtiAE4f7jXGy2YDVA80mgUUk/ln4sDHm9aJJzPbvvB5C+/DUoiVHedLPMG06eq41U4ApLMna5Jxx8kpcT/WY/86qVknv1uSeKD6vFVihQvVxZL/ov/Y7kSmpKL2r42MoDtIGGweuMsXgQrFWT1+wcp+YkTT+dYg7bA+xKngPlRVKD1GEfAqFGLodhAo8JsGw==",
+  "Signature": "signa",
   "SigningCertUrl": "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-60eadc530605d63b8e62a523676ef735.pem",
   "UnsubscribeUrl": "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:338472043295:eform-submissions:38bdc4e8-f2de-40bd-9c09-88b04cc795be",
   "MessageAttributes": {
