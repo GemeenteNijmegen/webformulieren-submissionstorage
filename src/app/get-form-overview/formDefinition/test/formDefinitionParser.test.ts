@@ -1,10 +1,7 @@
-import * as fs from 'fs';
+import * as formDefinitionMock01 from './mockFormDefinition_01.json';
+import * as formDefinitionMockSportAanmelden from './mockFormDefinitionAanmeldenSport.json';
 import { FormDefinitionParser } from '../FormDefinitionParser';
 describe('Form Definition Parser Tests', ()=> {
-  const formDefinitionMock01 = JSON.parse(fs.readFileSync(__dirname + '/mockFormDefinition_01.json', 'utf-8'));
-  const formDefinitionMockSportAanmelden = JSON.parse(fs.readFileSync(__dirname + '/mockFormDefinitionAanmeldenSport.json', 'utf-8'));
-
-
   describe('Development tests - disable after use to prevent logging', () => {
     test('should show logs to enable development with logged outputs', ()=> {
       const parsedFormDefinition = new FormDefinitionParser(formDefinitionMockSportAanmelden);
