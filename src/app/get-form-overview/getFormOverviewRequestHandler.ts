@@ -36,6 +36,8 @@ export class FormOverviewRequestHandler {
     // FormParser met included component types en alle submission.jsons
     // Resultaat arrays met data en header array
     // Converteer naar csv met aparte class die duidelijke foutmeldingen geeft
+    // Schrijf csv weg naar downloadbucket (misschien nog metadata over wie het opgehaald heeft enzo)
+    // Pagina maken in management lambda
 
 
     const storage = this.storage;
