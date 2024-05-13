@@ -6,10 +6,31 @@ import { ParsedFormDefinition } from '../formDefinition/FormDefinitionParser';
  * Might have to make the name more specific
  */
 export class FormParser {
+  parsedFormDefinition: ParsedFormDefinition;
+  headerArray: string[] = ['Formuliernaam', 'DatumTijdOntvangen', 'Kenmerk'];
+
   constructor(parsedFormDefinition: ParsedFormDefinition) {
     console.log('Parse forms with name: ', parsedFormDefinition.name);
-
+    this.parsedFormDefinition = parsedFormDefinition;
+    this.setFormDefinitionHeaders();
     //TODO: standaardvelden ophalen          Message.formTypeId, Message.Data.Timestamp, Message.reference,
+    //TODO: ophalen velden met formDefinition en leeg laten als het veld er niet is
+    //TODO: hoe om te gaan met values van checkboxes a en b
+  }
 
+  setFormDefinitionHeaders(): void {
+    const allLabels: string[] = this.parsedFormDefinition.includedFormDefinitionComponents?.map(component => component.label)
+      .filter((label): label is string => label !== undefined) ?? [];
+    this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
+      let header = '';
+      // Check if the component has a label and if that label is unique in the components. Otherwise you get double headers, which gets confusing.
+      if (component.label && allLabels.indexOf(component.label) === allLabels.lastIndexOf(component.label)) {
+        header = component.label;
+      } else {
+        header = component.key;
+      }
+
+
+    });
   }
 }

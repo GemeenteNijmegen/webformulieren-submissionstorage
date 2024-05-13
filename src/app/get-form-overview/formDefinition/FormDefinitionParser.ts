@@ -10,11 +10,33 @@ export type FormDefinitionComponents = {
   parentKey?: string;
 };
 
+/**
+ * This interface defines the structure of a parsed form definition object.
+ */
 export interface ParsedFormDefinition {
+  /**
+   * The unique name of the form definition.
+   */
   name: string;
+
+  /**
+   * The title or display name of the form definition.
+   */
   title: string;
+
+  /**
+   * The date and time the form definition was created (typically a string representation).
+   */
   created: string;
+
+  /**
+   * The date and time the form definition was last modified (typically a string representation).
+   */
   modified: string;
+
+  /**
+   * An array of `FormDefinitionComponents` objects that define the components included in the form.
+   */
   includedFormDefinitionComponents: FormDefinitionComponents[];
 }
 /**
