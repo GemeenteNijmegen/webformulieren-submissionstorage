@@ -27,10 +27,14 @@ export class FormParser {
       if (component.label && allLabels.indexOf(component.label) === allLabels.lastIndexOf(component.label)) {
         header = component.label;
       } else {
-        header = component.key;
+        header = component.label ? `${component.label} ${component.key}` : component.key;
       }
-      console.log(header, 'check if already in headerArray');
-
+      // Check if headerArray already has this header. Only add when unique
+      if (this.headerArray.includes(header)) {
+        console.debug(`[FormParser ${this.parsedFormDefinition.name}] Did not push ${header} to headerArray, because it already exists.`);
+      } else {
+        this.headerArray.push(header);
+      }
     });
   }
 }
