@@ -63,11 +63,13 @@ export class FormParser {
   private parseMessage(jsonMessage: any): string[] {
     const parsedMessage: string[] = [];
     this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
+      let value = '';
       if (component.parentKey) {
-        parsedMessage.push(jsonMessage.data[`${component.parentKey}${component.key}`]);
+        value = jsonMessage.data[`${component.parentKey}${component.key}`] ?? '';
       } else {
-        parsedMessage.push(jsonMessage.data[`${component.key}`]);
+        value = jsonMessage.data[`${component.key}`] ?? '';
       }
+      parsedMessage.push(value);
     });
     return parsedMessage;
   }

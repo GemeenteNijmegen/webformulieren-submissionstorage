@@ -43,6 +43,9 @@ describe('FormParser tests', () => {
       //Check if the headers have the same length as the parsedForm
       expect(formParser.getHeaders().length).toEqual(parsedForm.length);
       expect(parsedForm).toContain('TestAchternaamOuder01');
+      expect(parsedForm).not.toContain(undefined);
+      //Volgorde testen
+      console.log('PARSED FORM: ', parsedForm );
     });
     test('should process volwassen form', () => {
       const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
