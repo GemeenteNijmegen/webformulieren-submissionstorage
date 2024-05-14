@@ -12,6 +12,7 @@ export interface SubmissionData {
   formTitle?: string;
 }
 
+
 const dynamoDBStringSchema = z.object({
   S: z.string(),
 });
