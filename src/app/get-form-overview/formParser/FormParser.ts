@@ -63,14 +63,17 @@ export class FormParser {
   private parseMessage(jsonMessage: any): string[] {
     const parsedMessage: string[] = [];
     this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
-      let value = '';
-      if (component.parentKey) {
-        value = jsonMessage.data[`${component.parentKey}${component.key}`] ?? '';
+      let value: any = '';
+      // Does the component have a parent key and is the parentKey present in the form data being parsed?
+      if (component.parentKey && jsonMessage.data[`${component.parentKey}`]) {
+        value = jsonMessage.data[`${component.parentKey}`][`${component.key}`] ?? '';
       } else {
         value = jsonMessage.data[`${component.key}`] ?? '';
       }
       if (typeof value !== 'string') {
-        console.log('NOT STRING: ', component.key, value, typeof value);
+        console.log('NOT STRING: ', value, typeof value, component.key);
+        console.log('NOT STRING TYPE : ', typeof value);
+        value = 'NOT STRING';
       }
       parsedMessage.push(value);
     });
