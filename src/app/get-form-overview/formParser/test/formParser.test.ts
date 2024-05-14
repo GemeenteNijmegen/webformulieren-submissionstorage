@@ -49,30 +49,40 @@ describe('FormParser tests', () => {
       const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockKindForm);
       // const parsedForm = formParser.parseForm(mockVolwassenForm);
-      // console.log('PARSED FORM: ', parsedForm );
       // Combine headers with values to check results in logs
       const combinedHeadersAndParsedValues = [];
       for (let i = 0; i < formParser.getHeaders().length; i++) {
         combinedHeadersAndParsedValues.push({ [formParser.getHeaders()[i].toString()]: parsedForm[i] });
       }
-      console.log('PARSED FORM WITH HEADERS: ', combinedHeadersAndParsedValues);
+      console.log('Parsed form with headers: ', combinedHeadersAndParsedValues);
     });
     test('should process kind form', () => {
       const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockKindForm);
       expect(parsedForm).toContain('aanmeldensportactiviteit');
-      //Check if the headers have the same length as the parsedForm
       expect(formParser.getHeaders().length).toEqual(parsedForm.length);
       expect(parsedForm).toContain('TestAchternaamOuder01');
       expect(parsedForm).not.toContain(undefined);
-      //Volgorde testen
-
     });
+
     test('should process volwassen form', () => {
       const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockVolwassenForm);
       expect(parsedForm).toContain('aanmeldensportactiviteit');
+      expect(formParser.getHeaders().length).toEqual(parsedForm.length);
     });
 
+    // test('should show labels of radiobuttons instead of vague values like a and b', () => {
+    //   const formParser = new FormParser(sportParsedFormDefinition);
+    //   const parsedForm = formParser.parseForm(mockVolwassenForm);
+    // });
+    // test('should show the label values of selectboxes ', () => {
+    //   const formParser = new FormParser(sportParsedFormDefinition);
+    //   const parsedForm = formParser.parseForm(mockVolwassenForm);
+    // });
+    // test('should have values that match with the headers', () => {
+    //   const formParser = new FormParser(sportParsedFormDefinition);
+    //   const parsedForm = formParser.parseForm(mockVolwassenForm);
+    // });
   });
 });

@@ -12,8 +12,6 @@ export class FormParser {
   constructor(parsedFormDefinition: ParsedFormDefinition) {
     this.parsedFormDefinition = parsedFormDefinition;
     this.setFormDefinitionHeaders();
-    //TODO: ophalen velden met formDefinition en leeg laten als het veld er niet is
-    //TODO: hoe om te gaan met values van checkboxes a en b
   }
 
   setFormDefinitionHeaders(): void {
@@ -62,6 +60,7 @@ export class FormParser {
   }
   private parseMessage(jsonMessage: any): string[] {
     const parsedMessage: string[] = [];
+    // Check each component in the parsedFormDefinition and add a value from the form if it is in the JSONbody
     this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
       let value: any = '';
 
