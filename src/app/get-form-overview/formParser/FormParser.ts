@@ -70,7 +70,6 @@ export class FormParser {
       } else {
         value = jsonMessage.data[`${component.key}`] ?? '';
       }
-
       value = this.processNonStandardValueToString(value, component);
       parsedMessage.push(value);
     });
@@ -87,16 +86,13 @@ export class FormParser {
 
       return radioValue?.label ? radioValue.label : value;
     }
-
     // If the value is a string it can be returned immediately
     {if (typeof value == 'string') return value;}
-
 
     // Convert booleans to string
     if (typeof value === 'boolean') {
       return value.toString();
     }
-
 
     // Process select_boxes that have object values
     if (typeof value === 'object' && component.type === 'selectboxes_nijmegen') {
