@@ -8,9 +8,6 @@ import { SubmissionHandler } from '../SubmissionHandler';
 let mockDefinition = jest.fn().mockResolvedValue({ title: 'testTitel', name: 'testName' });
 jest.mock('../FormConnector', () => {
 
-let mockDefinition = jest.fn().mockResolvedValue({ title: 'testTitel', name: 'testName' });
-jest.mock('../FormConnector', () => {
-
   return {
     FormIoFormConnector: jest.fn(() => {
       return {
