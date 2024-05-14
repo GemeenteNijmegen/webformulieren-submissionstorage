@@ -44,11 +44,12 @@ describe('FormParser tests', () => {
   describe('Parse', ()=> {
     const mockKindForm = JSON.stringify(MockFormKind01);
     const mockVolwassenForm = JSON.stringify(MockFormVolwassen01);
+
     test('development test - enable to get logging while developing', () => {
       const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockKindForm);
       // const parsedForm = formParser.parseForm(mockVolwassenForm);
-      console.log('PARSED FORM: ', parsedForm );
+      // console.log('PARSED FORM: ', parsedForm );
       // Combine headers with values to check results in logs
       const combinedHeadersAndParsedValues = [];
       for (let i = 0; i < formParser.getHeaders().length; i++) {

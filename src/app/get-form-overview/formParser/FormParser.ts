@@ -72,16 +72,25 @@ export class FormParser {
         value = jsonMessage.data[`${component.key}`] ?? '';
       }
 
-      value = this.processNonStringValue(value, component);
+      value = this.processNonStandardValueToString(value, component);
       parsedMessage.push(value);
     });
     return parsedMessage;
   }
 
 
-  private processNonStringValue(value: any, component: FormDefinitionComponents): string {
+  private processNonStandardValueToString(value: any, component: FormDefinitionComponents): string {
+    // Radio button are strings and have to be checked first
+    if (component.type === 'radio_nijmegen' || component.type === 'radio' && component.values) {
+      const radioValue = component.values?.find((radioObject) => {
+        return radioObject.value === value;
+      });
+
+      return radioValue?.label ? radioValue.label : value;
+    }
+
     // If the value is a string it can be returned immediately
-    if (typeof value == 'string') return value;
+    {if (typeof value == 'string') return value;}
 
 
     // Convert booleans to string
@@ -92,7 +101,6 @@ export class FormParser {
 
     // Process select_boxes that have object values
     if (typeof value === 'object' && component.type === 'selectboxes_nijmegen') {
-      console.log('Process selectboxes_nijmegen object for: ', component.key, component.parentKey);
       let selectBoxStringValue = '';
       component.values?.forEach((v: { label: string; value: string; shortcut?: string}) => {
         // Check each checkbox value and add to the string
@@ -101,7 +109,6 @@ export class FormParser {
         const processedValue = value[`${v.value}`];
         selectBoxStringValue += `Checkbox ${v.label} is ${processedValue.toString()}. `;
       });
-      console.log('processed selectbox: ', selectBoxStringValue);
       return selectBoxStringValue.trim();
     }
 
