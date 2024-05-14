@@ -1,4 +1,6 @@
-export const MockIncludedFormDefintionComponentsDoubleComponents = [
+import { FormDefinitionComponents } from '../../formDefinition/FormDefinitionParser';
+
+export const MockIncludedFormDefintionComponentsDoubleComponents: FormDefinitionComponents[] = [
   {
     key: 'voornaamKind',
     keyPath: '.components[1].components[2].voornaamKind',

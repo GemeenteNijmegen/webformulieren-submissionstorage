@@ -5,6 +5,14 @@ import * as MockFormVolwassen01 from './subm_raw_volwassene_01.json';
 import { ParsedFormDefinition } from '../../formDefinition/FormDefinitionParser';
 import { FormParser } from '../FormParser';
 
+const sportParsedFormDefinition: ParsedFormDefinition = {
+  name: 'formName',
+  title: 'Formulier Sport Aanmelden',
+  created: '2024-08-15T12:05:33.193Z',
+  modified: '2024-08-15T12:05:33.193Z',
+  includedFormDefinitionComponents: MockIncludedFormDefintionComponents,
+};
+
 describe('FormParser tests', () => {
   test('should instantiate', () => {
     const formParser = new FormParser({ name: 'formName', includedFormDefinitionComponents: [] } as any as ParsedFormDefinition);
@@ -36,8 +44,20 @@ describe('FormParser tests', () => {
   describe('Parse', ()=> {
     const mockKindForm = JSON.stringify(MockFormKind01);
     const mockVolwassenForm = JSON.stringify(MockFormVolwassen01);
+    test('development test - enable to get logging while developing', () => {
+      const formParser = new FormParser(sportParsedFormDefinition);
+      const parsedForm = formParser.parseForm(mockKindForm);
+      // const parsedForm = formParser.parseForm(mockVolwassenForm);
+      console.log('PARSED FORM: ', parsedForm );
+      // Combine headers with values to check results in logs
+      const combinedHeadersAndParsedValues = [];
+      for (let i = 0; i < formParser.getHeaders().length; i++) {
+        combinedHeadersAndParsedValues.push({ [formParser.getHeaders()[i].toString()]: parsedForm[i] });
+      }
+      console.log('PARSED FORM WITH HEADERS: ', combinedHeadersAndParsedValues);
+    });
     test('should process kind form', () => {
-      const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
+      const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockKindForm);
       expect(parsedForm).toContain('aanmeldensportactiviteit');
       //Check if the headers have the same length as the parsedForm
@@ -45,10 +65,10 @@ describe('FormParser tests', () => {
       expect(parsedForm).toContain('TestAchternaamOuder01');
       expect(parsedForm).not.toContain(undefined);
       //Volgorde testen
-      console.log('PARSED FORM: ', parsedForm );
+
     });
     test('should process volwassen form', () => {
-      const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
+      const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockVolwassenForm);
       expect(parsedForm).toContain('aanmeldensportactiviteit');
     });

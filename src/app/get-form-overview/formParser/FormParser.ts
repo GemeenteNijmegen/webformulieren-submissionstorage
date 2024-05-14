@@ -69,6 +69,9 @@ export class FormParser {
       } else {
         value = jsonMessage.data[`${component.key}`] ?? '';
       }
+      if (typeof value !== 'string') {
+        console.log('NOT STRING: ', component.key, value, typeof value);
+      }
       parsedMessage.push(value);
     });
     return parsedMessage;

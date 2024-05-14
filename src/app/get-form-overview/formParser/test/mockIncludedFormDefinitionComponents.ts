@@ -1,4 +1,6 @@
-export const MockIncludedFormDefintionComponents = [
+import { FormDefinitionComponents } from '../../formDefinition/FormDefinitionParser';
+
+export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
   {
     key: 'ikMeldAan',
     keyPath: '.components[0].components[1].ikMeldAan',
