@@ -8,6 +8,7 @@ export type FormDefinitionComponents = {
   type: string; // Type of the form object like textfield, content or html_element
   inDataGrid: boolean; // Indicates if nested in a datagrid
   parentKey?: string;
+  values?: { value: string; label: string; shortcut?: string}[]; // Some components have values objects that map the value options to labels
 };
 
 /**
@@ -187,6 +188,7 @@ export class FormDefinitionParser {
             type: definitionObject.type,
             inDataGrid: isNestedInDataGrid, // Set inDataGrid flag
             parentKey: parentKey,
+            values: definitionObject.values,
           });
         }
 

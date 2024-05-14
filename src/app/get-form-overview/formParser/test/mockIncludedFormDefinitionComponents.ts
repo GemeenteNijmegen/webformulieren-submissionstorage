@@ -8,6 +8,18 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      {
+        label: 'een volwassene (18 jaar of ouder)',
+        value: 'a',
+        shortcut: '',
+      },
+      {
+        label: 'een kind (17 jaar of jonger)',
+        value: 'b',
+        shortcut: '',
+      },
+    ],
   },
   {
     key: 'voornaamKind',
@@ -40,6 +52,15 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      { label: 'basisonderwijs', value: 'a', shortcut: '' },
+      { label: 'voortgezet onderwijs', value: 'b', shortcut: '' },
+      {
+        label: 'mijn kind volgt (nog) geen onderwijs',
+        value: 'c',
+        shortcut: '',
+      },
+    ],
   },
   {
     key: 'basisonderwijs',
@@ -176,6 +197,7 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [{ label: '-', value: 'a', shortcut: '' }],
   },
   {
     key: 'aanmeldenVoorSportactiviteitB',
@@ -184,6 +206,7 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [{ label: '-', value: 'a', shortcut: '' }],
   },
   {
     key: 'aanmeldenVoorSportactiviteitC',
@@ -192,6 +215,9 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      { label: 'Onbeperkt Wijksporten', value: 'a', shortcut: '' },
+    ],
   },
   {
     key: 'aanmeldenVoorSportactiviteitD',
@@ -200,6 +226,18 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      {
+        label: 'Kwiek wandelroute (Park Maldenborgh)',
+        value: 'a',
+        shortcut: '',
+      },
+      {
+        label: 'Nationale (diabetes) Challenge (Goffert)',
+        value: 'b',
+        shortcut: '',
+      },
+    ],
   },
   {
     key: 'aanmeldenVoorSportactiviteitE',
@@ -208,6 +246,7 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [{ label: 'MixSports', value: 'a', shortcut: '' }],
   },
   {
     key: 'aanmeldenVoorSportactiviteitF',
@@ -216,6 +255,23 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      {
+        label: 'Onbeperkt Wijksporten (Sporthal Meijhorst)',
+        value: 'a',
+        shortcut: '',
+      },
+      {
+        label: 'Sport & spel (Wijkcentrum Dukenburg)',
+        value: 'b',
+        shortcut: '',
+      },
+      {
+        label: 'Sport & spel (Gymzaal Malvert)',
+        value: 'c',
+        shortcut: '',
+      },
+    ],
   },
   {
     key: 'aanmeldenVoorSportactiviteitG',
@@ -224,6 +280,13 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'selectboxes_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      {
+        label: 'Onbeperkt Wijksporten (Sporthal Horstacker)',
+        value: 'a',
+        shortcut: '',
+      },
+    ],
   },
   {
     key: 'naamAmbulantBegeleider',
@@ -248,6 +311,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: undefined,
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'geeftUToestemmingDatUwGegevensBewaardWordenVoorHetSeizoen',
@@ -256,6 +323,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: 'volwassen',
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'geeftUToestemmingVoorHetMakenVanFotosBijDeSportactiviteitenDieMisschienGebruiktWordenVoorReclame',
@@ -264,6 +335,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: 'volwassen',
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'geeftUToestemmingDatUGedurendeSeizoenBenaderdKanWordenVoorDePromotieVanAndereSportactiviteiten',
@@ -272,6 +347,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: 'volwassen',
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'geeftUToestemmingDatUwKindMagMeedoenAanDeSportactiviteitenEnMogenWijDaaroverMetUContactOpnemen',
@@ -280,6 +359,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: 'kind',
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'geeftUToestemmingDatDeGegevensVanUwKindBewaardWordenVoorHetSchooljaar',
@@ -288,6 +371,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: 'kind',
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'geeftUToestemmingVoorHetMakenVanFotosVanUwKindDieMisschienGebruiktWordenVoorReclame',
@@ -296,6 +383,10 @@ export const MockIncludedFormDefintionComponents: FormDefinitionComponents[] = [
     type: 'radio_nijmegen',
     inDataGrid: false,
     parentKey: 'kind',
+    values: [
+      { label: 'ja', value: 'ja', shortcut: '' },
+      { label: 'nee', value: 'nee', shortcut: '' },
+    ],
   },
   {
     key: 'opmerkingen',

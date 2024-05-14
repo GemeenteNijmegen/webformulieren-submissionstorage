@@ -1,4 +1,4 @@
-import { ParsedFormDefinition } from '../formDefinition/FormDefinitionParser';
+import { FormDefinitionComponents, ParsedFormDefinition } from '../formDefinition/FormDefinitionParser';
 
 /**
  * Takes data from a parsed Form Definition and processes one or multiple forms to structure its data
@@ -64,20 +64,47 @@ export class FormParser {
     const parsedMessage: string[] = [];
     this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
       let value: any = '';
+
       // Does the component have a parent key and is the parentKey present in the form data being parsed?
       if (component.parentKey && jsonMessage.data[`${component.parentKey}`]) {
         value = jsonMessage.data[`${component.parentKey}`][`${component.key}`] ?? '';
       } else {
         value = jsonMessage.data[`${component.key}`] ?? '';
       }
-      if (typeof value !== 'string') {
-        console.log('NOT STRING: ', value, typeof value, component.key);
-        console.log('NOT STRING TYPE : ', typeof value);
-        value = 'NOT STRING';
-      }
+
+      value = this.processNonStringValue(value, component);
       parsedMessage.push(value);
     });
     return parsedMessage;
   }
 
+
+  private processNonStringValue(value: any, component: FormDefinitionComponents): string {
+    // If the value is a string it can be returned immediately
+    if (typeof value == 'string') return value;
+
+
+    // Convert booleans to string
+    if (typeof value === 'boolean') {
+      return value.toString();
+    }
+
+
+    // Process select_boxes that have object values
+    if (typeof value === 'object' && component.type === 'selectboxes_nijmegen') {
+      console.log('Process selectboxes_nijmegen object for: ', component.key, component.parentKey);
+      let selectBoxStringValue = '';
+      component.values?.forEach((v: { label: string; value: string; shortcut?: string}) => {
+        // Check each checkbox value and add to the string
+        // value example { "a": true, "b": true } --> from submitted form
+        // Form Definition component has values which maps the answer values to labels
+        const processedValue = value[`${v.value}`];
+        selectBoxStringValue += `Checkbox ${v.label} is ${processedValue.toString()}. `;
+      });
+      console.log('processed selectbox: ', selectBoxStringValue);
+      return selectBoxStringValue.trim();
+    }
+
+    return `Unable to process non-string value for ${component.key} ${component.parentKey}`;
+  }
 }
