@@ -45,10 +45,11 @@ describe('FormParser tests', () => {
     const mockKindForm = JSON.stringify(MockFormKind01);
     const mockVolwassenForm = JSON.stringify(MockFormVolwassen01);
 
-    test('development test - enable to get logging while developing', () => {
+    xtest('development test - enable to get logging while developing', () => {
       const formParser = new FormParser(sportParsedFormDefinition);
-      const parsedForm = formParser.parseForm(mockKindForm);
-      // const parsedForm = formParser.parseForm(mockVolwassenForm);
+      // const parsedForm = formParser.parseForm(mockKindForm);
+      const parsedForm = formParser.parseForm(mockVolwassenForm);
+
       // Combine headers with values to check results in logs
       const combinedHeadersAndParsedValues = [];
       for (let i = 0; i < formParser.getHeaders().length; i++) {
@@ -62,7 +63,6 @@ describe('FormParser tests', () => {
       expect(parsedForm).toContain('aanmeldensportactiviteit');
       expect(formParser.getHeaders().length).toEqual(parsedForm.length);
       expect(parsedForm).toContain('TestAchternaamOuder01');
-      expect(parsedForm).not.toContain(undefined);
     });
 
     test('should process volwassen form', () => {
@@ -71,18 +71,51 @@ describe('FormParser tests', () => {
       expect(parsedForm).toContain('aanmeldensportactiviteit');
       expect(formParser.getHeaders().length).toEqual(parsedForm.length);
     });
+    test('should not have any undefined values', () => {
+      const formParser = new FormParser(sportParsedFormDefinition);
 
-    // test('should show labels of radiobuttons instead of vague values like a and b', () => {
-    //   const formParser = new FormParser(sportParsedFormDefinition);
-    //   const parsedForm = formParser.parseForm(mockVolwassenForm);
-    // });
-    // test('should show the label values of selectboxes ', () => {
-    //   const formParser = new FormParser(sportParsedFormDefinition);
-    //   const parsedForm = formParser.parseForm(mockVolwassenForm);
-    // });
-    // test('should have values that match with the headers', () => {
-    //   const formParser = new FormParser(sportParsedFormDefinition);
-    //   const parsedForm = formParser.parseForm(mockVolwassenForm);
-    // });
+      const parsedForm = formParser.parseForm(mockKindForm);
+      expect(parsedForm).not.toContain(undefined);
+
+      const parsedVolwassenForm = formParser.parseForm(mockVolwassenForm);
+      expect(parsedVolwassenForm).not.toContain(undefined);
+    });
+
+    test('should show labels of radiobuttons instead of vague values like a and b', () => {
+      const formParser = new FormParser(sportParsedFormDefinition);
+
+      const parsedForm = formParser.parseForm(mockKindForm);
+      expect(parsedForm).toContain('een kind (17 jaar of jonger)');
+      expect(parsedForm).toContain('basisonderwijs');
+
+      const parsedVolwassenForm = formParser.parseForm(mockVolwassenForm);
+      expect(parsedVolwassenForm).toContain('een volwassene (18 jaar of ouder)');
+    });
+    test('should show the label values of selectboxes ', () => {
+      const formParser = new FormParser(sportParsedFormDefinition);
+      const parsedForm = formParser.parseForm(mockVolwassenForm);
+      expect(parsedForm).toContain('Checkbox Kwiek wandelroute (Park Maldenborgh) is true. Checkbox Nationale (diabetes) Challenge (Goffert) is true.');
+
+
+    });
+    test('should have values that match with the headers', () => {
+      const formParser = new FormParser(sportParsedFormDefinition);
+      const parsedForm = formParser.parseForm(mockVolwassenForm);
+
+      // Combine headers with values to enable tests
+      const combinedHeadersAndParsedValues = [];
+      for (let i = 0; i < formParser.getHeaders().length; i++) {
+        combinedHeadersAndParsedValues.push({ [formParser.getHeaders()[i].toString()]: parsedForm[i] });
+      }
+      //Steekproef
+      expect(combinedHeadersAndParsedValues).toContainEqual({ 'E-mailadres eMailadres': 'test@nijmegen.nl' });
+      expect(combinedHeadersAndParsedValues).toContainEqual( { 'Ik heb alle vragen naar waarheid beantwoord': 'true' });
+      expect(combinedHeadersAndParsedValues).toContainEqual( { 'Stadsdeel stadsdeel': 'Nijmegen-Midden & Zuid' });
+      expect(combinedHeadersAndParsedValues).toContainEqual( { appId: 'SP3' });
+      expect(combinedHeadersAndParsedValues).toContainEqual( { Geboortedatum: '08-05-1996' });
+      expect(combinedHeadersAndParsedValues).toContainEqual( {
+        'Geeft u toestemming dat uw gegevens bewaard worden voor het seizoen 2023-2024?': 'ja',
+      });
+    });
   });
 });
