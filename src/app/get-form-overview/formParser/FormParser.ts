@@ -10,10 +10,8 @@ export class FormParser {
   private headerArray: string[] = ['Formuliernaam', 'DatumTijdOntvangen', 'Kenmerk'];
 
   constructor(parsedFormDefinition: ParsedFormDefinition) {
-    console.log('Parse forms with name: ', parsedFormDefinition.name);
     this.parsedFormDefinition = parsedFormDefinition;
     this.setFormDefinitionHeaders();
-    //TODO: standaardvelden ophalen          Message.formTypeId, Message.Data.Timestamp, Message.reference,
     //TODO: ophalen velden met formDefinition en leeg laten als het veld er niet is
     //TODO: hoe om te gaan met values van checkboxes a en b
   }
@@ -56,10 +54,22 @@ export class FormParser {
         jsonMessage.formTypeId,
         jsonBody.Timestamp,
         jsonMessage.reference);
+      parsedForm.push(...this.parseMessage(jsonMessage));
     } catch {
       console.debug(`[FormParser ${this.parsedFormDefinition.name}] JSON parse failed`);
     }
     return parsedForm;
+  }
+  private parseMessage(jsonMessage: any): string[] {
+    const parsedMessage: string[] = [];
+    this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
+      if (component.parentKey) {
+        parsedMessage.push(jsonMessage.data[`${component.parentKey}${component.key}`]);
+      } else {
+        parsedMessage.push(jsonMessage.data[`${component.key}`]);
+      }
+    });
+    return parsedMessage;
   }
 
 }

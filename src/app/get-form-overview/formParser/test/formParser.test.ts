@@ -40,6 +40,9 @@ describe('FormParser tests', () => {
       const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockKindForm);
       expect(parsedForm).toContain('aanmeldensportactiviteit');
+      //Check if the headers have the same length as the parsedForm
+      expect(formParser.getHeaders().length).toEqual(parsedForm.length);
+      expect(parsedForm).toContain('TestAchternaamOuder01');
     });
     test('should process volwassen form', () => {
       const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
