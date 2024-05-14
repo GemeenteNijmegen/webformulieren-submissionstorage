@@ -38,14 +38,13 @@ describe('FormParser tests', () => {
     const mockVolwassenForm = JSON.stringify(MockFormVolwassen01);
     test('should process kind form', () => {
       const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
-
       const parsedForm = formParser.parseForm(mockKindForm);
-      expect(parsedForm).toStrictEqual([]);
+      expect(parsedForm).toContain('aanmeldensportactiviteit');
     });
     test('should process volwassen form', () => {
       const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockVolwassenForm);
-      expect(parsedForm).toStrictEqual([]);
+      expect(parsedForm).toContain('aanmeldensportactiviteit');
     });
 
   });

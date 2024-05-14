@@ -47,8 +47,19 @@ export class FormParser {
    * In doubt about making it async, can be done later on.
    */
   parseForm(formBody: string): string[] {
-    console.log(formBody);
-    return [];
+    const parsedForm = [];
+    try {
+      // Body contains metadata and the message with specific form data that still has to be parsed to JSON
+      const jsonBody = JSON.parse(formBody);
+      const jsonMessage = JSON.parse(jsonBody.Message);
+      parsedForm.push(
+        jsonMessage.formTypeId,
+        jsonBody.Timestamp,
+        jsonMessage.reference);
+    } catch {
+      console.debug(`[FormParser ${this.parsedFormDefinition.name}] JSON parse failed`);
+    }
+    return parsedForm;
   }
 
 }
