@@ -169,12 +169,16 @@ export class Api extends Construct {
       timeout: Duration.minutes(10),
       memorySize: 1024,
     });
+    table.grantReadData(formOverviewFunction);
     storageBucket.grantRead(formOverviewFunction);
     downloadBucket.grantReadWrite(formOverviewFunction);
 
     const formOverviewApi = this.api.root.addResource('formoverview');
     formOverviewApi.addMethod('GET', new LambdaIntegration(formOverviewFunction), {
       apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.formuliernaam': true,
+      },
     });
   }
 
