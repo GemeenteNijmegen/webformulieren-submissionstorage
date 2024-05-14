@@ -41,5 +41,14 @@ export class FormParser {
     return this.headerArray;
   }
 
+  /**
+   * @param formBody string containing the body of a form. Can be obtained from a S3File with await bucketObject.Body.transformToString();
+   * Maybe refactor to receiving the  GetObjectCommandOutput.Body or both
+   * In doubt about making it async, can be done later on.
+   */
+  parseForm(formBody: string): string[] {
+    console.log(formBody);
+    return [];
+  }
 
 }

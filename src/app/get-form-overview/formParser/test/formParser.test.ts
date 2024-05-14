@@ -1,5 +1,7 @@
 import { MockIncludedFormDefintionComponents } from './mockIncludedFormDefinitionComponents';
 import { MockIncludedFormDefintionComponentsDoubleComponents } from './mockIncludedFormDefinitionComponentsDoubleComponents';
+import * as MockFormKind01 from './subm_raw_kind_01.json';
+import * as MockFormVolwassen01 from './subm_raw_volwassene_01.json';
 import { ParsedFormDefinition } from '../../formDefinition/FormDefinitionParser';
 import { FormParser } from '../FormParser';
 
@@ -31,5 +33,20 @@ describe('FormParser tests', () => {
       debugSpy.mockRestore();
     });
   });
-  describe('Parse Happyflow', ()=> {});
+  describe('Parse', ()=> {
+    const mockKindForm = JSON.stringify(MockFormKind01);
+    const mockVolwassenForm = JSON.stringify(MockFormVolwassen01);
+    test('should process kind form', () => {
+      const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
+
+      const parsedForm = formParser.parseForm(mockKindForm);
+      expect(parsedForm).toStrictEqual([]);
+    });
+    test('should process volwassen form', () => {
+      const formParser = new FormParser({ name: 'formName', title: 'Formulier Sport Aanmelden', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
+      const parsedForm = formParser.parseForm(mockVolwassenForm);
+      expect(parsedForm).toStrictEqual([]);
+    });
+
+  });
 });
