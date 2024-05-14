@@ -11,24 +11,25 @@ describe('FormParser tests', () => {
   describe('Headers', ()=> {
     test('should set formDefinition headers in constructor', () => {
       const formParser = new FormParser({ name: 'formName', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
-      expect(formParser.headerArray).toContain('Formuliernaam');
+      expect(formParser.getHeaders()).toContain('Formuliernaam');
     });
     test('should not set double labels', () => {
       const formParser = new FormParser({ name: 'formName', includedFormDefinitionComponents: MockIncludedFormDefintionComponents } as any as ParsedFormDefinition);
-      expect(formParser.headerArray).toContain('Stadsdeel stadsdeel1');
-      expect(formParser.headerArray).toContain('Stadsdeel stadsdeel');
-      expect(formParser.headerArray).not.toContain('Stadsdeel');
+      expect(formParser.getHeaders()).toContain('Stadsdeel stadsdeel1');
+      expect(formParser.getHeaders()).toContain('Stadsdeel stadsdeel');
+      expect(formParser.getHeaders()).not.toContain('Stadsdeel');
     });
     test('should not add double headers', () => {
       const debugSpy = jest.spyOn(console, 'debug');
 
       const formParser = new FormParser({ name: 'formNameDouble', includedFormDefinitionComponents: MockIncludedFormDefintionComponentsDoubleComponents } as any as ParsedFormDefinition);
-      expect(formParser.headerArray).toContain('Achternaam kind achternaamKind');
-      expect(formParser.headerArray).toContain('Stadsdeel stadsdeel');
+      expect(formParser.getHeaders()).toContain('Achternaam kind achternaamKind');
+      expect(formParser.getHeaders()).toContain('Stadsdeel stadsdeel');
       expect(debugSpy).toHaveBeenCalled();
       expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('Achternaam kind achternaamKind'));
       expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('Stadsdeel stadsdeel'));
       debugSpy.mockRestore();
     });
   });
+  describe('Parse Happyflow', ()=> {});
 });

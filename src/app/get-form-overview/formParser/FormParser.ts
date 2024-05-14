@@ -7,7 +7,7 @@ import { ParsedFormDefinition } from '../formDefinition/FormDefinitionParser';
  */
 export class FormParser {
   parsedFormDefinition: ParsedFormDefinition;
-  headerArray: string[] = ['Formuliernaam', 'DatumTijdOntvangen', 'Kenmerk'];
+  private headerArray: string[] = ['Formuliernaam', 'DatumTijdOntvangen', 'Kenmerk'];
 
   constructor(parsedFormDefinition: ParsedFormDefinition) {
     console.log('Parse forms with name: ', parsedFormDefinition.name);
@@ -36,5 +36,8 @@ export class FormParser {
         this.headerArray.push(header);
       }
     });
+  }
+  getHeaders(): string[] {
+    return this.headerArray;
   }
 }
