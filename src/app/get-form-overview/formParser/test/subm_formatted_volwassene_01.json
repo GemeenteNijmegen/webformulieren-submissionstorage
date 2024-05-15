@@ -1,0 +1,72 @@
+{
+  "Type": "Notification",
+  "MessageId": "30bce210-5ac7-5d59-b008-bcab9641ebf4",
+  "TopicArn": "arn:aws:sns:eu-central-1:338472043295:eform-submissions",
+  "Subject": null,
+  "Message": {
+    "formId": "48098098-ceec-4e2e-89aa-96573a4798cd",
+    "formTypeId": "aanmeldensportactiviteit",
+    "appId": "SP3",
+    "reference": "SP327.439",
+    "data": {
+      "ikMeldAan": "a",
+      "volgende": true,
+      "voornaam": "TestVoornaam01",
+      "achternaam": "TestAchternaam01",
+      "telefoonnummer": "827468324678",
+      "eMailadres": "test@nijmegen.nl",
+      "vorige": false,
+      "volgende1": true,
+      "appId": "SP3",
+      "vorige1": false,
+      "volgende2": true,
+      "opmerkingen": "Opmerkingen test test test Lorem Ipsum is simply dummy text.",
+      "vorige5": false,
+      "volgende6": true,
+      "ikHebAlleVragenNaarWaarheidBeantwoord": true,
+      "vorige6": false,
+      "volgende7": true,
+      "geboortedatum": "08-05-1996",
+      "contactpersoon": "Test Persoon01",
+      "telefoonnummerBijNoodgevallen": "27486234784632",
+      "stadsdeelVolwassen": { "stadsdeel": "Nijmegen-Midden & Zuid" },
+      "volwassen": {
+        "geeftUToestemmingDatUwGegevensBewaardWordenVoorHetSeizoen": "ja",
+        "geeftUToestemmingVoorHetMakenVanFotosBijDeSportactiviteitenDieMisschienGebruiktWordenVoorReclame": "ja",
+        "geeftUToestemmingDatUGedurendeSeizoenBenaderdKanWordenVoorDePromotieVanAndereSportactiviteiten": "ja"
+      },
+      "aanmeldenVoorSportactiviteitD": { "a": true, "b": true }
+    },
+    "metadata": {
+      "selectData": {
+        "stadsdeelVolwassen": {
+          "stadsdeel": { "label": "Nijmegen-Midden & Zuid" }
+        }
+      },
+      "timezone": "Europe/Amsterdam",
+      "offset": 120,
+      "origin": "https://app6-accp.nijmegen.nl",
+      "referrer": "",
+      "browserName": "Netscape",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:125.0) Gecko/20100101 Firefox/125.0",
+      "pathName": "/",
+      "onLine": true,
+      "timestamp": [2024, 5, 13, 8, 7, 21, 809187845]
+    },
+    "pdf": {
+      "reference": "231a214e2222fbc0831ce90eb28e6765",
+      "location": "48098098-ceec-4e2e-89aa-96573a4798cd/pdf/SP327.439",
+      "bucketName": "webforms-eformgenericserv-eformattuploads951db329-lm1p2s2mgzv3"
+    }
+  },
+  "Timestamp": "2024-05-13T08:07:34.150Z",
+  "SignatureVersion": "1",
+  "Signature": "sign",
+  "SigningCertUrl": "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-60eadc530605d63b8e62a523676ef735.pem",
+  "UnsubscribeUrl": "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:338472043295:eform-submissions:38bdc4e8-f2de-40bd-9c09-88b04cc795be",
+  "MessageAttributes": {
+    "BRP_data": { "Type": "String", "Value": "false" },
+    "AppId": { "Type": "String", "Value": "SP3" },
+    "KVK_data": { "Type": "String", "Value": "false" }
+  }
+}

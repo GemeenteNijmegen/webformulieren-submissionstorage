@@ -1,0 +1,445 @@
+    {
+        "_id": "62fa368dcd94dfadffb3d1d0",
+        "title": "Test formulier titel",
+        "name": "testFormulierNaam",
+        "path": "testFormulierNaam",
+        "type": "form",
+        "tags": [
+            "Overige"
+        ],
+        "components": [
+            {
+                "title": "Uw gegevens",
+                "breadcrumbClickable": true,
+                "buttonSettings": {
+                    "previous": false,
+                    "cancel": false,
+                    "next": false
+                },
+                "navigateOnEnter": false,
+                "saveOnEnter": false,
+                "scrollToTop": false,
+                "collapsible": false,
+                "key": "page1",
+                "type": "panel",
+                "label": "Page 1",
+                "components": [
+                    {
+                        "label": "Test formulier titel",
+                        "attrs": [
+                            {
+                                "attr": "",
+                                "value": ""
+                            }
+                        ],
+                        "content": "<h1>Test formulier titel</h1>",
+                        "refreshOnChange": false,
+                        "key": "testFormulierNaam",
+                        "type": "htmlelement",
+                        "input": false,
+                        "tableView": false
+                    },
+                    {
+                        "label": "Uw gegevens",
+                        "attrs": [
+                            {
+                                "attr": "",
+                                "value": ""
+                            }
+                        ],
+                        "content": "<h2>Uw gegevens</h2>",
+                        "refreshOnChange": false,
+                        "key": "uwGegevens",
+                        "type": "htmlelement",
+                        "input": false,
+                        "tableView": false
+                    },
+                    {
+                        "label": "Naam",
+                        "autocomplete": "name",
+                        "tableView": true,
+                        "key": "naam",
+                        "type": "textfield_nijmegen",
+                        "input": true
+                    },
+                    {
+                        "label": "E-mailadres",
+                        "key": "eMailadres",
+                        "type": "email_nijmegen",
+                        "input": true
+                    },
+                    {
+                        "label": "Telefoonnummer",
+                        "autocomplete": "tel",
+                        "tableView": true,
+                        "validate": {
+                            "required": true
+                        },
+                        "key": "telefoonnummer",
+                        "type": "textfield_nijmegen",
+                        "input": true
+                    },
+                    {
+                        "label": "Gegevens contactpersoon",
+                        "tableView": true,
+                        "inputFormat": "plain",
+                        "key": "gegevensContactpersoon",
+                        "type": "textarea_nijmegen",
+                        "input": true,
+                        "autoExpand": false
+                    },
+                    {
+                        "label": "Columns",
+                        "columns": [
+                            {
+                                "components": [
+                                    {
+                                        "label": "Volgende",
+                                        "size": "sm",
+                                        "tableView": false,
+                                        "key": "volgende2",
+                                        "type": "button",
+                                        "input": true
+                                    }
+                                ],
+                                "width": 3,
+                                "offset": 0
+                            },
+                            {
+                                "components": [],
+                                "width": 6
+                            }
+                        ],
+                        "key": "columns2",
+                        "type": "columns",
+                        "input": false,
+                        "tableView": false
+                    }
+                ]
+            },
+            {
+                "title": "Gegevens personen waarvoor u aanvraagt",
+                "key": "page2",
+                "type": "panel",
+                "label": "Page 2",
+                "input": false,
+                "tableView": false,
+                "components": [
+                    {
+                        "label": "Test formulier titel",
+                        "attrs": [
+                            {
+                                "attr": "",
+                                "value": ""
+                            }
+                        ],
+                        "content": "<h1>Test formulier titel</h1>",
+                        "key": "testFormulierNaam1",
+                        "type": "htmlelement",
+                        "input": false,
+                        "tableView": false
+                    },
+                    {
+                        "label": "Voor wie vraagt u aan? Beantwoord voor iedere persoon deze vragen: (datagrid)",
+                        "reorder": false,
+                        "addAnotherPosition": "bottom",
+                        "tableView": false,
+                        "defaultValue": [
+                            {
+                                "container": {
+                                    "voornaam": "",
+                                    "achternaam": "",
+                                    "leeftijd": ""
+                                }
+                            }
+                        ],
+                        "key": "voorWieVraagtUAan",
+                        "type": "datagrid",
+                        "input": true,
+                        "components": [
+                            {
+                                "label": "Container",
+                                "key": "container",
+                                "type": "container",
+                                "input": true,
+                                "components": [
+                                    {
+                                        "label": "Voornaam",
+                                        "tableView": true,
+                                        "key": "voornaam",
+                                        "type": "textfield_nijmegen",
+                                        "input": true
+                                    },
+                                    {
+                                        "label": "Achternaam",
+                                        "tableView": true,
+                                        "key": "achternaam",
+                                        "type": "textfield_nijmegen",
+                                        "input": true
+                                    },
+                                    {
+                                        "label": "Leeftijd",
+                                        "tableView": true,
+                                        "key": "leeftijd",
+                                        "type": "textfield_nijmegen",
+                                        "input": true
+                                    },
+                                    {
+                                        "label": "Woont u nu in Nijmegen?",
+                                        "optionsLabelPosition": "right",
+                                        "inline": false,
+                                        "tableView": false,
+                                        "values": [
+                                            {
+                                                "label": "ja",
+                                                "value": "ja"
+                                            },
+                                            {
+                                                "label": "nee",
+                                                "value": "nee"
+                                            }
+                                        ],
+                                        "key": "woontUNuInNijmegen",
+                                        "type": "radio_nijmegen",
+                                        "input": true
+                                    },
+                                    {
+                                        "label": "Achtergrondinformatie",
+                                        "attrs": [
+                                            {
+                                                "attr": "",
+                                                "value": ""
+                                            }
+                                        ],
+                                        "content": "Stuk tekst in een html element",
+                                        "refreshOnChange": false,
+                                        "key": "achtergrondinformatie",
+                                        "type": "htmlelement",
+                                        "input": false,
+                                        "tableView": false
+                                    },
+                                    {
+                                        "label": "Waarom wil u in Nijmegen wonen",
+                                        "tableView": true,
+                                        "inputFormat": "plain",
+                                        "key": "waaromWilUInNijmegenWonen",
+                                        "type": "textarea_nijmegen"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Wonen deze personen (tijdelijk) op dit moment in de gemeente Nijmegen?",
+                        "values": [
+                            {
+                                "label": "ja",
+                                "value": "ja"
+                            },
+                            {
+                                "label": "nee",
+                                "value": "nee"
+                            }
+                        ],
+                        "key": "wonenInGemeenteNijmegen",
+                        "type": "radio_nijmegen",
+                        "input": true
+                    },
+                    {
+                        "html": "<p>De personen wonen niet in de gemeente Nijmegen.</p>",
+                        "label": "Content",
+                        "key": "content",
+                        "type": "content",
+                        "input": false,
+                        "tableView": false
+                    },
+                    {
+                        "label": "Personen wonen in Nijmegen",
+                        "tableView": false,
+                        "key": "personenWonenInNijmegen",
+                        "conditional": {
+                            "show": true,
+                            "when": "wonenInGemeenteNijmegen",
+                            "eq": "ja"
+                        },
+                        "type": "container",
+                        "input": true,
+                        "components": [
+                            {
+                                "label": "Volgt een of meer van deze personen op dit moment onderwijs?",
+                                "optionsLabelPosition": "right",
+                                "values": [
+                                    {
+                                        "label": "ja",
+                                        "value": "ja"
+                                    },
+                                    {
+                                        "label": "nee",
+                                        "value": "nee"
+                                    }
+                                ],
+                                "key": "volgtEenOfMeerVanDezePersonenOpDitMomentOnderwijs",
+                                "type": "radio_nijmegen"
+                            },
+                            {
+                                "label": "Waar?",
+                                "key": "waar",
+                                "type": "textfield_nijmegen",
+                                "input": true
+                            },
+                            {
+                                "label": "Heeft een of meer van deze personen op dit moment betaald werk?",
+                                "optionsLabelPosition": "right",
+                                "inline": false,
+                                "tableView": false,
+                                "values": [
+                                    {
+                                        "label": "ja",
+                                        "value": "ja"
+                                    },
+                                    {
+                                        "label": "nee",
+                                        "value": "nee"
+                                    }
+                                ],
+                                "key": "heeftEenOfMeerVanDezePersonenOpDitMomentBetaaldWerk",
+                                "type": "radio_nijmegen",
+                                "input": true
+                            },
+                            {
+                                "label": "Waar?",
+                                "key": "waar1",
+                                "type": "textfield_nijmegen",
+                                "input": true
+                            },
+                            {
+                                "label": "Hebben deze personen huisdieren?",
+                                "optionsLabelPosition": "right",
+                                "inline": false,
+                                "tableView": false,
+                                "values": [
+                                    {
+                                        "label": "ja",
+                                        "value": "ja"
+                                    },
+                                    {
+                                        "label": "nee",
+                                        "value": "nee"
+                                    }
+                                ],
+                                "validate": {
+                                    "required": true
+                                },
+                                "key": "hebbenDezePersonenHuisdieren",
+                                "type": "radio_nijmegen",
+                                "input": true
+                            },
+                            {
+                                "label": "Welke huisdieren?",
+                                "key": "welkeHuisdieren",
+                                "type": "textfield_nijmegen",
+                                "input": true
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Opmerkingen",
+                        "inputFormat": "plain",
+                        "key": "opmerkingen",
+                        "type": "textarea_nijmegen"
+                    },
+                    {
+                        "label": "Columns",
+                        "columns": [
+                            {
+                                "components": [
+                                    {
+                                        "label": "Vorige",
+                                        "action": "event",
+                                        "showValidations": false,
+                                        "key": "vorige",
+                                        "type": "button",
+                                        "input": true,
+                                        "event": "navigateToPrevPage"
+                                    }
+                                ],
+                                "width": 3
+                            },
+                            {
+                                "components": [
+                                    {
+                                        "label": "Volgende",
+                                        "action": "event",
+                                        "tableView": false,
+                                        "key": "volgende",
+                                        "type": "button",
+                                        "event": "navigateToNextPage",
+                                        "input": true
+                                    }
+                                ],
+                                "width": 6
+                            }
+                        ],
+                        "key": "columns",
+                        "type": "columns"
+                    }
+                ]
+            },
+            {
+                "title": "Overzicht",
+                "key": "page3",
+                "type": "panel",
+                "label": "Page 3",
+                "components": [
+                    {
+                        "label": "Test formulier titel",
+                        "key": "testFormulierNaam2",
+                        "type": "htmlelement",
+                        "input": false
+                    },
+                    {
+                        "label": "Samenvatting",
+                        "key": "summary",
+                        "type": "summary"
+                    },
+                    {
+                        "label": "Ik heb alle vragen naar waarheid beantwoord",
+                        "key": "ikHebAlleVragenNaarWaarheidBeantwoord",
+                        "type": "checkboxnijmegen"
+                    },
+                    {
+                        "label": "Columns",
+                        "columns": [
+                            {
+                                "components": [
+                                    {
+                                        "label": "Vorige",
+                                        "action": "event",
+                                        "key": "vorige1",
+                                        "type": "button"
+                                    }
+                                ],
+                                "currentWidth": 3
+                            },
+                            {
+                                "components": [
+                                    {
+                                        "label": "Verzenden",
+                                        "key": "volgende1",
+                                        "type": "button"
+                                    }
+                                ],
+                                "pull": 0,
+                                "size": "md"
+                            }
+                        ],
+                        "key": "columns1",
+                        "type": "columns"
+                    }
+                ]
+            }
+        ],
+        "revisions": "current",
+        "created": "2022-08-15T12:05:33.193Z",
+        "modified": "2023-06-20T11:52:15.275Z"
+    }

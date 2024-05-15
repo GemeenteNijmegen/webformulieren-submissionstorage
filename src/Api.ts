@@ -45,7 +45,7 @@ export class Api extends Construct {
     });
 
     this.addListSubmissionsEndpoint(storageBucket, table);
-    this.addFormOverviewEndpoint(storageBucket, downloadBucket);
+    this.addFormOverviewEndpoint(table, storageBucket, downloadBucket);
     this.addDownloadEndpoint(storageBucket);
   }
 
@@ -159,21 +159,26 @@ export class Api extends Construct {
     });
   }
 
-  private addFormOverviewEndpoint(storageBucket: IBucket, downloadBucket: IBucket) {
+  private addFormOverviewEndpoint(table: ITable, storageBucket: IBucket, downloadBucket: IBucket) {
     const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', {
       environment: {
+        TABLE_NAME: table.tableName,
         BUCKET_NAME: storageBucket.bucketName,
         DOWNLOAD_BUCKET_NAME: downloadBucket.bucketName,
       },
       timeout: Duration.minutes(10),
       memorySize: 1024,
     });
+    table.grantReadData(formOverviewFunction);
     storageBucket.grantRead(formOverviewFunction);
     downloadBucket.grantReadWrite(formOverviewFunction);
 
     const formOverviewApi = this.api.root.addResource('formoverview');
     formOverviewApi.addMethod('GET', new LambdaIntegration(formOverviewFunction), {
       apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.formuliernaam': true,
+      },
     });
   }
 
