@@ -58,9 +58,11 @@ export class FormOverviewRequestHandler {
     const formDefinition = await this.storage.get(formdefinition);
     const bucketObjects = await this.getSubmissionsFromKeys(submissions);
 
-    const parsedFormDefinition = new FormDefinitionParser(formDefinition);
+    console.log('Transform formdefinition');
+    const formDefinitionString = await formDefinition!.Body!.transformToString();
+    const formDefinitionJSON = JSON.parse(formDefinitionString);
+    const parsedFormDefinition = new FormDefinitionParser(formDefinitionJSON);
     const formParser = new FormParser(parsedFormDefinition.getParsedFormDefinition());
-    bucketObjects.forEach;
 
 
     const csvFile: string = await this.compileCsvFile(bucketObjects, formParser);
@@ -107,6 +109,7 @@ export class FormOverviewRequestHandler {
     const csvArray = [];
     csvArray.push(formParser.getHeaders());
     const failedCsvProcessing = [];
+    console.log('Start parsing forms');
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
