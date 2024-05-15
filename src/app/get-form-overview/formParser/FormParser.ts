@@ -14,7 +14,7 @@ export class FormParser {
     this.setFormDefinitionHeaders();
   }
 
-  setFormDefinitionHeaders(): void {
+  private setFormDefinitionHeaders(): void {
     const allLabels: string[] = this.parsedFormDefinition.includedFormDefinitionComponents?.map(component => component.label)
       .filter((label): label is string => label !== undefined) ?? [];
     this.parsedFormDefinition.includedFormDefinitionComponents.forEach((component) => {
@@ -27,7 +27,7 @@ export class FormParser {
       }
       // Check if headerArray already has this header. Only add when unique
       if (this.headerArray.includes(header)) {
-        console.debug(`[FormParser ${this.parsedFormDefinition.name}] Did not push ${header} to headerArray, because it already exists.`);
+        console.error(`[FormParser ${this.parsedFormDefinition.name}] Did not push ${header} to headerArray, because it already exists.`);
       } else {
         this.headerArray.push(header);
       }

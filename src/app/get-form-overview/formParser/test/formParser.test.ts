@@ -30,7 +30,7 @@ describe('FormParser tests', () => {
       expect(formParser.getHeaders()).not.toContain('Stadsdeel');
     });
     test('should not add double headers', () => {
-      const debugSpy = jest.spyOn(console, 'debug');
+      const debugSpy = jest.spyOn(console, 'error');
 
       const formParser = new FormParser({ name: 'formNameDouble', includedFormDefinitionComponents: MockIncludedFormDefintionComponentsDoubleComponents } as any as ParsedFormDefinition);
       expect(formParser.getHeaders()).toContain('Achternaam kind achternaamKind');
