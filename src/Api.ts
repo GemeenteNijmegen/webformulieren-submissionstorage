@@ -42,6 +42,7 @@ export class Api extends Construct {
     const table = Table.fromTableAttributes(this, 'table', {
       tableName: StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName),
       encryptionKey: key,
+      globalIndexes: ['formNameIndex'],
     });
 
     this.addListSubmissionsEndpoint(storageBucket, table);

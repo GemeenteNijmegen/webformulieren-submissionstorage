@@ -65,7 +65,6 @@ export class StorageStack extends Stack {
       encryptionKey: key,
       encryption: TableEncryption.CUSTOMER_MANAGED,
     });
-    //TODO: grantRead() to lambda?
     table.addGlobalSecondaryIndex({
       indexName: 'formNameIndex',
       partitionKey: { name: 'formName', type: AttributeType.STRING },
