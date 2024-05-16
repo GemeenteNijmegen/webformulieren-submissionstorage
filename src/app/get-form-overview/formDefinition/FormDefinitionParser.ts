@@ -73,8 +73,8 @@ export class FormDefinitionParser {
   */
   constructor(formDefinitionObject: any) {
     this.formDefinitionObject = formDefinitionObject;
-    this.allParsedFormDefinitionComponents = this.extractFormDefinitionComponents();
     this.setFormMetaData();
+    this.allParsedFormDefinitionComponents = this.extractFormDefinitionComponents();
   }
 
   /**
@@ -98,25 +98,7 @@ export class FormDefinitionParser {
       includedFormDefinitionComponents: this.getIncludedFormDefinitionComponents(),
     };
   }
-  /**
-   * For development and debug purposes
-   * Provides an overview of all form component types encountered during parsing.
-   * This includes all types (included and excluded), excluded types, and included types.
-   * @returns {{allTypes: string[], includedTypes: string[], excludedTypes: string[]}} - An object containing information about form component types.
-   */
-  getFormDefinitionTypeOverview(): {
-    allTypes: string[];
-    includedTypes: string[];
-    excludedTypes: string[];
-  } {
-    const allTypes = new Set<string>();
-    this.allParsedFormDefinitionComponents.forEach(component => allTypes.add(component.type));
-    const allTypesArray = Array.from(allTypes);
-    const includedTypes = allTypesArray.filter(type => includedFormDataTypes.includes(type));
-    const excludedTypes = allTypesArray.filter(type => !includedTypes.includes(type));
 
-    return { allTypes: allTypesArray, includedTypes, excludedTypes };
-  }
 
   /**
    * Validates the presence of required metadata keys in the form definition object

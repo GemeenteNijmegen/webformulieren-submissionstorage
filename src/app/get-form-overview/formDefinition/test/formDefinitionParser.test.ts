@@ -10,10 +10,6 @@ describe('Form Definition Parser Tests', ()=> {
       // Logging of parsed components for development purposes
       console.log('All FormDefintionComponents: ', parsedFormDefinition.getAllFormDefinitionComponents());
       console.log('Included FormDefintionComponents: ', parsedFormDefinition.getIncludedFormDefinitionComponents());
-
-      // Log type overview for debugging purpose
-      // What types does the parsed form definition have and which ones are included and excluded for content overview geenration
-      console.log('Form Definition types:', parsedFormDefinition.getFormDefinitionTypeOverview());
     });
   });
 

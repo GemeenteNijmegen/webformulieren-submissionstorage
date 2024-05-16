@@ -42,28 +42,15 @@ export class FormOverviewRequestHandler {
   }
 
   async handleRequest(params:EventParameters): Promise<ApiGatewayV2Response> {
-    console.log('Processed event params', params);
-    // Message formuliernaam (later ook begin en einddatum)
-    // Zoeken naar inzendingenin database met getSubmissionsByFormName - foutmelding indien niks aanwezig
-    // Ophalen bestanden uit storage met storage.getBatch (submission.json staat in de keys)
-    // Formdefinitie ophalen en included fields ophalen (uit storage of uit live versie)
-    // FormParser met included component types en alle submission.jsons
-    // Resultaat arrays met data en header array
-    // Converteer naar csv met aparte class die duidelijke foutmeldingen geeft
-    // Schrijf csv weg naar downloadbucket (misschien nog metadata over wie het opgehaald heeft enzo)
-    // Pagina maken in management lambda
 
     const { submissions, formdefinition } = await this.getFormSubmissionsDatabase(params);
+    const formDefinition: GetObjectCommandOutput | undefined = await this.storage.get(formdefinition);
 
-    const formDefinition = await this.storage.get(formdefinition);
-    const bucketObjects = await this.getSubmissionsFromKeys(submissions);
-
-    console.log('Transform formdefinition');
     const formDefinitionString = await formDefinition!.Body!.transformToString();
     const formDefinitionJSON = JSON.parse(formDefinitionString);
     const parsedFormDefinition = new FormDefinitionParser(formDefinitionJSON);
     const formParser = new FormParser(parsedFormDefinition.getParsedFormDefinition());
-
+    const bucketObjects = await this.getSubmissionsFromKeys(submissions);
 
     const csvFile: string = await this.compileCsvFile(bucketObjects, formParser);
     const epochTime = new Date().getTime();
@@ -81,16 +68,11 @@ export class FormOverviewRequestHandler {
 
   async getFormSubmissionsDatabase(params: EventParameters): Promise<{submissions:string[]; formdefinition: string}> {
     if (!params.formuliernaam) {
-      console.error('Cannot retrieve formOverview without queryparam formuliernaam');
-      //TODO: Betere foutafhandeling, even lelijk opgelost
-      return { submissions: [], formdefinition: '' };
+      throw Error('Cannot retrieve formOverview without queryparam formuliernaam');
     }
-
     const databaseResult = await this.database.getSubmissionsByFormName({ formName: params.formuliernaam });
     if (!databaseResult || !Array.isArray(databaseResult) || !databaseResult.length) {
-      console.error('Cannot retrieve formOverview. DatabaseResult is false or empty');
-      //TODO: Betere foutafhandeling, even lelijk opgelost
-      return { submissions: [], formdefinition: '' };
+      throw Error('Cannot retrieve formOverview. DatabaseResult is false or empty');
     }
 
     const submissions: string[] = databaseResult.map((dbItem) => {
@@ -109,11 +91,9 @@ export class FormOverviewRequestHandler {
     const csvArray = [];
     csvArray.push(formParser.getHeaders());
     const failedCsvProcessing = [];
-    console.log('Start parsing forms');
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
-        // Waarschijnlijk ook async parsen
         csvArray.push(formParser.parseForm(bodyString));
       } else {
         failedCsvProcessing.push(`Geen body. Mogelijk metadata requestId: ${bucketObject.$metadata.requestId}`);
