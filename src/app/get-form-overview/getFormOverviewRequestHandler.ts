@@ -97,8 +97,10 @@ export class FormOverviewRequestHandler {
     const databaseResult = await this.database.getSubmissionsByFormName({ formName: params.formuliernaam });
     // TODO: empty result different return
     if (!databaseResult || !Array.isArray(databaseResult)) {
-      throw Error('Cannot retrieve formOverview. DatabaseResult is false');
+      throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
+    // No results from database should return an empty object to throw a 204
+    if (!databaseResult.length) { return { submissions: [], formdefinition: '' };}
 
     const submissions: string[] = databaseResult.map((dbItem) => {
       return `${dbItem.key}/submission.json`;

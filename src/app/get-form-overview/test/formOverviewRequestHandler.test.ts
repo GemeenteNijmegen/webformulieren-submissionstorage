@@ -1,4 +1,5 @@
-import { DynamoDBDatabase } from '../../submission/Database';
+import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { DynamoDBDatabase, SubmissionData } from '../../submission/Database';
 import { S3Storage } from '../../submission/Storage';
 import { FormOverviewRequestHandler } from '../getFormOverviewRequestHandler';
 
@@ -56,6 +57,28 @@ describe('FormOverviewRequestHandler Tests', () => {
       )
         .rejects.toThrow({ name: 'Error', message: 'Cannot retrieve formOverview without queryparam formuliernaam' });
     });
+    describe('parsing happyflows', () => {});
+    describe('database', () => {
+      test('should return 204 no content without database results', async () => {
+        mockDBGetSubmissionsByFormName.mockResolvedValue([] as SubmissionData[]);
+        const formOverviewRequestHandler = new FormOverviewRequestHandler();
+        await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).resolves.toStrictEqual({ statusCode: 204 } as ApiGatewayV2Response);
+      });
+      test('should throw error when databaseresult is false', async () => {
+        mockDBGetSubmissionsByFormName.mockResolvedValue(false);
+        const formOverviewRequestHandler = new FormOverviewRequestHandler();
+        await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).rejects.toThrow({ name: 'error', message: 'Cannot retrieve formOverview. DatabaseResult is false or not the expected array.' });
+      });
+      test('should throw an error when databaseresult is not an array ', async() => {
+        mockDBGetSubmissionsByFormName.mockResolvedValue('weird unexpected response');
+        const formOverviewRequestHandler = new FormOverviewRequestHandler();
+        await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).rejects.toThrow({ name: 'error', message: 'Cannot retrieve formOverview. DatabaseResult is false or not the expected array.' });
+      });
+    });
+    describe('formdefinition parsing', () => {});
+    describe('csv parsing', () => {});
+
+
   });
   describe('setup errors', () => {
     beforeEach(() => {
