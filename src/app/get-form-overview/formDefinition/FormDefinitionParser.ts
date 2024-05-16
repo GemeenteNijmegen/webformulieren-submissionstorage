@@ -72,7 +72,7 @@ export class FormDefinitionParser {
   * @param {any} formDefinitionObject - The form definition object to be parsed.
   */
   constructor(formDefinitionObject: any) {
-    this.formDefinitionObject = formDefinitionObject;
+    this.setFormDefinitionObject(formDefinitionObject);
     this.setFormMetaData();
     this.allParsedFormDefinitionComponents = this.extractFormDefinitionComponents();
   }
@@ -98,14 +98,22 @@ export class FormDefinitionParser {
       includedFormDefinitionComponents: this.getIncludedFormDefinitionComponents(),
     };
   }
-
-
+/**
+ * Check if form definition is not undefined or not json
+ */
+  setFormDefinitionObject(formDefinitionObject: any): void {
+    if(!formDefinitionObject){
+      throw new Error('FormDefinitionParser creation failed. FormDefinition in constructor undefined.');
+    };
+    this.formDefinitionObject = formDefinitionObject;
+  }
   /**
    * Validates the presence of required metadata keys in the form definition object
    * and throws an error if any are missing.
    */
   setFormMetaData() {
     const REQUIRED_METADATA_KEYS = ['name', 'title', 'created', 'modified'];
+    
     const missingKeys = REQUIRED_METADATA_KEYS.filter(
       key => !this.formDefinitionObject.hasOwnProperty(key) || this.formDefinitionObject[key] === undefined,
     );

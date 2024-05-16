@@ -1,15 +1,51 @@
+import { Readable } from 'stream';
 import * as formDefinitionMock01 from './mockFormDefinition_01.json';
+import * as formDefinitionMockSmall01 from './mockFormDefinition_01_small.json';
 import * as formDefinitionMockSportAanmelden from './mockFormDefinitionAanmeldenSport.json';
 import { FormDefinitionParser } from '../FormDefinitionParser';
 describe('Form Definition Parser Tests', ()=> {
   describe('Development tests - disable after use to prevent logging', () => {
     test('should show logs to enable development with logged outputs', ()=> {
+      // Choose your mock
       const parsedFormDefinition = new FormDefinitionParser(formDefinitionMockSportAanmelden);
       // const parsedFormDefinition = new FormDefinitionParser(formDefinitionMock01);
 
       // Logging of parsed components for development purposes
       console.log('All FormDefintionComponents: ', parsedFormDefinition.getAllFormDefinitionComponents());
       console.log('Included FormDefintionComponents: ', parsedFormDefinition.getIncludedFormDefinitionComponents());
+    });
+  });
+  describe('Instantiate', () => {
+    test('success', () => {
+      const parsedDefinition = new FormDefinitionParser(formDefinitionMockSmall01);
+      expect(parsedDefinition).toBeTruthy();
+    });
+
+    const startErrorMessage = 'Parsing Form Definition failed. Missing required metadata keys:';
+    test('throws error for empty object in constructor', () => {
+      expect(() => {new FormDefinitionParser({});}).toThrow({ name: 'Error', message: `${startErrorMessage} name, title, created, modified` } );
+    });
+    test('throws error when undefined', () => {
+      expect(() => {new FormDefinitionParser(undefined);}).toThrow({ name: 'Error', message: 'FormDefinitionParser creation failed. FormDefinition in constructor undefined.' } );
+    });
+    test('throws error non json object - resembles direct database result', () => {
+      expect(() => {new FormDefinitionParser({ Body: new Readable( { read() { } }) });}).toThrow({ name: 'Error', message: `${startErrorMessage} name, title, created, modified` } );
+    });
+
+    // Test each one
+    const requiredMetadataKeys = ['name', 'title', 'created', 'modified'];
+
+    requiredMetadataKeys.forEach(missingKey => {
+      const missingKeyObject = {
+        name: missingKey !== 'name' ? 'testFormulierNaam' : undefined,
+        title: missingKey !== 'title' ? 'Test formulier titel' : undefined,
+        created: missingKey !== 'created' ? '2022-08-15T12:05:33.193Z' : undefined,
+        modified: missingKey !== 'modified' ? '2023-06-20T11:52:15.275Z' : undefined,
+      };
+
+      test(`throws error for missing key: ${missingKey}`, () => {
+        expect(() => {new FormDefinitionParser(missingKeyObject);}).toThrow({ name: 'Error', message: `${startErrorMessage} ${missingKey}` } );
+      });
     });
   });
 
@@ -115,30 +151,6 @@ describe('Form Definition Parser Tests', ()=> {
         type: 'textfield_nijmegen',
         inDataGrid: true,
         parentKey: undefined,
-      });
-    });
-  });
-
-  describe('setFormMetaData method errors', () => {
-    const startErrorMessage = 'Parsing Form Definition failed. Missing required metadata keys:';
-    test('throws error for empty object in constructor', () => {
-      expect(() => {new FormDefinitionParser({});}).toThrow({ name: 'Error', message: `${startErrorMessage} name, title, created, modified` } );
-
-    });
-
-    // Test each one
-    const requiredMetadataKeys = ['name', 'title', 'created', 'modified'];
-
-    requiredMetadataKeys.forEach(missingKey => {
-      const missingKeyObject = {
-        name: missingKey !== 'name' ? 'testFormulierNaam' : undefined,
-        title: missingKey !== 'title' ? 'Test formulier titel' : undefined,
-        created: missingKey !== 'created' ? '2022-08-15T12:05:33.193Z' : undefined,
-        modified: missingKey !== 'modified' ? '2023-06-20T11:52:15.275Z' : undefined,
-      };
-
-      test(`throws error for missing key: ${missingKey}`, () => {
-        expect(() => {new FormDefinitionParser(missingKeyObject);}).toThrow({ name: 'Error', message: `${startErrorMessage} ${missingKey}` } );
       });
     });
   });
