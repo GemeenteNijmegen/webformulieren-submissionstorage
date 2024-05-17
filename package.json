@@ -38,7 +38,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.577.0",
+    "@aws-sdk/client-secrets-manager": "^3.578.0",
     "@gemeentenijmegen/projen-project-type": "^1.7.0",
     "@testcontainers/localstack": "^10.9.0",
     "@types/jest": "^29.5.12",
@@ -69,7 +69,7 @@
     "@gemeentenijmegen/aws-constructs": "^0.0.10",
     "@gemeentenijmegen/dnssec-record": "^0.0.15",
     "@gemeentenijmegen/utils": "^0.0.12",
-    "@types/aws-lambda": "^8.10.137",
+    "@types/aws-lambda": "^8.10.138",
     "aws-cdk-lib": "^2.1.0",
     "axios": "^1.6.8",
     "cdk-remote-stack": "^2.0.101",
