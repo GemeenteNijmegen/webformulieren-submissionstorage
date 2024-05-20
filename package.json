@@ -71,7 +71,7 @@
     "@gemeentenijmegen/utils": "^0.0.12",
     "@types/aws-lambda": "^8.10.138",
     "aws-cdk-lib": "^2.1.0",
-    "axios": "^1.6.8",
+    "axios": "^1.7.0",
     "cdk-remote-stack": "^2.0.101",
     "constructs": "^10.0.5",
     "dotenv": "^16.4.5",
