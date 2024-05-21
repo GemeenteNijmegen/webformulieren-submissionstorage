@@ -75,7 +75,7 @@ describe('FormOverviewRequestHandler Tests', () => {
             'Content-Disposition': expect.stringContaining('aanmeldenSportactiviteit.csv'),
             'Content-type': 'text/csv',
           },
-          body: expect.stringContaining('SP3,Nijmegen-Midden'),
+          body: expect.stringMatching(new RegExp('Csv has been saved in bucket as FormOverview-[0-9]*-aanmeldenSportactiviteit.csv')),
         } as ApiGatewayV2Response);
         expect(mockS3Store).toHaveBeenCalledWith(expect.stringContaining('aanmeldenSportactiviteit.csv'), expect.stringContaining('een volwassene (18 jaar of ouder),,,,,,,TestVoornaam01'));
         expect(logSpy).toHaveBeenCalledWith('Done processing csv file. Number of processed rows: 1. Number of failed csv transformations: 0. Number of header and form fields length mismatches:  0.');

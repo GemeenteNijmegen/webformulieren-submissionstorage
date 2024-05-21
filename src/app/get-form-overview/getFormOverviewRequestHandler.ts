@@ -68,7 +68,7 @@ export class FormOverviewRequestHandler {
     try {
       const csvFile = await this.compileCsvFile(submissionBucketObjects, formParser);
       const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile);
-      csvResponse = this.getCsvResponse(csvFile, csvFileName);
+      csvResponse = this.getCsvResponse(csvFileName);
     } catch {
       throw Error('Cannot retrieve formOverview. Parsing forms to csv or saving csvfile to downloadbucket failed.');
     }
@@ -82,10 +82,10 @@ export class FormOverviewRequestHandler {
     return csvFilenName;
   }
 
-  private getCsvResponse(csvFile: string, csvFilenName: string): ApiGatewayV2Response {
+  private getCsvResponse(csvFilenName: string): ApiGatewayV2Response {
     return {
       statusCode: 200,
-      body: csvFile,
+      body: `Csv has been saved in bucket as ${csvFilenName}`,
       headers: {
         'Content-type': 'text/csv',
         'Content-Disposition': `attachment;filename=${csvFilenName}`,
