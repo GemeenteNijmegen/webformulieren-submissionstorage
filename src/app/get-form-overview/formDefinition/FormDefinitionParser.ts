@@ -85,26 +85,31 @@ export class FormDefinitionParser {
     return this.allParsedFormDefinitionComponents;
   }
   getIncludedFormDefinitionComponents(): FormDefinitionComponents[] {
-    return this.allParsedFormDefinitionComponents.filter(component =>
-      includedFormDataTypes.includes(component.type),
+    return this.allParsedFormDefinitionComponents.filter(component => {
+      return includedFormDataTypes.includes(component.type);
+    },
     );
   }
   getParsedFormDefinition(): ParsedFormDefinition {
+    const included = this.getIncludedFormDefinitionComponents();
     return {
       name: this.formName,
       title: this.formTitle,
       created: this.createdDate,
       modified: this.modifiedDate,
-      includedFormDefinitionComponents: this.getIncludedFormDefinitionComponents(),
+      includedFormDefinitionComponents: included,
     };
   }
-/**
+  /**
  * Check if form definition is not undefined or not json
  */
   setFormDefinitionObject(formDefinitionObject: any): void {
-    if(!formDefinitionObject){
+    if (!formDefinitionObject) {
       throw new Error('FormDefinitionParser creation failed. FormDefinition in constructor undefined.');
     };
+    if (!formDefinitionObject.components || !formDefinitionObject.components.length) {
+      throw new Error('FormDefinitionParser creation failed. No components present in form definition to process.');
+    }
     this.formDefinitionObject = formDefinitionObject;
   }
   /**
@@ -113,7 +118,7 @@ export class FormDefinitionParser {
    */
   setFormMetaData() {
     const REQUIRED_METADATA_KEYS = ['name', 'title', 'created', 'modified'];
-    
+
     const missingKeys = REQUIRED_METADATA_KEYS.filter(
       key => !this.formDefinitionObject.hasOwnProperty(key) || this.formDefinitionObject[key] === undefined,
     );
@@ -153,7 +158,6 @@ export class FormDefinitionParser {
     const results: FormDefinitionComponents[] = [];
     let isNestedInDataGrid = false; // Flag to track datagrid nesting because the objects can be the same. In the form it looks like "Nog een toevoegen"
     let parentKey: string | undefined = undefined; // Track the parent container name for the next traverses. Makes it possible to see the form components that are nested. In the form it might look like  "stadsdeelVolwassen": { "stadsdeel": "Nijmegen-Midden & Zuid" } parentkey is stadsDeelVolwassen in this case
-
     function traverse(definitionObject: any, path = '') {
       if (typeof definitionObject === 'string' || typeof definitionObject === 'number' || typeof definitionObject === 'boolean') {
         return; // Skip primitive values
@@ -212,7 +216,7 @@ export class FormDefinitionParser {
       }
     }
 
-    traverse(this.formDefinitionObject);
+    traverse(this.formDefinitionObject.components);
     return results;
   }
 }

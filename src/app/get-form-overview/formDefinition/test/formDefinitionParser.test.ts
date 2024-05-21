@@ -4,7 +4,7 @@ import * as formDefinitionMockSmall01 from './mockFormDefinition_01_small.json';
 import * as formDefinitionMockSportAanmelden from './mockFormDefinitionAanmeldenSport.json';
 import { FormDefinitionParser } from '../FormDefinitionParser';
 describe('Form Definition Parser Tests', ()=> {
-  describe('Development tests - disable after use to prevent logging', () => {
+  xdescribe('Development tests - disable after use to prevent logging', () => {
     test('should show logs to enable development with logged outputs', ()=> {
       // Choose your mock
       const parsedFormDefinition = new FormDefinitionParser(formDefinitionMockSportAanmelden);
@@ -12,7 +12,7 @@ describe('Form Definition Parser Tests', ()=> {
 
       // Logging of parsed components for development purposes
       console.log('All FormDefintionComponents: ', parsedFormDefinition.getAllFormDefinitionComponents());
-      console.log('Included FormDefintionComponents: ', parsedFormDefinition.getIncludedFormDefinitionComponents());
+      // console.log('Included FormDefintionComponents: ', parsedFormDefinition.getIncludedFormDefinitionComponents());
     });
   });
   describe('Instantiate', () => {
@@ -23,13 +23,13 @@ describe('Form Definition Parser Tests', ()=> {
 
     const startErrorMessage = 'Parsing Form Definition failed. Missing required metadata keys:';
     test('throws error for empty object in constructor', () => {
-      expect(() => {new FormDefinitionParser({});}).toThrow({ name: 'Error', message: `${startErrorMessage} name, title, created, modified` } );
+      expect(() => {new FormDefinitionParser({});}).toThrow({ name: 'Error', message: 'FormDefinitionParser creation failed. No components present in form definition to process.' } );
     });
     test('throws error when undefined', () => {
       expect(() => {new FormDefinitionParser(undefined);}).toThrow({ name: 'Error', message: 'FormDefinitionParser creation failed. FormDefinition in constructor undefined.' } );
     });
     test('throws error non json object - resembles direct database result', () => {
-      expect(() => {new FormDefinitionParser({ Body: new Readable( { read() { } }) });}).toThrow({ name: 'Error', message: `${startErrorMessage} name, title, created, modified` } );
+      expect(() => {new FormDefinitionParser({ Body: new Readable( { read() { } }) });}).toThrow({ name: 'Error', message: 'FormDefinitionParser creation failed. No components present in form definition to process.' } );
     });
 
     // Test each one
@@ -41,6 +41,7 @@ describe('Form Definition Parser Tests', ()=> {
         title: missingKey !== 'title' ? 'Test formulier titel' : undefined,
         created: missingKey !== 'created' ? '2022-08-15T12:05:33.193Z' : undefined,
         modified: missingKey !== 'modified' ? '2023-06-20T11:52:15.275Z' : undefined,
+        components: [{ naam: 'testcomponent' }],
       };
 
       test(`throws error for missing key: ${missingKey}`, () => {
@@ -67,20 +68,22 @@ describe('Form Definition Parser Tests', ()=> {
       // Basic component
       expect(allParsedFormDefinitionComponents).toContainEqual({
         key: 'voornaam',
-        keyPath: '.components[2].components[3].voornaam',
+        keyPath: '[2].components[3].voornaam',
         label: 'Voornaam',
         type: 'textfield_nijmegen',
         inDataGrid: false,
+        values: undefined,
       });
 
       // Button component included in all components
       expect(allParsedFormDefinitionComponents).toContainEqual( {
         key: 'volgende1',
-        keyPath: '.components[2].components[10].columns[1].components[0].volgende1',
+        keyPath: '[2].components[10].columns[1].components[0].volgende1',
         label: 'Volgende',
         type: 'button',
         inDataGrid: false,
         parentKey: undefined,
+        values: undefined,
       });
     });
 
@@ -91,35 +94,38 @@ describe('Form Definition Parser Tests', ()=> {
 
       expect(allParsedFormDefinitionComponents).toContainEqual( {
         key: 'stadsdeel',
-        keyPath: '.components[4].components[4].components[0].stadsdeel',
+        keyPath: '[4].components[4].components[0].stadsdeel',
         label: 'Stadsdeel',
         type: 'select_nijmegen',
         inDataGrid: false,
         parentKey: 'stadsdeelVolwassen',
+        values: undefined,
       });
 
     });
 
     test('should only return included type parsed components', ()=> {
       const includedParsedFormDefinitionComponents = parsedFormDefinition.getIncludedFormDefinitionComponents();
-
+      expect(includedParsedFormDefinitionComponents.length).toBe(39);
       // Basic textfield component
       expect(includedParsedFormDefinitionComponents).toContainEqual({
         key: 'voornaam',
-        keyPath: '.components[2].components[3].voornaam',
+        keyPath: '[2].components[3].voornaam',
         label: 'Voornaam',
         type: 'textfield_nijmegen',
         inDataGrid: false,
+        values: undefined,
       });
 
       // Not included button component
       expect(includedParsedFormDefinitionComponents).not.toContainEqual( {
         key: 'volgende1',
-        keyPath: '.components[2].components[10].columns[1].components[0].volgende1',
+        keyPath: '[2].components[10].columns[1].components[0].volgende1',
         label: 'Volgende',
         type: 'button',
         inDataGrid: false,
         parentKey: undefined,
+        values: undefined,
       });
     });
   });
@@ -146,11 +152,12 @@ describe('Form Definition Parser Tests', ()=> {
       // There can be one or many
       expect(allParsedFormDefinitionComponents).toContainEqual( {
         key: 'voornaam',
-        keyPath: '.components[1].components[1].components[0].components[0].voornaam',
+        keyPath: '[1].components[1].components[0].components[0].voornaam',
         label: 'Voornaam',
         type: 'textfield_nijmegen',
         inDataGrid: true,
         parentKey: undefined,
+        values: undefined,
       });
     });
   });

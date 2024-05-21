@@ -30,15 +30,15 @@ describe('FormParser tests', () => {
       expect(formParser.getHeaders()).not.toContain('Stadsdeel');
     });
     test('should not add double headers', () => {
-      const debugSpy = jest.spyOn(console, 'error');
+      const errorSpy = jest.spyOn(console, 'error');
 
       const formParser = new FormParser({ name: 'formNameDouble', includedFormDefinitionComponents: MockIncludedFormDefintionComponentsDoubleComponents } as any as ParsedFormDefinition);
       expect(formParser.getHeaders()).toContain('Achternaam kind achternaamKind');
       expect(formParser.getHeaders()).toContain('Stadsdeel stadsdeel');
-      expect(debugSpy).toHaveBeenCalled();
-      expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('Achternaam kind achternaamKind'));
-      expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining('Stadsdeel stadsdeel'));
-      debugSpy.mockRestore();
+      expect(errorSpy).toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Achternaam kind achternaamKind'));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Stadsdeel stadsdeel'));
+      errorSpy.mockRestore();
     });
   });
   describe('Parse', ()=> {
