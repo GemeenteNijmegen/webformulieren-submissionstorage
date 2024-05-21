@@ -100,10 +100,6 @@ describe('FormOverviewRequestHandler Tests', () => {
         await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).rejects.toThrow({ name: 'error', message: 'Cannot retrieve formOverview. DatabaseResult is false or not the expected array.' });
       });
     });
-    describe('formdefinition parsing', () => {});
-    describe('csv parsing', () => {});
-
-
   });
   describe('setup errors', () => {
     beforeEach(() => {

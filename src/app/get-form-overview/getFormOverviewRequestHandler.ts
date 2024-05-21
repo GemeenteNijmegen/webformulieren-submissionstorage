@@ -109,7 +109,6 @@ export class FormOverviewRequestHandler {
     return { submissions, formdefinition };
   }
 
-
   async getSubmissionsFromKeys(allKeys: string[]): Promise<GetObjectCommandOutput[]> {
     return this.storage.getBatch(allKeys);
   }
