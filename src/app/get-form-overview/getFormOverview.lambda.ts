@@ -1,21 +1,17 @@
-import { APIGatewayProxyResult } from 'aws-lambda';
+import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
+import { Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { FormOverviewRequestHandler } from './getFormOverviewRequestHandler';
+import { parsedEvent } from './parsedEvent';
 
-const formOverviewHandler = new FormOverviewRequestHandler();
 
-export async function handler(): Promise<APIGatewayProxyResult> {
-  console.log('Start lambda FormOverviewHandler');
+export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGatewayV2Response> {
   try {
-    return await formOverviewHandler.handleRequest('message');
-
+    const params = parsedEvent(event);
+    const formOverviewHandler = new FormOverviewRequestHandler();
+    return await formOverviewHandler.handleRequest(params);
   } catch (error: any) {
     console.error(error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/text',
-      },
-      body: 'Error retrieving formoverview ',
-    };
+    return Response.error(500);
   }
 }

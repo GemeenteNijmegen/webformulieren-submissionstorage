@@ -129,7 +129,6 @@ export class S3Storage implements Storage {
       Prefix: searchKey,
     } as ListObjectsV2Request);
 
-    // try {
     let isTruncated: boolean = true;
 
     while (isTruncated) {
@@ -146,9 +145,6 @@ export class S3Storage implements Storage {
       command.input.ContinuationToken =
           listObjectsV2Output.NextContinuationToken;
     }
-    // } catch (err) {
-    //   console.error(err);
-    // }
     console.info(
       `[searchAllObjectsByShortKey] Found ${allKeys.length} bucket objects with prefix ${searchKey}`,
     );
