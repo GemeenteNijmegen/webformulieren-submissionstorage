@@ -1,6 +1,6 @@
 
 import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
-import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
+import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http';
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
@@ -48,7 +48,7 @@ export class FormOverviewRequestHandler {
 
     const { submissions, formdefinition } = await this.getFormSubmissionsDatabase(params);
     // No submissions found in database
-    if (!submissions.length) return { statusCode: 204 };
+    if (!submissions.length) return Response.ok(204);
 
     let parsedFormDefinition: FormDefinitionParser;
     let formParser: FormParser;
