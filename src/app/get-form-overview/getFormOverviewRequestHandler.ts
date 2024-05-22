@@ -83,19 +83,11 @@ export class FormOverviewRequestHandler {
   }
 
   private getCsvResponse(csvFileName: string): ApiGatewayV2Response {
-    return {
-      statusCode: 200,
-      body: `Csv has been saved in bucket as ${csvFileName}`,
-      headers: {
-        'Content-type': 'text/csv',
-        'Content-Disposition': `attachment;filename=${csvFileName}`,
-      },
-    };
+    return Response.ok(200, `Csv has been saved in bucket as ${csvFileName}`);
   }
 
   async getFormSubmissionsDatabase(params: EventParameters): Promise<{submissions:string[]; formdefinition: string}> {
     const databaseResult = await this.database.getSubmissionsByFormName({ formName: params.formuliernaam });
-    // TODO: empty result different return
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
