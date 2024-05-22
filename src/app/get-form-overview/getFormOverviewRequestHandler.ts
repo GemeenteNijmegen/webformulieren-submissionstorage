@@ -77,18 +77,18 @@ export class FormOverviewRequestHandler {
 
   private async saveCsvFile( parsedFormDefinition: FormDefinitionParser, csvFile: string) {
     const epochTime = new Date().getTime();
-    const csvFilenName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
-    await this.downloadStorage.store(csvFilenName, csvFile);
-    return csvFilenName;
+    const csvFileName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
+    await this.downloadStorage.store(csvFileName, csvFile);
+    return csvFileName;
   }
 
-  private getCsvResponse(csvFilenName: string): ApiGatewayV2Response {
+  private getCsvResponse(csvFileName: string): ApiGatewayV2Response {
     return {
       statusCode: 200,
-      body: `Csv has been saved in bucket as ${csvFilenName}`,
+      body: `Csv has been saved in bucket as ${csvFileName}`,
       headers: {
         'Content-type': 'text/csv',
-        'Content-Disposition': `attachment;filename=${csvFilenName}`,
+        'Content-Disposition': `attachment;filename=${csvFileName}`,
       },
     };
   }
