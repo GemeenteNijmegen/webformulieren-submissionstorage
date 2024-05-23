@@ -87,7 +87,7 @@ export class FormParser {
       return radioValue?.label ? radioValue.label : value;
     }
     // If the value is a string it can be returned immediately
-    {if (typeof value == 'string') return value;}
+    if (typeof value == 'string') return value.replace(/,/g, '\\,');
 
     // Convert booleans to string
     if (typeof value === 'boolean') {
