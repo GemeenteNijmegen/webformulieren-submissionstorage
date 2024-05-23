@@ -96,11 +96,13 @@ describe('FormParser tests', () => {
       const parsedForm = formParser.parseForm(mockVolwassenForm);
       expect(parsedForm).toContain('Checkbox Kwiek wandelroute (Park Maldenborgh) is true. Checkbox Nationale (diabetes) Challenge (Goffert) is true.');
     });
-    test('should backslash a comma in a string', () => {
-      const commastring = 'TestOuder01 \\, eneenkommabackslash';
+    test('should remove semicolon from strings', () => {
+      const semicolonString = 'TestOuder01; eneenpuntkommadiegaatverdwijnen ;';
+      const parsedSemicolonString = 'TestOuder01 eneenpuntkommadiegaatverdwijnen ';
       const formParser = new FormParser(sportParsedFormDefinition);
       const parsedForm = formParser.parseForm(mockKindForm);
-      expect(parsedForm).toContain(commastring);
+      expect(parsedForm).toContain(parsedSemicolonString);
+      expect(parsedForm).not.toContain(semicolonString);
     });
     test('should have values that match with the headers', () => {
       const formParser = new FormParser(sportParsedFormDefinition);

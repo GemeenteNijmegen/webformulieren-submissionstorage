@@ -125,7 +125,7 @@ export class FormOverviewRequestHandler {
 
     let csvContent: string = '';
     csvArray.forEach(row => {
-      csvContent += row.join(',') + '\n';
+      csvContent += row.join(';') + '\n';
     });
     console.log(`Done processing csv file. Number of processed rows: ${(csvArray.length - 1)}. Number of failed csv transformations: ${failedCsvProcessing.length}. Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
     return csvContent;
