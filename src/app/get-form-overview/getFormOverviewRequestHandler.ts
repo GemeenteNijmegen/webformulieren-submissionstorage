@@ -1,6 +1,6 @@
 
 import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
-import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
+import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http';
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
@@ -48,7 +48,7 @@ export class FormOverviewRequestHandler {
 
     const { submissions, formdefinition } = await this.getFormSubmissionsDatabase(params);
     // No submissions found in database
-    if (!submissions.length) return { statusCode: 204 };
+    if (!submissions.length) return Response.ok(204);
 
     let parsedFormDefinition: FormDefinitionParser;
     let formParser: FormParser;
@@ -77,25 +77,17 @@ export class FormOverviewRequestHandler {
 
   private async saveCsvFile( parsedFormDefinition: FormDefinitionParser, csvFile: string) {
     const epochTime = new Date().getTime();
-    const csvFilenName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
-    await this.downloadStorage.store(csvFilenName, csvFile);
-    return csvFilenName;
+    const csvFileName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
+    await this.downloadStorage.store(csvFileName, csvFile);
+    return csvFileName;
   }
 
-  private getCsvResponse(csvFilenName: string): ApiGatewayV2Response {
-    return {
-      statusCode: 200,
-      body: `Csv has been saved in bucket as ${csvFilenName}`,
-      headers: {
-        'Content-type': 'text/csv',
-        'Content-Disposition': `attachment;filename=${csvFilenName}`,
-      },
-    };
+  private getCsvResponse(csvFileName: string): ApiGatewayV2Response {
+    return Response.ok(200, `Csv has been saved in bucket as ${csvFileName}`);
   }
 
   async getFormSubmissionsDatabase(params: EventParameters): Promise<{submissions:string[]; formdefinition: string}> {
     const databaseResult = await this.database.getSubmissionsByFormName({ formName: params.formuliernaam });
-    // TODO: empty result different return
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
