@@ -161,7 +161,10 @@ export class DynamoDBDatabase implements Database {
     // const { formName, startDate, endDate } = parameters;
     const { formName } = parameters;
     const sortKeyFilter: string | undefined = this.buildDateRangeSort(parameters.startDate, parameters.endDate);
-    //TODO: check grantRead() on global secondary index if it does not work
+
+    let keyConditionExpression: string = '#formName = :name';
+    if (sortKeyFilter) { keyConditionExpression += ` AND ${sortKeyFilter}`;}
+
     const queryInput: QueryCommandInput = {
       TableName: this.table,
       IndexName: 'formNameIndex', // Use the secondary index name
@@ -174,7 +177,7 @@ export class DynamoDBDatabase implements Database {
           S: `${formName}`,
         },
       },
-      KeyConditionExpression: `#formName = :name ${sortKeyFilter || ''}`,
+      KeyConditionExpression: keyConditionExpression,
     };
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
