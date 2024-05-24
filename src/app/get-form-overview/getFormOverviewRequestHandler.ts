@@ -87,7 +87,11 @@ export class FormOverviewRequestHandler {
   }
 
   async getFormSubmissionsDatabase(params: EventParameters): Promise<{submissions:string[]; formdefinition: string}> {
-    const databaseResult = await this.database.getSubmissionsByFormName({ formName: params.formuliernaam });
+    const databaseResult = await this.database.getSubmissionsByFormName({
+      formName: params.formuliernaam,
+      startDate: params.startdatum,
+      endDate: params.einddatum,
+    });
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
