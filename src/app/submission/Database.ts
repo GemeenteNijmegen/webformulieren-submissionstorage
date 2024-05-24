@@ -160,23 +160,22 @@ export class DynamoDBDatabase implements Database {
   async getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<SubmissionData[] | false> {
     // const { formName, startDate, endDate } = parameters;
     const { formName } = parameters;
-
+    const sortKeyFilter: string | undefined = this.buildDateRangeSort(parameters.startDate, parameters.endDate);
     //TODO: check grantRead() on global secondary index if it does not work
     const queryInput: QueryCommandInput = {
       TableName: this.table,
       IndexName: 'formNameIndex', // Use the secondary index name
       ExpressionAttributeNames: {
         '#formName': 'formName',
+        '#sortKeyName': 'dateSubmitted',
       },
       ExpressionAttributeValues: {
         ':name': {
           S: `${formName}`,
         },
       },
-      KeyConditionExpression: '#formName = :name',
-      //FilterExpression: this.buildDateRangeFilterExpression(startDate, endDate), // Optional filter by date range
+      KeyConditionExpression: `#formName = :name ${sortKeyFilter || ''}`,
     };
-
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
       if (results.Items) {
@@ -204,24 +203,20 @@ export class DynamoDBDatabase implements Database {
     }
   }
 
-  buildKeyConditionExpression(formName: string): any {
-    return formName;
-  }
 
-  buildDateRangeFilterExpression(startDate?: string, endDate?: string): string | undefined {
+  buildDateRangeSort(startDate?: string, endDate?: string): string | undefined {
     if (!startDate && !endDate) {
       return undefined; // No date filter needed
     }
-    const conditions: string[] = [];
-    if (startDate) {
-      conditions.push('#dateSubmitted >= :startDate'); // Filter by start date only
+    if (startDate && !endDate) {
+      return `#sortKeyName <= ${startDate}`; // Filter by start date only
     }
 
-    if (endDate) {
-      conditions.push('#dateSubmitted <= :endDate'); // Filter by end date only
+    if (endDate && ! startDate) {
+      return `#sortKeyName >= ${endDate}`; // Filter by end date only
     }
-    const filterExpression = conditions.join(' AND ');
-    return filterExpression.replace('#dateSubmitted', 'dateSubmitted'); // Remove placeholder prefix
+
+    return `#sortKeyName BETWEEN ${startDate} AND ${endDate}`;
   }
 
 
