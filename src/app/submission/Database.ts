@@ -227,12 +227,12 @@ export class DynamoDBDatabase implements Database {
       return '#formName = :name'; // No date filter needed
     }
     if (startDate && !endDate) {
-      return '#formName = :name AND #sortKeyName <= :startDate'; // Filter by start date only
+      return '#formName = :name AND #sortKeyName >= :startDate'; // Filter by start date only
     }
     if (endDate && ! startDate) {
-      return '#formName = :name AND #sortKeyName >= :endDate'; // Filter by end date only
+      return '#formName = :name AND #sortKeyName <= :endDate'; // Filter by end date only
     }
-    return '#formName = :name AND #sortKeyName BETWEEN :startDate AND :endDate';
+    return '#formName = :name AND #sortKeyName BETWEEN :endDate AND :startDate';
   }
 }
 
