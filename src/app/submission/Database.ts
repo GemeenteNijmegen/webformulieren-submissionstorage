@@ -158,13 +158,10 @@ export class DynamoDBDatabase implements Database {
 
 
   async getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<SubmissionData[] | false> {
-    // const { formName, startDate, endDate } = parameters;
-    const { formName } = parameters;
-    const sortKeyFilter: string | undefined = this.buildDateRangeSort(parameters.startDate, parameters.endDate);
-
-    let keyConditionExpression: string = '#formName = :name';
-    if (sortKeyFilter) { keyConditionExpression += ` AND ${sortKeyFilter}`;}
-
+    const keyConditionExpression: string = this.buildDateRangeSort(parameters.startDate, parameters.endDate);
+    const expressionAttributeValues: {
+      [key: string]: { S: string };
+    } = this.buildExpressionAttributeValues(parameters);
     const queryInput: QueryCommandInput = {
       TableName: this.table,
       IndexName: 'formNameIndex', // Use the secondary index name
@@ -172,13 +169,10 @@ export class DynamoDBDatabase implements Database {
         '#formName': 'formName',
         '#sortKeyName': 'dateSubmitted',
       },
-      ExpressionAttributeValues: {
-        ':name': {
-          S: `${formName}`,
-        },
-      },
+      ExpressionAttributeValues: expressionAttributeValues,
       KeyConditionExpression: keyConditionExpression,
     };
+    console.log('QueryCommandInput: ', queryInput);
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
       if (results.Items) {
@@ -198,7 +192,7 @@ export class DynamoDBDatabase implements Database {
         });
         return items;
       }
-      console.log(`No items found in ${formName} formName query`);
+      console.log(`No items found in ${parameters.formName} formName query`);
       return false;
     } catch (error) {
       console.error('Error fetching submissions:', error);
@@ -206,23 +200,40 @@ export class DynamoDBDatabase implements Database {
     }
   }
 
-
-  buildDateRangeSort(startDate?: string, endDate?: string): string | undefined {
+  buildExpressionAttributeValues(parameters: GetSubmissionsByFormNameParameters): {
+    [key: string]: { S: string };
+  } {
+    let expressionAttributes: {
+      [key: string]: { S: string };
+    } = {
+      ':name': {
+        S: `${parameters.formName}`,
+      },
+    };
+    if (parameters.startDate) {
+      expressionAttributes[':startDate'] = {
+        S: `${parameters.startDate}`,
+      };
+    }
+    if (parameters.endDate) {
+      expressionAttributes[':endDate'] = {
+        S: `${parameters.endDate}`,
+      };
+    }
+    return expressionAttributes;
+  }
+  buildDateRangeSort(startDate?: string, endDate?: string): string {
     if (!startDate && !endDate) {
-      return undefined; // No date filter needed
+      return '#formName = :name'; // No date filter needed
     }
     if (startDate && !endDate) {
-      return `#sortKeyName <= ${startDate}`; // Filter by start date only
+      return '#formName = :name AND #sortKeyName <= :startDate'; // Filter by start date only
     }
-
     if (endDate && ! startDate) {
-      return `#sortKeyName >= ${endDate}`; // Filter by end date only
+      return '#formName = :name AND #sortKeyName >= :endDate'; // Filter by end date only
     }
-
-    return `#sortKeyName BETWEEN ${startDate} AND ${endDate}`;
+    return '#formName = :name AND #sortKeyName BETWEEN :startDate AND :endDate';
   }
-
-
 }
 
 export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
