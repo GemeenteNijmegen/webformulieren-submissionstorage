@@ -1,4 +1,4 @@
-import { Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Bucket, BucketEncryption, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
@@ -74,8 +74,21 @@ export class StorageStack extends Stack {
     this.addArnToParameterStore('tableParam', table.tableArn, Statics.ssmSubmissionTableArn);
     this.addArnToParameterStore('tableNameParam', table.tableName, Statics.ssmSubmissionTableName);
 
-    this.addParameters();
+    new Table(this, 'formoverview-table', {
+      partitionKey: { name: 'id', type: AttributeType.STRING },
+      sortKey: { name: 'createdDate', type: AttributeType.STRING },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      timeToLiveAttribute: 'ttl',
+      encryptionKey: key,
+      encryption: TableEncryption.CUSTOMER_MANAGED,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
 
+    this.addArnToParameterStore('formOverviewTableParam', table.tableArn, Statics.ssmFormOverviewTableArn);
+    this.addArnToParameterStore('formOverviewTableNameParam', table.tableName, Statics.ssmFormOverviewTableName);
+
+
+    this.addParameters();
     this.addMigrations(table, storageBucket);
   }
 

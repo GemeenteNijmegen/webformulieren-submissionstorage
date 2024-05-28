@@ -9,6 +9,7 @@ let mockS3Get = jest.fn().mockResolvedValue({});
 let mockS3GetBatch = jest.fn().mockResolvedValue([]);
 let mockS3Store = jest.fn().mockResolvedValue(true);
 let mockDBGetSubmissionsByFormName = jest.fn().mockResolvedValue([]);
+let mockDBStoreFormOverview = jest.fn().mockResolvedValue(true);
 
 jest.mock('../../../submission/Storage', () => {
   return {
@@ -30,6 +31,15 @@ jest.mock('../../../submission/Database', () => {
     }),
   };
 });
+jest.mock('../../database/FormOverviewDatabase', () => {
+  return {
+    DDBFormOverviewDatabase: jest.fn(() => {
+      return {
+        storeFormOverview: mockDBStoreFormOverview,
+      };
+    }),
+  };
+});
 
 const originalEnv = process.env;
 describe('FormOverviewRequestHandler Tests', () => {
@@ -41,6 +51,7 @@ describe('FormOverviewRequestHandler Tests', () => {
         TABLE_NAME: 'MockTableName',
         BUCKET_NAME: 'MockBucketname',
         DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
+        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
       };
     });
     afterEach(() => {
@@ -111,14 +122,16 @@ describe('FormOverviewRequestHandler Tests', () => {
         ...originalEnv,
         BUCKET_NAME: 'MockBucketname',
         DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
+        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
       };
-      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No table NAME provided, retrieving submissions will fail.' });
+      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No submissions table NAME provided, retrieving submissions will fail.' });
     });
     test('bucketname error', () => {
       process.env = {
         ...originalEnv,
         TABLE_NAME: 'MockTableName',
         DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
+        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
       };
       expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No bucket NAME provided, retrieving submissions will fail.' });
     });
@@ -127,8 +140,18 @@ describe('FormOverviewRequestHandler Tests', () => {
         ...originalEnv,
         TABLE_NAME: 'MockTableName',
         BUCKET_NAME: 'MockBucketname',
+        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
       };
       expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No download bucket NAME provided, storing formOverview will fail.' });
+    });
+    test('formoverviewtable error', () => {
+      process.env = {
+        ...originalEnv,
+        TABLE_NAME: 'MockTableName',
+        BUCKET_NAME: 'MockBucketname',
+        DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
+      };
+      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No form overview table NAME provided, storing formOverview metadata will fail.' });
     });
   });
 });

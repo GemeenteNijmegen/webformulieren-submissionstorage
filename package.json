@@ -8,6 +8,8 @@
     "bundle:app/download/download.lambda:watch": "npx projen bundle:app/download/download.lambda:watch",
     "bundle:app/formOverview/getFormOverview/getFormOverview.lambda": "npx projen bundle:app/formOverview/getFormOverview/getFormOverview.lambda",
     "bundle:app/formOverview/getFormOverview/getFormOverview.lambda:watch": "npx projen bundle:app/formOverview/getFormOverview/getFormOverview.lambda:watch",
+    "bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda": "npx projen bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda",
+    "bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda:watch": "npx projen bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda:watch",
     "bundle:app/listSubmissions/listSubmissions.lambda": "npx projen bundle:app/listSubmissions/listSubmissions.lambda",
     "bundle:app/listSubmissions/listSubmissions.lambda:watch": "npx projen bundle:app/listSubmissions/listSubmissions.lambda:watch",
     "bundle:app/submission/submission.lambda": "npx projen bundle:app/submission/submission.lambda",
