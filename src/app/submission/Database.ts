@@ -1,5 +1,6 @@
 import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { z } from 'zod';
+import { FormNameIndexQueryBuilder } from './FormNameIndexQueryBuilder';
 import { hashString } from './hash';
 
 export interface SubmissionData {
@@ -7,6 +8,15 @@ export interface SubmissionData {
   key: string;
   pdf: string;
   attachments?: string[];
+  dateSubmitted?: string;
+  formName?: string;
+  formTitle?: string;
+}
+/**
+ * Interface with expected results from a query of the secondary formNameIndex
+ */
+export interface FormNameSubmissionData {
+  key: string;
   dateSubmitted?: string;
   formName?: string;
   formTitle?: string;
@@ -43,7 +53,6 @@ export interface GetSubmissionParameters {
 }
 export interface GetSubmissionsByFormNameParameters {
   formName: string;
-  // TODO: maybe date range interface and string might not be the best option
   startDate?: string;
   endDate?: string;
 }
@@ -52,7 +61,7 @@ export interface Database {
   storeSubmission(submission: SubmissionData): Promise<boolean>;
   listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false>;
   getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false>;
-  getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<SubmissionData[]|false>;
+  getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<FormNameSubmissionData[]|false>;
 }
 
 export class DynamoDBDatabase implements Database {
@@ -157,37 +166,20 @@ export class DynamoDBDatabase implements Database {
   }
 
 
-  async getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<SubmissionData[] | false> {
-    const keyConditionExpression: string = this.buildDateRangeSort(parameters.startDate, parameters.endDate);
-    const expressionAttributeValues: {
-      [key: string]: { S: string };
-    } = this.buildExpressionAttributeValues(parameters);
-    const queryInput: QueryCommandInput = {
-      TableName: this.table,
-      IndexName: 'formNameIndex', // Use the secondary index name
-      ExpressionAttributeNames: {
-        '#formName': 'formName',
-        '#sortKeyName': 'dateSubmitted',
-      },
-      ExpressionAttributeValues: expressionAttributeValues,
-      KeyConditionExpression: keyConditionExpression,
-    };
-    console.log('QueryCommandInput: ', queryInput);
+  async getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<FormNameSubmissionData[] | false> {
+    const builder = new FormNameIndexQueryBuilder(this.table);
+    const queryInput: QueryCommandInput = builder.withFormName(parameters.formName).withDateRange(parameters.startDate, parameters.endDate).build();
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
       if (results.Items) {
         const parsedResults = submissionTableItemsSchema.parse(results);
-        // Make unit test
         console.log(`${parsedResults.Items.length} items found`);
         const items = parsedResults.Items?.map((item) => {
           return {
-            userId: item?.pk.S ?? '',
             key: item?.sk.S ?? '',
-            pdf: item?.pdfKey.S ?? '',
             dateSubmitted: item.dateSubmitted?.S ?? new Date(1970, 0, 0).toISOString(),
             formName: item.formName?.S ?? 'onbekend',
             formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
-            attachments: item.attachments?.L.map(attachment => attachment.S) ?? [],
           };
         });
         return items;
@@ -198,41 +190,6 @@ export class DynamoDBDatabase implements Database {
       console.error('Error fetching submissions:', error);
       return false;
     }
-  }
-
-  buildExpressionAttributeValues(parameters: GetSubmissionsByFormNameParameters): {
-    [key: string]: { S: string };
-  } {
-    let expressionAttributes: {
-      [key: string]: { S: string };
-    } = {
-      ':name': {
-        S: `${parameters.formName}`,
-      },
-    };
-    if (parameters.startDate) {
-      expressionAttributes[':startDate'] = {
-        S: `${parameters.startDate}`,
-      };
-    }
-    if (parameters.endDate) {
-      expressionAttributes[':endDate'] = {
-        S: `${parameters.endDate}`,
-      };
-    }
-    return expressionAttributes;
-  }
-  buildDateRangeSort(startDate?: string, endDate?: string): string {
-    if (!startDate && !endDate) {
-      return '#formName = :name'; // No date filter needed
-    }
-    if (startDate && !endDate) {
-      return '#formName = :name AND #sortKeyName >= :startDate'; // Filter by start date only
-    }
-    if (endDate && ! startDate) {
-      return '#formName = :name AND #sortKeyName <= :endDate'; // Filter by end date only
-    }
-    return '#formName = :name AND #sortKeyName BETWEEN :endDate AND :startDate';
   }
 }
 
