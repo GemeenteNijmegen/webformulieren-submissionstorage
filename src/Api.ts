@@ -10,7 +10,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { DownloadFunction } from './app/download/download-function';
-import { GetFormOverviewFunction } from './app/get-form-overview/getFormOverview-function';
+import { GetFormOverviewFunction } from './app/formOverview/get-form-overview/getFormOverview-function';
 import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
 import { Statics } from './statics';
 

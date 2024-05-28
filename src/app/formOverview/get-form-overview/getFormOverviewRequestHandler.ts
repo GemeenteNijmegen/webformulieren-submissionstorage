@@ -4,8 +4,8 @@ import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-htt
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
-import { Database, DynamoDBDatabase } from '../submission/Database';
-import { S3Storage, Storage } from '../submission/Storage';
+import { Database, DynamoDBDatabase } from '../../submission/Database';
+import { S3Storage, Storage } from '../../submission/Storage';
 
 export class FormOverviewRequestHandler {
   private storage: Storage;
