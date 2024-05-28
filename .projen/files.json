@@ -17,7 +17,7 @@
     "cdk.json",
     "LICENSE",
     "src/app/download/download-function.ts",
-    "src/app/formOverview/get-form-overview/getFormOverview-function.ts",
+    "src/app/formOverview/getFormOverview/getFormOverview-function.ts",
     "src/app/listSubmissions/listSubmissions-function.ts",
     "src/app/submission/submission-function.ts",
     "src/migrations/migration-2024-02-06-enrich-table-function.ts",

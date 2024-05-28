@@ -10,16 +10,16 @@ export interface GetFormOverviewFunctionProps extends lambda.FunctionOptions {
 }
 
 /**
- * An AWS Lambda function which executes src/app/formOverview/get-form-overview/getFormOverview.
+ * An AWS Lambda function which executes src/app/formOverview/getFormOverview/getFormOverview.
  */
 export class GetFormOverviewFunction extends lambda.Function {
   constructor(scope: Construct, id: string, props?: GetFormOverviewFunctionProps) {
     super(scope, id, {
-      description: 'src/app/formOverview/get-form-overview/getFormOverview.lambda.ts',
+      description: 'src/app/formOverview/getFormOverview/getFormOverview.lambda.ts',
       ...props,
       runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS),
       handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../../../assets/app/formOverview/get-form-overview/getFormOverview.lambda')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../../../assets/app/formOverview/getFormOverview/getFormOverview.lambda')),
     });
     this.addEnvironment('AWS_NODEJS_CONNECTION_REUSE_ENABLED', '1', { removeInEdge: true });
   }
