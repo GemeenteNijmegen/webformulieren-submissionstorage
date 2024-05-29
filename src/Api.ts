@@ -10,7 +10,8 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { DownloadFunction } from './app/download/download-function';
-import { GetFormOverviewFunction } from './app/get-form-overview/getFormOverview-function';
+import { GetFormOverviewFunction } from './app/formOverview/getFormOverview/getFormOverview-function';
+import { ListFormOverviewsFunction } from './app/formOverview/listFormOverviews/listFormOverviews-function';
 import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
 import { Statics } from './statics';
 
@@ -45,9 +46,17 @@ export class Api extends Construct {
       globalIndexes: ['formNameIndex'],
     });
 
+    const formOverviewTable = Table.fromTableAttributes(this, 'formOverviewTable', {
+      tableName: StringParameter.valueForStringParameter(this, Statics.ssmFormOverviewTableName),
+      encryptionKey: key,
+    });
+
     this.addListSubmissionsEndpoint(storageBucket, table);
-    this.addFormOverviewEndpoint(table, storageBucket, downloadBucket);
     this.addDownloadEndpoint(storageBucket);
+
+    this.addGetFormOverviewEndpoint(table, storageBucket, downloadBucket, formOverviewTable);
+    this.addListFormOverviewsEndpoint(formOverviewTable);
+    this.addFormOverviewDownloadEndpoint(downloadBucket);
   }
 
   private createApiWithApiKey(subdomain?: string) {
@@ -160,12 +169,13 @@ export class Api extends Construct {
     });
   }
 
-  private addFormOverviewEndpoint(table: ITable, storageBucket: IBucket, downloadBucket: IBucket) {
+  private addGetFormOverviewEndpoint(table: ITable, storageBucket: IBucket, downloadBucket: IBucket, formOverviewTable: ITable) {
     const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', {
       environment: {
         TABLE_NAME: table.tableName,
         BUCKET_NAME: storageBucket.bucketName,
         DOWNLOAD_BUCKET_NAME: downloadBucket.bucketName,
+        FORM_OVERVIEW_TABLE_NAME: formOverviewTable.tableName,
       },
       timeout: Duration.minutes(10),
       memorySize: 1024,
@@ -181,6 +191,43 @@ export class Api extends Construct {
         'method.request.querystring.formuliernaam': true,
         'method.request.querystring.startdatum': false,
         'method.request.querystring.einddatum': false,
+      },
+    });
+  }
+
+  private addListFormOverviewsEndpoint(formOverviewTable: ITable) {
+    const listFormOverviewsFunction = new ListFormOverviewsFunction(this, 'listFormOverview', {
+      environment: {
+        FORM_OVERVIEW_TABLE_NAME: formOverviewTable.tableName,
+      },
+      timeout: Duration.minutes(10),
+      memorySize: 1024,
+    });
+    formOverviewTable.grantReadData(listFormOverviewsFunction);
+    const formOverviewApi = this.api.root.addResource('listformoverviews');
+    formOverviewApi.addMethod('GET', new LambdaIntegration(listFormOverviewsFunction), {
+      apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.maxresults': false,
+      },
+    });
+  }
+
+  private addFormOverviewDownloadEndpoint(downloadBucket: IBucket) {
+    const downloadFunction = new DownloadFunction(this, 'form-overview-download', {
+      environment: {
+        BUCKET_NAME: downloadBucket.bucketName,
+      },
+      timeout: Duration.minutes(10),
+      memorySize: 1024,
+    });
+    downloadBucket.grantRead(downloadFunction);
+
+    const downloadEndpoint = this.api.root.addResource('downloadformoverview');
+    downloadEndpoint.addMethod('GET', new LambdaIntegration(downloadFunction), {
+      apiKeyRequired: true,
+      requestParameters: {
+        'method.request.querystring.key': true,
       },
     });
   }
