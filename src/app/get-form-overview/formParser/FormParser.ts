@@ -4,10 +4,15 @@ import { FormDefinitionComponents, ParsedFormDefinition } from '../formDefinitio
  * Takes data from a parsed Form Definition and processes one or multiple forms to structure its data
  * The result is an object that can easily be converted to a csv, but also returned just as an object to display on an html page for example
  * Might have to make the name more specific
+ * TODO:
+ * Dealing with datagrid elements
+ * Containers in containers (also in formdefinitionparser)
+ * BRP data
+ * Formatting text checkboxes
  */
 export class FormParser {
   parsedFormDefinition: ParsedFormDefinition;
-  private headerArray: string[] = ['Formuliernaam', 'DatumTijdOntvangen', 'Kenmerk'];
+  private headerArray: string[] = ['Formuliernaam', 'DatumTijdOntvangen', 'FormulierKenmerk'];
 
   constructor(parsedFormDefinition: ParsedFormDefinition) {
     this.parsedFormDefinition = parsedFormDefinition;
@@ -87,7 +92,7 @@ export class FormParser {
       return radioValue?.label ? radioValue.label : value;
     }
     // If the value is a string it can be returned immediately
-    {if (typeof value == 'string') return value;}
+    if (typeof value == 'string') return value.replace(/;/g, '');
 
     // Convert booleans to string
     if (typeof value === 'boolean') {
