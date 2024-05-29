@@ -87,7 +87,11 @@ export class FormOverviewRequestHandler {
   }
 
   async getFormSubmissionsDatabase(params: EventParameters): Promise<{submissions:string[]; formdefinition: string}> {
-    const databaseResult = await this.database.getSubmissionsByFormName({ formName: params.formuliernaam });
+    const databaseResult = await this.database.getSubmissionsByFormName({
+      formName: params.formuliernaam,
+      startDate: params.startdatum,
+      endDate: params.einddatum,
+    });
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
@@ -125,7 +129,7 @@ export class FormOverviewRequestHandler {
 
     let csvContent: string = '';
     csvArray.forEach(row => {
-      csvContent += row.join(',') + '\n';
+      csvContent += row.join(';') + '\n';
     });
     console.log(`Done processing csv file. Number of processed rows: ${(csvArray.length - 1)}. Number of failed csv transformations: ${failedCsvProcessing.length}. Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
     return csvContent;

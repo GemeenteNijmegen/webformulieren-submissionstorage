@@ -179,6 +179,8 @@ export class Api extends Construct {
       apiKeyRequired: true,
       requestParameters: {
         'method.request.querystring.formuliernaam': true,
+        'method.request.querystring.startdatum': false,
+        'method.request.querystring.einddatum': false,
       },
     });
   }

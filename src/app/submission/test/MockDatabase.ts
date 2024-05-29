@@ -42,17 +42,13 @@ export class MockDatabase implements Database {
 
   async getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters) {
     return [{
-      userId: 'USER1',
       key: 'DMS123.001',
-      pdf: 'submission.pdf',
       dateSubmitted: '2024-04-11T13:53:34.120Z',
       formName: parameters.formName,
       formTitle: `Titel ${parameters.formName}`,
     },
     {
-      userId: 'USER2',
       key: 'DMS123.002',
-      pdf: 'submission.pdf',
       dateSubmitted: '2024-04-12T13:53:34.120Z',
       formName: parameters.formName,
       formTitle: `Titel ${parameters.formName}`,
