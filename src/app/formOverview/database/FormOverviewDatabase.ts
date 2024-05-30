@@ -1,4 +1,4 @@
-import { DynamoDBClient, PutItemCommand, QueryCommand, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand, PutItemCommandInput, QueryCommand, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 
 export interface FormOverviewData {
   fileName: string; // filename of csv
@@ -29,8 +29,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
 
     const timestamp = new Date().toISOString();
     const ttl = Date.now() + (1000 * 3600 * 24 * 30 * 6); // 6 months
-
-    await this.client.send(new PutItemCommand({
+    const putItemCommandQuery: PutItemCommandInput = {
       Item: {
         id: { S: this.FORMID },
         createdDate: { S: timestamp },
@@ -43,8 +42,15 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
         ttl: { N: ttl.toString() },
       },
       TableName: this.tableName,
-    }));
-    return true;
+    };
+    console.log('[FormOverviewDatabase] Store form overview: ', putItemCommandQuery );
+    try {
+      await this.client.send(new PutItemCommand(putItemCommandQuery));
+      return true;
+    } catch (error) {
+      console.error('[FormOverviewDatabase] Store form overview failed with error:', error);
+      return false;
+    }
   }
   async getFormOverviews(): Promise<FormOverviewData[]> {
 
