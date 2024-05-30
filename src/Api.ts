@@ -180,6 +180,7 @@ export class Api extends Construct {
       timeout: Duration.minutes(10),
       memorySize: 1024,
     });
+    formOverviewTable.grantReadData(formOverviewFunction);
     table.grantReadData(formOverviewFunction);
     storageBucket.grantRead(formOverviewFunction);
     downloadBucket.grantReadWrite(formOverviewFunction);
