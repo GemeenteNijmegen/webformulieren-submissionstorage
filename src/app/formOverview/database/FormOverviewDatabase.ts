@@ -62,8 +62,9 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
       ExpressionAttributeValues: {
         ':id': { S: this.FORMID },
       },
-      KeyConditionExpression: '#id = :name',
+      KeyConditionExpression: '#id = :id',
     };
+
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
       if (results.Items) {
