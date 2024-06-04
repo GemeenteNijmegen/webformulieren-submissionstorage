@@ -7,6 +7,7 @@ import { parsedEvent } from './parsedEvent';
 export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGatewayV2Response> {
   try {
     const params = parsedEvent(event);
+    console.log(params);
     const requestHandler = new ListSubmissionsRequestHandler();
     return await requestHandler.handleRequest(params);
   } catch (error: any) {

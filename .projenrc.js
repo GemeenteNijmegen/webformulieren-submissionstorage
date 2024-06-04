@@ -26,6 +26,7 @@ const project = new GemeenteNijmegenCdkApp({
     'axios',
     'dotenv',
     'cdk-remote-stack',
+    'jose', // 🌮
   ],
   jestOptions: {
     jestConfig: {

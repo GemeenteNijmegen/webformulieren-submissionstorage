@@ -123,10 +123,15 @@ export class Api extends Construct {
   }
 
   private addListSubmissionsEndpoint(storageBucket: IBucket, table: ITable) {
+    const issuer = new StringParameter(this, 'issuer', {
+      stringValue: '-',
+      parameterName: Statics.ssmJwtTokenIssuer,
+    });
     const lambda = new ListSubmissionsFunction(this, 'list-submissions', {
       environment: {
         BUCKET_NAME: storageBucket.bucketName,
         TABLE_NAME: table.tableName,
+        ISSUER: issuer.stringValue,
       },
       memorySize: 1024,
     });
