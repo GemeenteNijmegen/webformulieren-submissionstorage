@@ -65,16 +65,15 @@ export class ListSubmissionsRequestHandler {
         issuer: this.environment.issuer,
       });
 
-      if (result.payload.sub) {
-        return new Bsn(result.payload.sub).bsn;
-      } else if (result.payload[this.environment.yiviClaimBsn]) {
-        return new Bsn(result.payload[this.environment.yiviClaimBsn] as string).bsn;
-      } else if (result.payload[this.environment.yiviClaimKvk]) {
+      if (result.payload[this.environment.yiviClaimKvk]) { // yivi kvk
         return result.payload[this.environment.yiviClaimKvk] as string;
-      } else if (result.payload[this.environment.kvkNumberClaim]) {
+      } else if (result.payload[this.environment.yiviClaimBsn]) { // yivi bsn
+        return new Bsn(result.payload[this.environment.yiviClaimBsn] as string).bsn;
+      } else if (result.payload[this.environment.kvkNumberClaim]) { // kvk
         return result.payload[this.environment.kvkNumberClaim] as string;
+      } else if (result.payload.sub) { // digid (note sub can be filled more often)
+        return new Bsn(result.payload.sub).bsn;
       }
-
       throw Error('No claim to authenticate the user is found in the JWT');
     } catch (error) {
       console.error(error);
