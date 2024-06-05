@@ -127,11 +127,26 @@ export class Api extends Construct {
       stringValue: '-',
       parameterName: Statics.ssmJwtTokenIssuer,
     });
+    const yiviClaimBsn = new StringParameter(this, 'yivi-claim-brp', {
+      stringValue: '-',
+      parameterName: Statics.ssmYiviClaimBsn,
+    });
+    const yiviClaimKvk = new StringParameter(this, 'yivi-claim-kvk', {
+      stringValue: '-',
+      parameterName: Statics.ssmYiviClaimKvk,
+    });
+    const kvkNumberCLaim = new StringParameter(this, 'kvk-number-claim', {
+      stringValue: '-',
+      parameterName: Statics.ssmKvkNumberClaim,
+    });
     const lambda = new ListSubmissionsFunction(this, 'list-submissions', {
       environment: {
         BUCKET_NAME: storageBucket.bucketName,
         TABLE_NAME: table.tableName,
         ISSUER: issuer.stringValue,
+        YIVI_CLAIM_BSN: yiviClaimBsn.stringValue,
+        YIVI_CLAIM_KVK: yiviClaimKvk.stringValue,
+        KVK_NUMBER_CLAIM: kvkNumberCLaim.stringValue,
       },
       memorySize: 1024,
     });

@@ -63,6 +63,9 @@ export abstract class Statics {
   static ssmFormOverviewTableName: string = `/${this.projectName}/formOverviewTableName`;
   static ssmFormIoBaseUrl: string = `/${this.projectName}/formIoBaseUrl`;
   static ssmJwtTokenIssuer = `/${this.projectName}/jwtTokenIssuer`;
+  static ssmYiviClaimBsn = `/${this.projectName}/yiviClaimBsn`;
+  static ssmYiviClaimKvk = `/${this.projectName}/yiviClaimKvk`;
+  static ssmKvkNumberClaim = `/${this.projectName}/kvkNumberClaim`;
 
   static secretFormIoApiKey: string = `/${this.projectName}/FormIoAPIKey`;
 }

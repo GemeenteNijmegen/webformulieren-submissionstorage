@@ -20,13 +20,16 @@ export class ListSubmissionsRequestHandler {
     if (process.env.BUCKET_NAME == undefined) {
       throw Error('No bucket NAME provided, retrieving submissions will fail.');
     }
-    if (!process.env.ISSUER) {
-      throw Error('No issuer url defined to validate the authorization tokens');
+    if (!process.env.ISSUER || !process.env.YIVI_CLAIM_BSN || !process.env.YIVI_CLAIM_KVK || !process.env.KVK_NUMBER_CLAIM) {
+      throw Error('No issuer url or yivi claims defined to validate the authorization tokens');
     }
     return {
       tableName: process.env.TABLE_NAME,
       bucketName: process.env.BUCKET_NAME,
       issuer: process.env.ISSUER,
+      yiviClaimBsn: process.env.YIVI_CLAIM_BSN,
+      yiviClaimKvk: process.env.YIVI_CLAIM_KVK,
+      kvkNumberClaim: process.env.KVK_NUMBER_CLAIM,
     };
   }
 
@@ -61,8 +64,18 @@ export class ListSubmissionsRequestHandler {
       const result = await jose.jwtVerify(idToken, jwks, {
         issuer: this.environment.issuer,
       });
-      const bsn = new Bsn(result.payload.sub ?? 'undefined');
-      return bsn.bsn;
+
+      if (result.payload.sub) {
+        return new Bsn(result.payload.sub).bsn;
+      } else if (result.payload[this.environment.yiviClaimBsn]) {
+        return new Bsn(result.payload[this.environment.yiviClaimBsn] as string).bsn;
+      } else if (result.payload[this.environment.yiviClaimKvk]) {
+        return result.payload[this.environment.yiviClaimKvk] as string;
+      } else if (result.payload[this.environment.kvkNumberClaim]) {
+        return result.payload[this.environment.kvkNumberClaim] as string;
+      }
+
+      throw Error('No claim to authenticate the user is found in the JWT');
     } catch (error) {
       console.error(error);
       throw Error('Invalid token!');
