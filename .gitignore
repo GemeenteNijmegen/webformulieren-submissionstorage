@@ -60,6 +60,7 @@ junit.xml
 .cdk.staging/
 .parcel-cache/
 !/src/app/download/download-function.ts
+!/src/app/formOverview/authorizer/JwtAuthorizer-function.ts
 !/src/app/formOverview/getFormOverview/getFormOverview-function.ts
 !/src/app/formOverview/listFormOverviews/listFormOverviews-function.ts
 !/src/app/listSubmissions/listSubmissions-function.ts

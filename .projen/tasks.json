@@ -49,6 +49,9 @@
           "spawn": "bundle:app/download/download.lambda"
         },
         {
+          "spawn": "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda"
+        },
+        {
           "spawn": "bundle:app/formOverview/getFormOverview/getFormOverview.lambda"
         },
         {
@@ -80,6 +83,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda": {
+      "name": "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda",
+      "description": "Create a JavaScript bundle from src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda:watch": {
+      "name": "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
