@@ -1,5 +1,5 @@
 import { Duration } from 'aws-cdk-lib';
-import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPolicy, TokenAuthorizer, IdentitySource } from 'aws-cdk-lib/aws-apigateway';
+import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPolicy, IdentitySource, RequestAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
@@ -23,7 +23,7 @@ export class Api extends Construct {
   private api: RestApi;
   private hostedZone?: IHostedZone;
 
-  private authorizer: TokenAuthorizer;
+  private authorizer: RequestAuthorizer;
 
   constructor(scope: Construct, id: string, props: ApiProps) {
     super(scope, id);
@@ -200,18 +200,18 @@ export class Api extends Construct {
   }
 
   /**
-   * Construct a TokenAuthorizer (used by api gateway)
+   * Construct a RequestAuthorizer (used by api gateway)
    * to secure the fromOverview endpoints as a PoC.
    * @returns
    */
   private jwtAuthorizer() {
-    return new TokenAuthorizer(this, 'token-authorizer', {
+    return new RequestAuthorizer(this, 'request-authorizer', {
       handler: new JwtAuthorizerFunction(this, 'authorizer-function', {
         environment: {
           TRUSTED_ISSUER: 'authentication.sandbox-marnix.csp-nijmegen.nl',
         },
       }),
-      identitySource: IdentitySource.header('Authorization'),
+      identitySources: [IdentitySource.header('Authorization')],
     });
   }
 
