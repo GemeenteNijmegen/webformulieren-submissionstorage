@@ -161,6 +161,7 @@ export class Api extends Construct {
     const listSubmissionsEndpoint = this.api.root.addResource('submissions');
     listSubmissionsEndpoint.addMethod('GET', new LambdaIntegration(lambda), {
       apiKeyRequired: true,
+      authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.user_id': true,
         'method.request.querystring.user_type': true,
@@ -168,6 +169,7 @@ export class Api extends Construct {
     });
     listSubmissionsEndpoint.addResource('{key}').addMethod('GET', new LambdaIntegration(lambda), {
       apiKeyRequired: true,
+      authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.user_id': true,
         'method.request.querystring.user_type': true,
