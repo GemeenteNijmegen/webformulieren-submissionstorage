@@ -1,12 +1,12 @@
-import { APIGatewayEventRequestContextLambdaAuthorizer } from 'aws-lambda';
+import { APIGatewayEventRequestContext } from 'aws-lambda';
 
 
-export function getContext(identifier: string) {
-  const requestContext: APIGatewayEventRequestContextLambdaAuthorizer<any> = {
-    lambda: {
+export function getContext(identifier: string): APIGatewayEventRequestContext {
+  const requestContext = {
+    authorizer: {
       identifier: identifier,
       type: 'person',
     },
   };
-  return requestContext;
+  return requestContext as any;
 }

@@ -1,5 +1,4 @@
 import * as jose from 'jose';
-import { getContext } from './ContextFixture';
 import { ListSubmissionsRequestHandler } from '../ListSubmissionsRequestHandler';
 
 const listResults = [{
@@ -69,12 +68,12 @@ jest.spyOn(jose, 'jwtVerify').mockResolvedValue({ payload: { sub: '900026236' } 
 describe('Request Handler', () => {
 
   test('Handler correctly returns', async() => {
-    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', idToken: 'eyuoirgjweogiejqg' }, getContext('900222670'));
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', idToken: 'eyuoirgjweogiejqg' });
     expect(result.body).toBe(JSON.stringify(expectedListResults));
   });
 
   test('Handler correctly returns getSubmission', async() => {
-    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey', idToken: 'eyuoirgjweogiejqg' }, getContext('900222670'));
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey', idToken: 'eyuoirgjweogiejqg' });
     expect(result.body).toBe(JSON.stringify(getResult));
   });
 

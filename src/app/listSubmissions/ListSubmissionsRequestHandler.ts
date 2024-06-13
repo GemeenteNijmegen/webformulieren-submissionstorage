@@ -1,6 +1,4 @@
 import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
-import { Bsn } from '@gemeentenijmegen/utils';
-import { APIGatewayEventRequestContextLambdaAuthorizer } from 'aws-lambda';
 import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 
@@ -43,8 +41,8 @@ export class ListSubmissionsRequestHandler {
     ];
   }
 
-  async handleRequest(parameters: EventParameters, context: APIGatewayEventRequestContextLambdaAuthorizer<any>): Promise<ApiGatewayV2Response> {
-    const userId = await this.getUserIdFromContext(context);
+  async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
+    const userId = parameters.userId;
     let results;
     if (parameters.key) {
       results = await this.database.getSubmission({ userId: userId, key: parameters.key });
@@ -52,16 +50,6 @@ export class ListSubmissionsRequestHandler {
       results = await this.database.listSubmissions({ userId: userId });
     }
     return Response.json(results);
-  }
-
-  private async getUserIdFromContext(context: APIGatewayEventRequestContextLambdaAuthorizer<any>) {
-    console.log(context);
-    const identifier = context.lambda.identifier;
-    const type = context.lambda.type;
-    if (type == 'person') {
-      return new Bsn(identifier).bsn;
-    }
-    return identifier;
   }
 
 }
