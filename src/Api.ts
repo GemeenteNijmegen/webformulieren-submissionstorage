@@ -208,7 +208,7 @@ export class Api extends Construct {
     return new RequestAuthorizer(this, 'request-authorizer', {
       handler: new JwtAuthorizerFunction(this, 'authorizer-function', {
         environment: {
-          TRUSTED_ISSUER: 'authentication.sandbox-marnix.csp-nijmegen.nl',
+          TRUSTED_ISSUER: 'auth-service.sandbox-01.csp-nijmegen.nl',
         },
       }),
       identitySources: [IdentitySource.header('Authorization')],
