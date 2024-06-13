@@ -1,4 +1,4 @@
-import { APIGatewayAuthorizerCallback, APIGatewayRequestAuthorizerEvent } from 'aws-lambda';
+import { APIGatewayAuthorizerWithContextCallback, APIGatewayRequestAuthorizerEvent } from 'aws-lambda';
 import * as jose from 'jose';
 
 const configuration = {
@@ -19,13 +19,25 @@ const configuration = {
       path: '/downloadformoverview',
       requiredScope: 'form-overview',
     },
+    {
+      method: 'GET',
+      path: '/submissions',
+      requiredScope: 'submissions:read-own',
+    },
   ],
 };
+
+
+type IdentityType = 'person' | 'system' | 'organization';
+interface Identity {
+  identifier: string;
+  type: IdentityType;
+}
 
 export async function handler(
   event: APIGatewayRequestAuthorizerEvent,
   _context: any,
-  callback: APIGatewayAuthorizerCallback,
+  callback: APIGatewayAuthorizerWithContextCallback<any>,
 ) {
 
   console.log(event);
@@ -34,8 +46,8 @@ export async function handler(
     if (!jwt) {
       throw Error('No token provided in header');
     }
-    const subject = await validateJwt(jwt, event);
-    callback(null, generatePolicy(subject, 'Allow', event.methodArn));
+    const identity = await validateJwt(jwt, event);
+    callback(null, generatePolicy('Allow', event.methodArn, identity));
   } catch (error) {
     console.log(error);
     if (error instanceof Unauthorized) {
@@ -45,46 +57,58 @@ export async function handler(
   }
 };
 
-async function validateJwt(jwt: string, event: APIGatewayRequestAuthorizerEvent) {
+async function validateJwt(jwt: string, event: APIGatewayRequestAuthorizerEvent) : Promise<Identity> {
   const issuer = `https://${process.env.TRUSTED_ISSUER}/oauth`;
   const jwks = jose.createRemoteJWKSet(new URL(`${issuer}/.well-known/jwks.json`));
   const result = await jose.jwtVerify(jwt, jwks, {
     issuer: issuer,
   });
 
-  if (!result.payload.sub) {
-    throw Error('No subject found in token');
+  // Check if we know the endpoint that is requested
+  const requirements = getEndpointAuthorizationRequirements(event.path, event.httpMethod);
+  console.log('Auth requirements', requirements);
+
+  // Check if we are allowed to request the endpoint with the given claims in the token
+  const scopes = (result.payload.scope as string);
+  if (!scopes || !scopes.split(' ').find(scope => scope == requirements.requiredScope)) {
+    throw new Unauthorized();
   }
 
-
+  // Validate audience
   if (Array.isArray(result.payload.aud) && !result.payload.aud?.includes(configuration.audience)) {
     throw Error('Wrong audience');
   } else if (result.payload.aud != configuration.audience) {
     throw Error('Wrong audience');
   }
 
-  const requirements = getEndpointAuthorizationRequirements(event.path, event.httpMethod);
-
-  console.log('Auth requirements', requirements);
-
-  const scopes = (result.payload.scope as string);
-  if (scopes && scopes.split(' ').find(scope => scope == requirements.requiredScope)) {
-    return result.payload.sub;
+  // Try to identify the token owner
+  if (result.payload.identifier) {
+    return {
+      identifier: result.payload.identifier as string,
+      type: result.payload.type as IdentityType,
+    };
+  } else if (result.payload.sub) {
+    return {
+      identifier: result.payload.sub,
+      type: 'system',
+    };
+  } else {
+    throw Error('No subject found in token');
   }
 
-  throw new Unauthorized();
+
 }
 
 
 function getEndpointAuthorizationRequirements(path: string, method: string) {
-  const authorizationRequirements = configuration.endpoints.find(endpoint => endpoint.path == path && endpoint.method == method);
+  const authorizationRequirements = configuration.endpoints.find(endpoint => path.startsWith(endpoint.path) && endpoint.method == method);
   if (!authorizationRequirements) {
     throw Error('No endpoint authorization configured, this is a problem with the configuration of the API itself, not the caller');
   }
   return authorizationRequirements;
 }
 
-function generatePolicy(principalId: string, effect: string, resource: string) {
+function generatePolicy(effect: string, resource: string, identity: Identity) {
   if (!effect && !resource) {
     throw Error('missing effect and resource');
   }
@@ -99,7 +123,10 @@ function generatePolicy(principalId: string, effect: string, resource: string) {
   };
 
   return {
-    principalId: principalId,
+    context: {
+      ...identity,
+    },
+    principalId: identity.identifier,
     policyDocument: policyDocument,
   };
 
