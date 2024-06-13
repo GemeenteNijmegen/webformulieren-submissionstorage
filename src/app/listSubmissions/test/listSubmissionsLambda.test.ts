@@ -1,4 +1,5 @@
 import * as jose from 'jose';
+import { getContext } from './ContextFixture';
 import { handler } from '../listSubmissions.lambda';
 
 const personEvent = {
@@ -249,17 +250,17 @@ jest.spyOn(jose, 'jwtVerify').mockResolvedValue({ payload: { sub: '900026236' } 
 
 describe('Handler parsing events', () => {
   test('returns 200 with correct query params for person', async() => {
-    const result = await handler(personEvent);
+    const result = await handler(personEvent, getContext('900222670'));
     expect(result.statusCode).toBe(200);
   });
 
   test('returns 200 with correct query params for organisation', async() => {
-    const result = await handler(organisationEvent);
+    const result = await handler(organisationEvent, getContext('900222670'));
     expect(result.statusCode).toBe(200);
   });
 
   test('returns 400 with incorrect query params', async() => {
-    const result = await handler(invalidEvent);
+    const result = await handler(invalidEvent, getContext('900222670'));
     expect(result.statusCode).toBe(500);
   });
 

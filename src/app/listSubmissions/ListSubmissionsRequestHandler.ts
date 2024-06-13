@@ -1,6 +1,6 @@
 import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
 import { Bsn } from '@gemeentenijmegen/utils';
-import * as jose from 'jose';
+import { APIGatewayEventRequestContextLambdaAuthorizer } from 'aws-lambda';
 import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 
@@ -43,8 +43,8 @@ export class ListSubmissionsRequestHandler {
     ];
   }
 
-  async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
-    const userId = await this.getUserIdFromIdToken(parameters.idToken);
+  async handleRequest(parameters: EventParameters, context: APIGatewayEventRequestContextLambdaAuthorizer<any>): Promise<ApiGatewayV2Response> {
+    const userId = await this.getUserIdFromContext(context);
     let results;
     if (parameters.key) {
       results = await this.database.getSubmission({ userId: userId, key: parameters.key });
@@ -54,31 +54,14 @@ export class ListSubmissionsRequestHandler {
     return Response.json(results);
   }
 
-  /**
-   * Parse JWT token and check validity
-   * @param idToken the jwt id_token
-   */
-  private async getUserIdFromIdToken(idToken: string) {
-    try {
-      const jwks = jose.createRemoteJWKSet(new URL(`${this.environment.issuer}/certs`));
-      const result = await jose.jwtVerify(idToken, jwks, {
-        issuer: this.environment.issuer,
-      });
-
-      if (result.payload[this.environment.yiviClaimKvk]) { // yivi kvk
-        return result.payload[this.environment.yiviClaimKvk] as string;
-      } else if (result.payload[this.environment.yiviClaimBsn]) { // yivi bsn
-        return new Bsn(result.payload[this.environment.yiviClaimBsn] as string).bsn;
-      } else if (result.payload[this.environment.kvkNumberClaim]) { // kvk
-        return result.payload[this.environment.kvkNumberClaim] as string;
-      } else if (result.payload.sub) { // digid (note sub can be filled more often)
-        return new Bsn(result.payload.sub).bsn;
-      }
-      throw Error('No claim to authenticate the user is found in the JWT');
-    } catch (error) {
-      console.error(error);
-      throw Error('Invalid token!');
+  private async getUserIdFromContext(context: APIGatewayEventRequestContextLambdaAuthorizer<any>) {
+    console.log(context);
+    const identifier = context.lambda.identifier;
+    const type = context.lambda.type;
+    if (type == 'person') {
+      return new Bsn(identifier).bsn;
     }
+    return identifier;
   }
 
 }
