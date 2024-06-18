@@ -14,16 +14,17 @@ import { JwtAuthorizerFunction } from './app/formOverview/authorizer/JwtAuthoriz
 import { GetFormOverviewFunction } from './app/formOverview/getFormOverview/getFormOverview-function';
 import { ListFormOverviewsFunction } from './app/formOverview/listFormOverviews/listFormOverviews-function';
 import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
+import { Configurable } from './Configuration';
 import { Statics } from './statics';
 
-interface ApiProps {
+interface ApiProps extends Configurable {
   subdomain?: string;
 }
 export class Api extends Construct {
   private api: RestApi;
   private hostedZone?: IHostedZone;
 
-  private authorizer: RequestAuthorizer;
+  private authorizer?: RequestAuthorizer;
 
   constructor(scope: Construct, id: string, props: ApiProps) {
     super(scope, id);
@@ -32,7 +33,8 @@ export class Api extends Construct {
 
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
 
-    this.authorizer = this.jwtAuthorizer();
+    // Only setup authorizer if configured. This is experimental functionality.
+    this.authorizer = props.configuration.useGatewayAuthorizer ? this.jwtAuthorizer() : undefined;
 
     // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
     const storageBucket = Bucket.fromBucketAttributes(this, 'bucket', {
@@ -260,6 +262,7 @@ export class Api extends Construct {
     const listFormOverviewsFunction = new ListFormOverviewsFunction(this, 'listFormOverview', {
       environment: {
         FORM_OVERVIEW_TABLE_NAME: formOverviewTable.tableName,
+        USE_GATEWAY_AUTHORIZER: this.authorizer ? 'true' : 'false',
       },
       timeout: Duration.minutes(10),
       memorySize: 1024,
