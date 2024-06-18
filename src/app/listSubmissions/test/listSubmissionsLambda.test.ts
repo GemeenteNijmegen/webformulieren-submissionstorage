@@ -115,9 +115,6 @@ beforeAll(() => {
     TABLE_NAME: 'mock_table',
     BUCKET_NAME: 'mock_bucket',
     ISSUER: 'https://example.com',
-    YIVI_CLAIM_KVK: 'abc',
-    YIVI_CLAIM_BSN: 'def',
-    KVK_NUMBER_CLAIM: 'ghi',
   };
 });
 
