@@ -1,12 +1,18 @@
 import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
 import { Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 import { ListSubmissionsRequestHandler } from './ListSubmissionsRequestHandler';
-import { parsedEvent } from './parsedEvent';
+import { parsedEvent, parsedEventWithAuthorizer } from './parsedEvent';
 
-export async function handler(event: APIGatewayProxyEventV2): Promise<ApiGatewayV2Response> {
+export async function handler(
+  event: APIGatewayProxyEvent): Promise<ApiGatewayV2Response> {
   try {
-    const params = parsedEvent(event);
+    let params;
+    if (process.env.USE_GATEWAY_AUTHORIZER == 'true') {
+      params = parsedEventWithAuthorizer(event);
+    } else {
+      params = parsedEvent(event);
+    }
     const requestHandler = new ListSubmissionsRequestHandler();
     return await requestHandler.handleRequest(params);
   } catch (error: any) {

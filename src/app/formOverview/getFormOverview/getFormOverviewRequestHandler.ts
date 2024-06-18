@@ -87,6 +87,7 @@ export class FormOverviewRequestHandler {
     const epochTime = new Date().getTime();
     const csvFileName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
     await this.downloadStorage.store(csvFileName, csvFile);
+    console.log('Database');
     await this.formOverviewDatabase.storeFormOverview({
       fileName: csvFileName,
       createdBy: 'default_change_to_api_queryparam',

@@ -25,6 +25,6 @@ export class ApiStack extends Stack {
       topicArns: topicArns,
     });
 
-    new Api(this, 'api', { subdomain: props.configuration.subdomain });
+    new Api(this, 'api', { subdomain: props.configuration.subdomain, configuration: props.configuration });
   }
 }

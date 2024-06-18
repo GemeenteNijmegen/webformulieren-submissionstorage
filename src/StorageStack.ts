@@ -74,7 +74,7 @@ export class StorageStack extends Stack {
     this.addArnToParameterStore('tableParam', table.tableArn, Statics.ssmSubmissionTableArn);
     this.addArnToParameterStore('tableNameParam', table.tableName, Statics.ssmSubmissionTableName);
 
-    new Table(this, 'formoverview-table', {
+    const formOverviewTable = new Table(this, 'formoverview-table', {
       partitionKey: { name: 'id', type: AttributeType.STRING },
       sortKey: { name: 'createdDate', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
@@ -84,8 +84,8 @@ export class StorageStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
-    this.addArnToParameterStore('formOverviewTableParam', table.tableArn, Statics.ssmFormOverviewTableArn);
-    this.addArnToParameterStore('formOverviewTableNameParam', table.tableName, Statics.ssmFormOverviewTableName);
+    this.addArnToParameterStore('formOverviewTableParam', formOverviewTable.tableArn, Statics.ssmFormOverviewTableArn);
+    this.addArnToParameterStore('formOverviewTableNameParam', formOverviewTable.tableName, Statics.ssmFormOverviewTableName);
 
 
     this.addParameters();
