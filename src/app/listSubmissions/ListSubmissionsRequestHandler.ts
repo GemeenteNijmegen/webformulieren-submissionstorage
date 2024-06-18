@@ -4,11 +4,10 @@ import { Database, DynamoDBDatabase } from '../submission/Database';
 
 export class ListSubmissionsRequestHandler {
 
-  private environment;
   private database: Database;
   constructor() {
-    this.environment = this.getEvironmentVariables();
-    [this.database] = this.setup(this.environment);
+    const environment = this.getEvironmentVariables();
+    [this.database] = this.setup(environment);
   }
 
   private getEvironmentVariables() {
@@ -18,16 +17,9 @@ export class ListSubmissionsRequestHandler {
     if (process.env.BUCKET_NAME == undefined) {
       throw Error('No bucket NAME provided, retrieving submissions will fail.');
     }
-    if (!process.env.ISSUER || !process.env.YIVI_CLAIM_BSN || !process.env.YIVI_CLAIM_KVK || !process.env.KVK_NUMBER_CLAIM) {
-      throw Error('No issuer url or yivi claims defined to validate the authorization tokens');
-    }
     return {
       tableName: process.env.TABLE_NAME,
       bucketName: process.env.BUCKET_NAME,
-      issuer: process.env.ISSUER,
-      yiviClaimBsn: process.env.YIVI_CLAIM_BSN,
-      yiviClaimKvk: process.env.YIVI_CLAIM_KVK,
-      kvkNumberClaim: process.env.KVK_NUMBER_CLAIM,
     };
   }
 
@@ -42,12 +34,11 @@ export class ListSubmissionsRequestHandler {
   }
 
   async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
-    const userId = parameters.userId;
     let results;
     if (parameters.key) {
-      results = await this.database.getSubmission({ userId: userId, key: parameters.key });
+      results = await this.database.getSubmission({ userId: parameters.userId, key: parameters.key });
     } else {
-      results = await this.database.listSubmissions({ userId: userId });
+      results = await this.database.listSubmissions({ userId: parameters.userId });
     }
     return Response.json(results);
   }
