@@ -5,7 +5,7 @@ const EventParametersSchema = z.object({
   userId: z.string(),
   userType: z.enum(['organisation', 'person']),
   key: z.string().optional(),
-  idToken: z.string().transform((header) => header.replace('Bearer ', '')),
+  idToken: z.string().optional().transform((header) => header?.replace('Bearer ', '')),
 });
 export type EventParameters = z.infer<typeof EventParametersSchema>;
 
@@ -14,7 +14,6 @@ export function parsedEvent(event: APIGatewayProxyEvent): EventParameters {
     userId: event.queryStringParameters?.user_id,
     userType: event.queryStringParameters?.user_type,
     key: event.pathParameters?.key,
-    idToken: event.headers.Authorization,
   });
 }
 
