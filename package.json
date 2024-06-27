@@ -79,7 +79,7 @@
     "cdk-remote-stack": "^2.0.101",
     "constructs": "^10.0.5",
     "dotenv": "^16.4.5",
-    "jose": "^5.4.1",
+    "jose": "^5.5.0",
     "sns-validator": "^0.3.5",
     "zod": "^3.23.8"
   },
