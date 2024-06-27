@@ -150,6 +150,10 @@
       "type": "runtime"
     },
     {
+      "name": "jose",
+      "type": "runtime"
+    },
+    {
       "name": "sns-validator",
       "type": "runtime"
     },

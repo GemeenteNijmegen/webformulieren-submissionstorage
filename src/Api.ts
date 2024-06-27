@@ -1,5 +1,5 @@
 import { Duration } from 'aws-cdk-lib';
-import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPolicy } from 'aws-cdk-lib/aws-apigateway';
+import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPolicy, IdentitySource, RequestAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Key } from 'aws-cdk-lib/aws-kms';
@@ -10,16 +10,21 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { DownloadFunction } from './app/download/download-function';
-import { GetFormOverviewFunction } from './app/get-form-overview/getFormOverview-function';
+import { JwtAuthorizerFunction } from './app/formOverview/authorizer/JwtAuthorizer-function';
+import { GetFormOverviewFunction } from './app/formOverview/getFormOverview/getFormOverview-function';
+import { ListFormOverviewsFunction } from './app/formOverview/listFormOverviews/listFormOverviews-function';
 import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
+import { Configurable } from './Configuration';
 import { Statics } from './statics';
 
-interface ApiProps {
+interface ApiProps extends Configurable {
   subdomain?: string;
 }
 export class Api extends Construct {
   private api: RestApi;
   private hostedZone?: IHostedZone;
+
+  private authorizer?: RequestAuthorizer;
 
   constructor(scope: Construct, id: string, props: ApiProps) {
     super(scope, id);
@@ -27,6 +32,9 @@ export class Api extends Construct {
     this.api = this.createApiWithApiKey(props.subdomain);
 
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
+
+    // Only setup authorizer if configured. This is experimental functionality.
+    this.authorizer = props.configuration.useGatewayAuthorizer ? this.jwtAuthorizer() : undefined;
 
     // IBucket requires encryption key, otherwise grant methods won't add the correct permissions
     const storageBucket = Bucket.fromBucketAttributes(this, 'bucket', {
@@ -45,9 +53,17 @@ export class Api extends Construct {
       globalIndexes: ['formNameIndex'],
     });
 
+    const formOverviewTable = Table.fromTableAttributes(this, 'formOverviewTable', {
+      tableName: StringParameter.valueForStringParameter(this, Statics.ssmFormOverviewTableName),
+      encryptionKey: key,
+    });
+
     this.addListSubmissionsEndpoint(storageBucket, table);
-    this.addFormOverviewEndpoint(table, storageBucket, downloadBucket);
     this.addDownloadEndpoint(storageBucket);
+
+    this.addGetFormOverviewEndpoint(table, storageBucket, downloadBucket, formOverviewTable);
+    this.addListFormOverviewsEndpoint(formOverviewTable);
+    this.addFormOverviewDownloadEndpoint(downloadBucket);
   }
 
   private createApiWithApiKey(subdomain?: string) {
@@ -127,6 +143,7 @@ export class Api extends Construct {
     const listSubmissionsEndpoint = this.api.root.addResource('submissions');
     listSubmissionsEndpoint.addMethod('GET', new LambdaIntegration(lambda), {
       apiKeyRequired: true,
+      authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.user_id': true,
         'method.request.querystring.user_type': true,
@@ -134,6 +151,7 @@ export class Api extends Construct {
     });
     listSubmissionsEndpoint.addResource('{key}').addMethod('GET', new LambdaIntegration(lambda), {
       apiKeyRequired: true,
+      authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.user_id': true,
         'method.request.querystring.user_type': true,
@@ -141,6 +159,10 @@ export class Api extends Construct {
     });
   }
 
+  /**
+   * Download endpoint for submissions and attachments
+   * @param storageBucket
+   */
   private addDownloadEndpoint(storageBucket: IBucket) {
     const downloadFunction = new DownloadFunction(this, 'download', {
       environment: {
@@ -154,22 +176,48 @@ export class Api extends Construct {
     const downloadEndpoint = this.api.root.addResource('download');
     downloadEndpoint.addMethod('GET', new LambdaIntegration(downloadFunction), {
       apiKeyRequired: true,
+      authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.key': true,
       },
     });
   }
 
-  private addFormOverviewEndpoint(table: ITable, storageBucket: IBucket, downloadBucket: IBucket) {
+  /**
+   * Construct a RequestAuthorizer (used by api gateway)
+   * to secure the fromOverview endpoints as a PoC.
+   * @returns
+   */
+  private jwtAuthorizer() {
+    return new RequestAuthorizer(this, 'request-authorizer', {
+      handler: new JwtAuthorizerFunction(this, 'authorizer-function', {
+        environment: {
+          TRUSTED_ISSUER: 'auth-service.sandbox-01.csp-nijmegen.nl',
+        },
+      }),
+      identitySources: [IdentitySource.header('Authorization')],
+    });
+  }
+
+  /**
+   * Generate form overview endpoints
+   * @param table
+   * @param storageBucket
+   * @param downloadBucket
+   * @param formOverviewTable
+   */
+  private addGetFormOverviewEndpoint(table: ITable, storageBucket: IBucket, downloadBucket: IBucket, formOverviewTable: ITable) {
     const formOverviewFunction = new GetFormOverviewFunction(this, 'getFormOverview', {
       environment: {
         TABLE_NAME: table.tableName,
         BUCKET_NAME: storageBucket.bucketName,
         DOWNLOAD_BUCKET_NAME: downloadBucket.bucketName,
+        FORM_OVERVIEW_TABLE_NAME: formOverviewTable.tableName,
       },
       timeout: Duration.minutes(10),
       memorySize: 1024,
     });
+    formOverviewTable.grantReadWriteData(formOverviewFunction);
     table.grantReadData(formOverviewFunction);
     storageBucket.grantRead(formOverviewFunction);
     downloadBucket.grantReadWrite(formOverviewFunction);
@@ -177,10 +225,59 @@ export class Api extends Construct {
     const formOverviewApi = this.api.root.addResource('formoverview');
     formOverviewApi.addMethod('GET', new LambdaIntegration(formOverviewFunction), {
       apiKeyRequired: true,
+      authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.formuliernaam': true,
         'method.request.querystring.startdatum': false,
         'method.request.querystring.einddatum': false,
+      },
+    });
+  }
+
+  /**
+   * Lists the finished form overviews
+   * @param formOverviewTable
+   */
+  private addListFormOverviewsEndpoint(formOverviewTable: ITable) {
+    const listFormOverviewsFunction = new ListFormOverviewsFunction(this, 'listFormOverview', {
+      environment: {
+        FORM_OVERVIEW_TABLE_NAME: formOverviewTable.tableName,
+        USE_GATEWAY_AUTHORIZER: this.authorizer ? 'true' : 'false',
+      },
+      timeout: Duration.minutes(10),
+      memorySize: 1024,
+    });
+    formOverviewTable.grantReadData(listFormOverviewsFunction);
+    const formOverviewApi = this.api.root.addResource('listformoverviews');
+    formOverviewApi.addMethod('GET', new LambdaIntegration(listFormOverviewsFunction), {
+      apiKeyRequired: true,
+      authorizer: this.authorizer,
+      requestParameters: {
+        'method.request.querystring.maxresults': false,
+      },
+    });
+  }
+
+  /**
+   * Download function for form overviews
+   * @param downloadBucket
+   */
+  private addFormOverviewDownloadEndpoint(downloadBucket: IBucket) {
+    const downloadFunction = new DownloadFunction(this, 'form-overview-download', {
+      environment: {
+        BUCKET_NAME: downloadBucket.bucketName,
+      },
+      timeout: Duration.minutes(10),
+      memorySize: 1024,
+    });
+    downloadBucket.grantRead(downloadFunction);
+
+    const downloadEndpoint = this.api.root.addResource('downloadformoverview');
+    downloadEndpoint.addMethod('GET', new LambdaIntegration(downloadFunction), {
+      apiKeyRequired: true,
+      authorizer: this.authorizer,
+      requestParameters: {
+        'method.request.querystring.key': true,
       },
     });
   }

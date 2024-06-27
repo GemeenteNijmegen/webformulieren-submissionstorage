@@ -59,6 +59,8 @@ export abstract class Statics {
   static ssmDownloadBucketName: string = `/${this.projectName}/downloadBucketName`;
   static ssmSubmissionTableArn: string = `/${this.projectName}/submissionTableArn`;
   static ssmSubmissionTableName: string = `/${this.projectName}/submissionTableName`;
+  static ssmFormOverviewTableArn: string = `/${this.projectName}/formOverviewTableArn`;
+  static ssmFormOverviewTableName: string = `/${this.projectName}/formOverviewTableName`;
   static ssmFormIoBaseUrl: string = `/${this.projectName}/formIoBaseUrl`;
 
   static secretFormIoApiKey: string = `/${this.projectName}/FormIoAPIKey`;

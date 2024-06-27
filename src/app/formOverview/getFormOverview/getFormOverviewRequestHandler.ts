@@ -4,22 +4,24 @@ import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-htt
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
-import { Database, DynamoDBDatabase } from '../submission/Database';
-import { S3Storage, Storage } from '../submission/Storage';
+import { Database, DynamoDBDatabase } from '../../submission/Database';
+import { S3Storage, Storage } from '../../submission/Storage';
+import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormOverviewDatabase';
 
 export class FormOverviewRequestHandler {
   private storage: Storage;
   private downloadStorage: Storage;
   private database: Database;
+  private formOverviewDatabase: FormOverviewDatabase;
 
   constructor() {
     const environment = this.getEvironmentVariables();
-    [this.database, this.storage, this.downloadStorage] = this.setup(environment);
+    [this.database, this.storage, this.downloadStorage, this.formOverviewDatabase] = this.setup(environment);
   }
 
   private getEvironmentVariables() {
     if (process.env.TABLE_NAME == undefined) {
-      throw Error('No table NAME provided, retrieving submissions will fail.');
+      throw Error('No submissions table NAME provided, retrieving submissions will fail.');
     }
     if (process.env.BUCKET_NAME == undefined) {
       throw Error('No bucket NAME provided, retrieving submissions will fail.');
@@ -27,18 +29,24 @@ export class FormOverviewRequestHandler {
     if (process.env.DOWNLOAD_BUCKET_NAME == undefined) {
       throw Error('No download bucket NAME provided, storing formOverview will fail.');
     }
+    if (process.env.FORM_OVERVIEW_TABLE_NAME == undefined) {
+      throw Error('No form overview table NAME provided, storing formOverview metadata will fail.');
+    }
     return {
       tableName: process.env.TABLE_NAME,
       bucketName: process.env.BUCKET_NAME,
       downloadBucketName: process.env.DOWNLOAD_BUCKET_NAME,
+      formOverviewTableName: process.env.FORM_OVERVIEW_TABLE_NAME,
     };
   }
 
-  private setup(environment: {tableName: string; bucketName: string; downloadBucketName: string} ): [Database, Storage, Storage] {
+  private setup(environment: {tableName: string; bucketName: string; downloadBucketName: string; formOverviewTableName: string} ):
+  [Database, Storage, Storage, FormOverviewDatabase] {
     const database = new DynamoDBDatabase(environment.tableName);
     const storage = new S3Storage(environment.bucketName);
     const downloadStorage = new S3Storage(environment.downloadBucketName);
-    return [database, storage, downloadStorage];
+    const formOverviewDatabase = new DDBFormOverviewDatabase(environment.formOverviewTableName);
+    return [database, storage, downloadStorage, formOverviewDatabase];
   }
 
   async handleRequest(params:EventParameters): Promise<ApiGatewayV2Response> {
@@ -67,7 +75,7 @@ export class FormOverviewRequestHandler {
     let csvResponse: ApiGatewayV2Response;
     try {
       const csvFile = await this.compileCsvFile(submissionBucketObjects, formParser);
-      const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile);
+      const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile, params);
       csvResponse = this.getCsvResponse(csvFileName);
     } catch {
       throw Error('Cannot retrieve formOverview. Parsing forms to csv or saving csvfile to downloadbucket failed.');
@@ -75,10 +83,19 @@ export class FormOverviewRequestHandler {
     return csvResponse;
   }
 
-  private async saveCsvFile( parsedFormDefinition: FormDefinitionParser, csvFile: string) {
+  private async saveCsvFile( parsedFormDefinition: FormDefinitionParser, csvFile: string, params: EventParameters) {
     const epochTime = new Date().getTime();
     const csvFileName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
     await this.downloadStorage.store(csvFileName, csvFile);
+    console.log('Database');
+    await this.formOverviewDatabase.storeFormOverview({
+      fileName: csvFileName,
+      createdBy: 'default_change_to_api_queryparam',
+      formName: parsedFormDefinition.allMetadata.formName,
+      formTitle: parsedFormDefinition.allMetadata.formTitle,
+      queryStartDate: params.startdatum,
+      queryEndDate: params.einddatum,
+    });
     return csvFileName;
   }
 

@@ -57,6 +57,12 @@ export interface Configuration {
    * Set this boolean to setup DNSSEC
    */
   readonly useDnsSec?: boolean;
+
+  /**
+   * If set, the lambda's will use a lambda authorizer to verify and authorize users.
+   * This authorizer uses tokens provided by our auth service.
+   */
+  readonly useGatewayAuthorizer?: boolean;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -83,6 +89,7 @@ const configurations: { [name: string] : Configuration } = {
     subscribeToTopicArns: [
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
+    useGatewayAuthorizer: true,
   },
   acceptance: {
     branchName: 'acceptance',
@@ -96,6 +103,7 @@ const configurations: { [name: string] : Configuration } = {
     subscribeToTopicArns: [
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
+    useGatewayAuthorizer: false,
   },
   production: {
     branchName: 'main',
@@ -110,5 +118,6 @@ const configurations: { [name: string] : Configuration } = {
       'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
     ],
     useDnsSec: true,
+    useGatewayAuthorizer: false,
   },
 };

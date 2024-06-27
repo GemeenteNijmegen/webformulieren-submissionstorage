@@ -148,7 +148,9 @@
           "**/test/**",
           "**/build-tools/**",
           "src/app/download/download.lambda.ts",
-          "src/app/get-form-overview/getFormOverview.lambda.ts",
+          "src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts",
+          "src/app/formOverview/getFormOverview/getFormOverview.lambda.ts",
+          "src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts",
           "src/app/listSubmissions/listSubmissions.lambda.ts",
           "src/app/submission/submission.lambda.ts",
           "src/migrations/migration-2024-02-06-enrich-table.lambda.ts"

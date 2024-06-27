@@ -59,6 +59,7 @@ beforeAll(() => {
 });
 
 describe('Request Handler', () => {
+
   test('Handler correctly returns', async() => {
     const result = await handler.handleRequest({ userId: '900222670', userType: 'person' });
     expect(result.body).toBe(JSON.stringify(expectedListResults));
