@@ -1,4 +1,3 @@
-import * as jose from 'jose';
 import { ListSubmissionsRequestHandler } from '../ListSubmissionsRequestHandler';
 
 const listResults = [{
@@ -55,22 +54,19 @@ beforeAll(() => {
     ...originalEnv,
     TABLE_NAME: 'mock_table',
     BUCKET_NAME: 'mock_bucket',
-    ISSUER: 'https://example.com',
   };
   handler = new ListSubmissionsRequestHandler();
 });
 
-jest.spyOn(jose, 'jwtVerify').mockResolvedValue({ payload: { sub: '900026236' } } as any);
-
 describe('Request Handler', () => {
 
   test('Handler correctly returns', async() => {
-    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', idToken: 'eyuoirgjweogiejqg' });
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person' });
     expect(result.body).toBe(JSON.stringify(expectedListResults));
   });
 
   test('Handler correctly returns getSubmission', async() => {
-    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey', idToken: 'eyuoirgjweogiejqg' });
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey' });
     expect(result.body).toBe(JSON.stringify(getResult));
   });
 
