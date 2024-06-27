@@ -1,5 +1,3 @@
-import * as jose from 'jose';
-import { getContext } from './ContextFixture';
 import { handler } from '../listSubmissions.lambda';
 
 const personEvent = {
@@ -14,13 +12,12 @@ const personEvent = {
   headers: {
     header1: 'value1',
     header2: 'value1,value2',
-    Authorization: 'Bearer eyuoirgjweogiejqg',
   },
   queryStringParameters: {
     user_id: '900222670',
     user_type: 'person',
   },
-  requestContext: getContext('900222670'),
+  requestContext: {},
   body: 'Hello from Lambda',
   pathParameters: {
     parameter1: 'value1',
@@ -50,7 +47,7 @@ const organisationEvent = {
     user_id: '69599084',
     user_type: 'organisation',
   },
-  requestContext: getContext('900222670'),
+  requestContext: {},
   body: 'Hello from Lambda',
   pathParameters: {
     parameter1: 'value1',
@@ -78,7 +75,7 @@ const invalidEvent = {
   queryStringParameters: {
     user_type: 'organisation',
   },
-  requestContext: getContext('900222670'),
+  requestContext: {},
   body: 'Hello from Lambda',
   pathParameters: {
     parameter1: 'value1',
@@ -114,13 +111,9 @@ beforeAll(() => {
     ...originalEnv,
     TABLE_NAME: 'mock_table',
     BUCKET_NAME: 'mock_bucket',
-    ISSUER: 'https://example.com',
   };
 });
 
-
-jest.spyOn(jose, 'createRemoteJWKSet').mockReturnValue('' as any);
-jest.spyOn(jose, 'jwtVerify').mockResolvedValue({ payload: { sub: '900026236' } } as any);
 
 describe('Handler parsing events', () => {
   test('returns 200 with correct query params for person', async() => {
