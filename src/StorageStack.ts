@@ -30,7 +30,7 @@ export class StorageStack extends Stack {
       objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED,
       lifecycleRules: [
         {
-          expiration: Duration.days(365),
+          expiration: Duration.days(730), //Two Years
         },
       ],
       encryptionKey: key,
