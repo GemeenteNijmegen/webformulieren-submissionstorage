@@ -8,6 +8,8 @@
     "bundle:app/download/download.lambda:watch": "npx projen bundle:app/download/download.lambda:watch",
     "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda": "npx projen bundle:app/formOverview/authorizer/JwtAuthorizer.lambda",
     "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda:watch": "npx projen bundle:app/formOverview/authorizer/JwtAuthorizer.lambda:watch",
+    "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda": "npx projen bundle:app/formOverview/getFormCount/getFormCountExpired.lambda",
+    "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda:watch": "npx projen bundle:app/formOverview/getFormCount/getFormCountExpired.lambda:watch",
     "bundle:app/formOverview/getFormOverview/getFormOverview.lambda": "npx projen bundle:app/formOverview/getFormOverview/getFormOverview.lambda",
     "bundle:app/formOverview/getFormOverview/getFormOverview.lambda:watch": "npx projen bundle:app/formOverview/getFormOverview/getFormOverview.lambda:watch",
     "bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda": "npx projen bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda",

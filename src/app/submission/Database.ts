@@ -1,4 +1,4 @@
-import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand, QueryCommandInput, QueryCommandOutput, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { z } from 'zod';
 import { FormNameIndexQueryBuilder } from './FormNameIndexQueryBuilder';
 import { hashString } from './hash';
@@ -17,9 +17,9 @@ export interface SubmissionData {
  */
 export interface FormNameSubmissionData {
   key: string;
-  dateSubmitted?: string;
-  formName?: string;
-  formTitle?: string;
+  dateSubmitted: string;
+  formName: string;
+  formTitle: string;
 }
 
 
@@ -62,6 +62,7 @@ export interface Database {
   listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false>;
   getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false>;
   getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<FormNameSubmissionData[]|false>;
+  getExpiredForms(date: string): Promise<FormNameSubmissionData[] | false>;
 }
 
 export class DynamoDBDatabase implements Database {
@@ -71,6 +72,39 @@ export class DynamoDBDatabase implements Database {
   constructor(tableName: string, config?: { dynamoDBClient?: DynamoDBClient }) {
     this.table = tableName;
     this.client = config?.dynamoDBClient ?? new DynamoDBClient({});
+  }
+
+  async getExpiredForms(date: string): Promise<FormNameSubmissionData[] | false> {
+    const command = new ScanCommand({
+      FilterExpression: '>= :date',
+      ExpressionAttributeValues: {
+        ':date': { S: date },
+      },
+      TableName: this.table,
+    });
+    console.debug(JSON.stringify(command));
+
+    try {
+      const results = await this.client.send(command);
+      if (results.Items) {
+        const parsedResults = submissionTableItemsSchema.parse(results);
+        console.log(`${parsedResults.Items.length} items found`);
+        const items = parsedResults.Items?.map((item) => {
+          return {
+            key: item?.sk.S ?? '',
+            dateSubmitted: item.dateSubmitted?.S ?? new Date(1970, 0, 0).toISOString(),
+            formName: item.formName?.S ?? 'onbekend',
+            formTitle: item.formTitle?.S ?? 'Onbekende aanvraag',
+          };
+        });
+        return items;
+      }
+
+    } catch (err) {
+      console.error('Error getting data from DynamoDB: ' + err);
+      throw err;
+    }
+    return false;
   }
 
   async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false> {
