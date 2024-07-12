@@ -76,7 +76,7 @@ export class DynamoDBDatabase implements Database {
 
   async getExpiredForms(date: string): Promise<FormNameSubmissionData[] | false> {
     const command = new ScanCommand({
-      FilterExpression: '#dateSubmitted >= :date',
+      FilterExpression: '#dateSubmitted <= :date',
       ExpressionAttributeValues: {
         ':date': { S: date },
       },
