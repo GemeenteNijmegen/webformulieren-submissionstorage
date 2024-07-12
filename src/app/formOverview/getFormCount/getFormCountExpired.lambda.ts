@@ -5,12 +5,13 @@ import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormO
 export async function handler(event: any) {
 
   const environment = getEvironmentVariables();
-  const [database, _downloadStorage, _formOveriewDatabase] = setup(environment);
+  const [database, downloadStorage, formOverviewDatabase] = setup(environment);
 
   const date = new Date();
   date.setMonth(new Date().getMonth()-11);
+  const formsRetrievedBeforeDate = event.date ?? date.toISOString().substring(0, 10); // Date to retrieve forms that are at least 11 months old or the date given by the event
 
-  const items = await database.getExpiredForms(event.date ?? date.toISOString().substring(0, 10));
+  const items = await database.getExpiredForms(formsRetrievedBeforeDate);
 
   const counter: Record <string, number> = {};
 
@@ -26,9 +27,29 @@ export async function handler(event: any) {
     }
   });
 
-  console.log(JSON.stringify(counter));
-}
+  const csvFile = transformToCSV(counter);
+  console.log('CsvContent count expired forms ', formsRetrievedBeforeDate, ' /n ', csvFile);
+  const epochTime = new Date().getTime();
+  const csvFileName = `ExpiringFormsOverview-${formsRetrievedBeforeDate}-${epochTime}.csv`;
+  await downloadStorage.store(csvFileName, csvFile);
+  await formOverviewDatabase.storeFormOverview({
+    fileName: csvFileName,
+    createdBy: 'default_change_to_api_queryparam',
+    formName: `ExpiringFormsOverview-${formsRetrievedBeforeDate}-${epochTime}`,
+    formTitle: `ExpiringFormsOverview ${formsRetrievedBeforeDate}`,
+    queryStartDate: date.toISOString().substring(0, 10) ?? '',
+    queryEndDate: 'onbekend',
+  });
 
+}
+function transformToCSV(countedForms: Record <string, number>): string {
+  let csvContent: string = 'Formuliernaam; Aantal; \n';
+  for (const key in countedForms) {
+    csvContent += `${key}; ${countedForms[key]};\n`;
+  }
+  console.log(`Done processing csv file. Number of processed rows: ${(countedForms.length - 1)}.`);
+  return csvContent;
+}
 function getEvironmentVariables() {
   if (process.env.TABLE_NAME == undefined) {
     throw Error('No submissions table NAME provided, retrieving submissions will fail.');
