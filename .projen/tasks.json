@@ -52,6 +52,9 @@
           "spawn": "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda"
         },
         {
+          "spawn": "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda"
+        },
+        {
           "spawn": "bundle:app/formOverview/getFormOverview/getFormOverview.lambda"
         },
         {
@@ -101,6 +104,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda": {
+      "name": "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda",
+      "description": "Create a JavaScript bundle from src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormCount/getFormCountExpired.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda:watch": {
+      "name": "bundle:app/formOverview/getFormCount/getFormCountExpired.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormCount/getFormCountExpired.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },

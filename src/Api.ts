@@ -11,6 +11,7 @@ import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { DownloadFunction } from './app/download/download-function';
 import { JwtAuthorizerFunction } from './app/formOverview/authorizer/JwtAuthorizer-function';
+import { GetFormCountExpiredFunction } from './app/formOverview/getFormCount/getFormCountExpired-function';
 import { GetFormOverviewFunction } from './app/formOverview/getFormOverview/getFormOverview-function';
 import { ListFormOverviewsFunction } from './app/formOverview/listFormOverviews/listFormOverviews-function';
 import { ListSubmissionsFunction } from './app/listSubmissions/listSubmissions-function';
@@ -62,6 +63,7 @@ export class Api extends Construct {
     this.addDownloadEndpoint(storageBucket);
 
     this.addGetFormOverviewEndpoint(table, storageBucket, downloadBucket, formOverviewTable);
+    this.addGetFormCountExpired(table, downloadBucket, formOverviewTable);
     this.addListFormOverviewsEndpoint(formOverviewTable);
     this.addFormOverviewDownloadEndpoint(downloadBucket);
   }
@@ -197,6 +199,21 @@ export class Api extends Construct {
       }),
       identitySources: [IdentitySource.header('Authorization')],
     });
+  }
+
+  private addGetFormCountExpired(table: ITable, downloadBucket: IBucket, formOverviewTable: ITable) {
+    const formCountExpiredFunction = new GetFormCountExpiredFunction(this, 'getFormCountExpired', {
+      environment: {
+        TABLE_NAME: table.tableName,
+        DOWNLOAD_BUCKET_NAME: downloadBucket.bucketName,
+        FORM_OVERVIEW_TABLE_NAME: formOverviewTable.tableName,
+      },
+      timeout: Duration.minutes(15),
+      memorySize: 2048,
+    });
+    formOverviewTable.grantReadWriteData(formCountExpiredFunction);
+    table.grantReadData(formCountExpiredFunction);
+    downloadBucket.grantReadWrite(formCountExpiredFunction);
   }
 
   /**

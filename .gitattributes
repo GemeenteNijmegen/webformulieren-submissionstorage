@@ -21,6 +21,7 @@
 /package.json linguist-generated
 /src/app/download/download-function.ts linguist-generated
 /src/app/formOverview/authorizer/JwtAuthorizer-function.ts linguist-generated
+/src/app/formOverview/getFormCount/getFormCountExpired-function.ts linguist-generated
 /src/app/formOverview/getFormOverview/getFormOverview-function.ts linguist-generated
 /src/app/formOverview/listFormOverviews/listFormOverviews-function.ts linguist-generated
 /src/app/listSubmissions/listSubmissions-function.ts linguist-generated
