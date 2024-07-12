@@ -1,4 +1,4 @@
-import { Database, GetSubmissionParameters, GetSubmissionsByFormNameParameters, ListSubmissionParameters, SubmissionData, dynamoDBItem } from '../Database';
+import { Database, FormNameSubmissionData, GetSubmissionParameters, GetSubmissionsByFormNameParameters, ListSubmissionParameters, SubmissionData, dynamoDBItem } from '../Database';
 import { hashString } from '../hash';
 
 
@@ -7,6 +7,9 @@ export class MockDatabase implements Database {
 
   constructor(tableName?: string) {
     this.table = tableName;
+  }
+  getExpiredForms(_date: string): Promise<false | FormNameSubmissionData[]> {
+    throw new Error('Method not implemented.');
   }
   async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData> {
     return {
