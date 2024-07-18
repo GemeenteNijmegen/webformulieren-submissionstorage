@@ -46,7 +46,7 @@
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.614.0",
     "@gemeentenijmegen/projen-project-type": "^1.7.2",
-    "@testcontainers/localstack": "^10.10.3",
+    "@testcontainers/localstack": "^10.10.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^18",
     "@types/sns-validator": "^0.3.3",
@@ -62,7 +62,7 @@
     "jest-junit": "^15",
     "projen": "^0.82.8",
     "standard-version": "^9",
-    "testcontainers": "^10.10.3",
+    "testcontainers": "^10.10.4",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
