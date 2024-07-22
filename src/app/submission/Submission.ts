@@ -1,9 +1,9 @@
+import { Storage } from '@gemeentenijmegen/utils';
 import { z } from 'zod';
 import { Database } from './Database';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 import { s3Object } from './s3Object';
-import { Storage } from './Storage';
 import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
 import { dateArrayToDate } from '../../utils/dateArrayToDate';
 

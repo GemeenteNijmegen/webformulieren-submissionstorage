@@ -4,8 +4,7 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 import { ListSubmissionsRequestHandler } from './ListSubmissionsRequestHandler';
 import { parsedEvent, parsedEventWithAuthorizer } from './parsedEvent';
 
-export async function handler(
-  event: APIGatewayProxyEvent): Promise<ApiGatewayV2Response> {
+export async function handler(event: APIGatewayProxyEvent): Promise<ApiGatewayV2Response> {
   try {
     let params;
     if (process.env.USE_GATEWAY_AUTHORIZER == 'true') {

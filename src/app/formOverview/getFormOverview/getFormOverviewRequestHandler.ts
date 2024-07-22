@@ -1,11 +1,11 @@
 
 import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http';
+import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
-import { S3Storage, Storage } from '../../submission/Storage';
 import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormOverviewDatabase';
 
 export class FormOverviewRequestHandler {

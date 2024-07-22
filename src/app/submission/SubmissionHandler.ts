@@ -1,7 +1,6 @@
-import { AWS } from '@gemeentenijmegen/utils';
+import { S3Storage, Storage, AWS } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
-import { S3Storage, Storage } from './Storage';
 import { Submission } from './Submission';
 
 
