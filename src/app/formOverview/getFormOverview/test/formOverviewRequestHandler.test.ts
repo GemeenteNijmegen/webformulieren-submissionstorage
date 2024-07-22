@@ -1,6 +1,6 @@
 import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { S3Storage } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase, SubmissionData } from '../../../submission/Database';
-import { S3Storage } from '../../../submission/Storage';
 import * as formDefinitionMockSportAanmelden from '../formDefinition/test/mockFormDefinitionAanmeldenSport.json';
 import * as mockFormVolwassen01 from '../formParser/test/subm_raw_volwassene_01.json';
 import { FormOverviewRequestHandler } from '../getFormOverviewRequestHandler';
@@ -11,7 +11,7 @@ let mockS3Store = jest.fn().mockResolvedValue(true);
 let mockDBGetSubmissionsByFormName = jest.fn().mockResolvedValue([]);
 let mockDBStoreFormOverview = jest.fn().mockResolvedValue(true);
 
-jest.mock('../../../submission/Storage', () => {
+jest.mock('@gemeentenijmegen/utils', () => {
   return {
     S3Storage: jest.fn(() => {
       return {

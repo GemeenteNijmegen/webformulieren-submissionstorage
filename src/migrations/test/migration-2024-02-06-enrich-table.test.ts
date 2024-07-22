@@ -2,11 +2,11 @@ import * as crypto from 'crypto';
 import { CreateTableCommand, DeleteTableCommand, DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb';
 // import { S3Client } from '@aws-sdk/client-s3';
 // eslint-disable-next-line import/no-extraneous-dependencies
+import { S3Storage } from '@gemeentenijmegen/utils';
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
 import * as formDefinitionSample from './sample-formdefinition.json';
 import * as submissionSampleNoTimestamp from './sample-submission-no-timestamp.json';
 import { DynamoDBDatabase } from '../../app/submission/Database';
-import { S3Storage } from '../../app/submission/Storage';
 import * as snsSample from '../../app/submission/test/samples/sns.sample.json';
 import { describeIntegration } from '../../app/test-utils/describeIntegration';
 import { Migration, handler } from '../migration-2024-02-06-enrich-table.lambda';
@@ -19,7 +19,7 @@ const getObjectMock = (file:any) => ({
   },
 });
 
-jest.mock('../../app/submission/Storage', () => {
+jest.mock('@gemeentenijmegen/utils', () => {
   return {
     S3Storage: jest.fn(() => {
       return {
