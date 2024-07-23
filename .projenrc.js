@@ -1,5 +1,4 @@
 const { GemeenteNijmegenCdkApp } = require('@gemeentenijmegen/projen-project-type');
-const { LambdaRuntime } = require('projen/lib/awscdk');
 const project = new GemeenteNijmegenCdkApp({
   name: 'webformulieren-submissionstorage',
   cdkVersion: '2.1.0',

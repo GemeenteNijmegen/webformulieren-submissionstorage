@@ -1,5 +1,5 @@
+import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
-import { S3Storage, Storage } from '../../submission/Storage';
 import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormOverviewDatabase';
 
 export async function handler(event: any) {
@@ -7,9 +7,10 @@ export async function handler(event: any) {
   const environment = getEvironmentVariables();
   const [database, downloadStorage, formOverviewDatabase] = setup(environment);
 
+  // Retrieve forms that are at least 11 months old or older than the date given by the event
   const date = new Date();
   date.setMonth(new Date().getMonth()-11);
-  const formsRetrievedBeforeDate = event.date ?? date.toISOString().substring(0, 10); // Date to retrieve forms that are at least 11 months old or the date given by the event
+  const formsRetrievedBeforeDate = event.date ?? date.toISOString().substring(0, 'yyyy-mm-dd'.length);
 
   const items = await database.getExpiredForms(formsRetrievedBeforeDate);
 
@@ -37,7 +38,7 @@ export async function handler(event: any) {
     createdBy: 'default_change_to_api_queryparam',
     formName: `ExpiringFormsOverview-${formsRetrievedBeforeDate}-${epochTime}`,
     formTitle: `ExpiringFormsOverview ${formsRetrievedBeforeDate}`,
-    queryStartDate: date.toISOString().substring(0, 10) ?? '',
+    queryStartDate: formsRetrievedBeforeDate,
     queryEndDate: 'onbekend',
   });
 

@@ -1,5 +1,5 @@
+import { S3Storage } from '@gemeentenijmegen/utils';
 import { MockDatabase } from './MockDatabase';
-import { MockStorage } from './MockStorage';
 import * as snsSampleAnonymous from './samples/sns.sample-anonymous.json';
 import * as snsSamplePayment from './samples/sns.sample-payment.json';
 import * as snsSample from './samples/sns.sample.json';
@@ -8,7 +8,7 @@ import { Submission } from '../Submission';
 
 const messages = snsSample.Records.map(record => record.Sns);
 const message = messages.pop();
-const storage = new MockStorage('mockBucket');
+const storage = new S3Storage('mockBucket');
 const formConnector = new MockFormConnector();
 const database = new MockDatabase();
 const submission = new Submission({ storage, formConnector, database });

@@ -1,5 +1,5 @@
 import { AttributeValue, DynamoDBClient, ScanCommand, ScanCommandOutput, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import { S3Storage, Storage } from '../app/submission/Storage';
+import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { dateArrayToDate } from '../utils/dateArrayToDate';
 
 /**

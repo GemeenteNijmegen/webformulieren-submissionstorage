@@ -1,7 +1,7 @@
 import { Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { S3Storage } from '@gemeentenijmegen/utils';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { parsedEvent } from './parsedEvent';
-import { S3Storage } from '../submission/Storage';
 
 if (!process.env.BUCKET_NAME) {
   throw Error('No bucket provided');
