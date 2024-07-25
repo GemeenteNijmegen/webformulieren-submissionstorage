@@ -2,6 +2,8 @@ import { Duration } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPolicy, IdentitySource, RequestAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { ARecord, HostedZone, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets';
@@ -214,6 +216,16 @@ export class Api extends Construct {
     formOverviewTable.grantReadWriteData(formCountExpiredFunction);
     table.grantReadData(formCountExpiredFunction);
     downloadBucket.grantReadWrite(formCountExpiredFunction);
+
+    new Rule(this, 'expired-cronjob', {
+      description: 'Monthly form expiration overview creation',
+      schedule: Schedule.cron({
+        day: '1',
+        hour: '3',
+        minute: '8',
+      }),
+      targets: [new LambdaFunction(formCountExpiredFunction)],
+    });
   }
 
   /**
