@@ -89,7 +89,7 @@ const configurations: { [name: string] : Configuration } = {
     subscribeToTopicArns: [
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
-    useGatewayAuthorizer: true,
+    useGatewayAuthorizer: false,
   },
   acceptance: {
     branchName: 'acceptance',
