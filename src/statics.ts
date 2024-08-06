@@ -64,4 +64,14 @@ export abstract class Statics {
   static ssmFormIoBaseUrl: string = `/${this.projectName}/formIoBaseUrl`;
 
   static secretFormIoApiKey: string = `/${this.projectName}/FormIoAPIKey`;
+
+  // ZGW APIs
+  static readonly ssmZgwApiUrl = '/webform/zgw/api-url';
+  static readonly ssmZgwClientId = '/webform/zgw/client-id';
+  static readonly ssmZgwZaaktype = '/webform/zgw/zaaktype';
+  static readonly ssmZgwZaakstatus = '/webform/zgw/zaakstatus';
+  static readonly ssmZgwClientSecret = '/webform/zgw/client-secret';
+  static readonly ssmZgwDocumentenApiUrl = '/webform/zgw/documenten-api-url';
+  static readonly ssmZgwInformatieObjectType = '/webform/zgw/informatieobjecttype';
+
 }

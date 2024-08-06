@@ -59,20 +59,19 @@ export class SubmissionHandler {
 
     await submission.parse(message);
     await submission.save();
-
-    if (submission.reference) {
-      await this.sendEvent(submission.reference);
-    }
+    await this.sendEvent(submission);
   }
 
-  async sendEvent(reference: string) {
+  async sendEvent(submission: Submission) {
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
           Source: 'Submissionstorage',
           DetailType: 'New Form Processed',
           Detail: JSON.stringify({
-            Reference: reference,
+            Reference: submission.key,
+            UserId: submission.bsn ?? submission.kvk, // Can only be a BSN or KVK?
+            Key: submission.key,
           }),
         },
       ],

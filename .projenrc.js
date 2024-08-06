@@ -10,6 +10,7 @@ const project = new GemeenteNijmegenCdkApp({
     'aws-sdk-client-mock',
     'testcontainers',
     '@testcontainers/localstack',
+    '@types/jsonwebtoken',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
@@ -27,6 +28,8 @@ const project = new GemeenteNijmegenCdkApp({
     'dotenv',
     'cdk-remote-stack',
     'jose', // 🌮
+    'jsonwebtoken',
+    'url-join',
   ],
   jestOptions: {
     jestConfig: {

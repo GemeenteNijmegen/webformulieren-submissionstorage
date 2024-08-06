@@ -26,11 +26,15 @@ export class Submission {
   private formConnector: FormConnector;
   private database: Database;
 
-  public reference?: string;
   public bsn?: string;
   public kvk?: string;
   public pdf?: { bucket: string; key: string };
   public attachments?: s3Object[];
+
+  /**
+   * Unique identifier for the submission.
+   * Filled with reference number in form submission.
+   */
   public key?: string;
 
   constructor(props: SubmissionProps) {
@@ -66,7 +70,6 @@ export class Submission {
     };
     this.key = this.parsedSubmission.reference;
     this.attachments = await this.getAttachments();
-    this.reference = this.parsedSubmission.reference;
   }
 
   /**
