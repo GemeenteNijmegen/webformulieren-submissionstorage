@@ -57,6 +57,7 @@ export class SubmissionZgwForwarder extends Construct {
     });
     bucket.grantWrite(zgwLambda);
     clientsecret.grantRead(zgwLambda);
+    table.grantReadData(zgwLambda);
 
     return zgwLambda;
   }
