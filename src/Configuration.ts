@@ -63,6 +63,12 @@ export interface Configuration {
    * This authorizer uses tokens provided by our auth service.
    */
   readonly useGatewayAuthorizer?: boolean;
+
+  /**
+   * Forward submission to ZGW APIs feature flag
+   * @default false
+   */
+  readonly forwardToZgw?: boolean;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -90,6 +96,7 @@ const configurations: { [name: string] : Configuration } = {
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
     useGatewayAuthorizer: false,
+    forwardToZgw: true,
   },
   acceptance: {
     branchName: 'acceptance',

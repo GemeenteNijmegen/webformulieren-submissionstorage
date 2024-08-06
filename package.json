@@ -18,6 +18,8 @@
     "bundle:app/listSubmissions/listSubmissions.lambda:watch": "npx projen bundle:app/listSubmissions/listSubmissions.lambda:watch",
     "bundle:app/submission/submission.lambda": "npx projen bundle:app/submission/submission.lambda",
     "bundle:app/submission/submission.lambda:watch": "npx projen bundle:app/submission/submission.lambda:watch",
+    "bundle:app/zgw/zgw.lambda": "npx projen bundle:app/zgw/zgw.lambda",
+    "bundle:app/zgw/zgw.lambda:watch": "npx projen bundle:app/zgw/zgw.lambda:watch",
     "bundle:migrations/migration-2024-02-06-enrich-table.lambda": "npx projen bundle:migrations/migration-2024-02-06-enrich-table.lambda",
     "bundle:migrations/migration-2024-02-06-enrich-table.lambda:watch": "npx projen bundle:migrations/migration-2024-02-06-enrich-table.lambda:watch",
     "clobber": "npx projen clobber",
@@ -69,6 +71,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.616.0",
+    "@aws-sdk/client-eventbridge": "^3.623.0",
     "@aws-sdk/client-s3": "^3.616.0",
     "@aws-sdk/s3-request-presigner": "^3.616.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.13",

@@ -1,3 +1,4 @@
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { S3Storage, Storage, AWS } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
@@ -35,6 +36,13 @@ export class SubmissionHandler {
     this.apiKeyPromise = AWS.getSecret(process.env.FORMIO_API_KEY_ARN);
   }
 
+  /**
+   * A number of actions is performed:
+   * - Retrieve form definition and store in S3
+   * - Retrieve attachments and store in S3
+   * - Store submission in DynamoDB
+   * @param message
+   */
   async handleRequest(message: any) {
     const key = await this.apiKeyPromise;
     if (process.env.FORMIO_BASE_URL == undefined) {
@@ -47,10 +55,27 @@ export class SubmissionHandler {
 
     await submission.parse(message);
     await submission.save();
-    //Retrieve form definition and store in S3
 
-    //Retrieve attachments and store in S3
-
-    //Store submission in DynamoDB
+    if (submission.reference) {
+      await this.sendEvent(submission.reference);
+    }
   }
+
+  async sendEvent(reference: string) {
+    const client = new EventBridgeClient();
+    await client.send(new PutEventsCommand({
+      Entries: [
+        {
+          Source: 'Submissionstorage',
+          DetailType: 'New Form Submitted',
+          Detail: JSON.stringify({
+            Reference: reference,
+          }),
+        },
+      ],
+    }));
+  }
+
 }
+
+
