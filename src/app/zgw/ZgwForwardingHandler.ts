@@ -78,7 +78,7 @@ export class ZgwForwarderHandler {
   }
 
   async uploadAttachment(key: string, zaak: string, attachment: string) {
-    const attachmentKey = `${key}/${attachment}`;
+    const attachmentKey = `${key}/attachments/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
     const base64 = await inhoud?.Body?.transformToString('base64');
     return this.zgw.addDocumentToZaak(zaak, attachment, base64 ?? '');
