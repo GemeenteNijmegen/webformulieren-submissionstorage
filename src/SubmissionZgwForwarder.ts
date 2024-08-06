@@ -50,7 +50,7 @@ export class SubmissionZgwForwarder extends Construct {
         ZAAKSTATUS: StringParameter.valueForStringParameter(this, Statics.ssmZgwZaakstatus),
         ZAKEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwZakenApiUrl),
         DOCUMENTEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwDocumentenApiUrl),
-        OBJECTINFORMATIETYPE: StringParameter.valueForStringParameter(this, Statics.ssmZgwInformatieObjectType),
+        INFORMATIEOBJECTTYPE: StringParameter.valueForStringParameter(this, Statics.ssmZgwInformatieObjectType),
         DEBUG: this.props.configuration.debug ? 'true' : 'false',
       },
       timeout: Duration.minutes(5),
