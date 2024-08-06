@@ -6,11 +6,15 @@ import { Submission } from './Submission';
 
 
 export class SubmissionHandler {
+
+  private readonly eventsClient: EventBridgeClient;
+
   private storage!: Storage;
   private database!: DynamoDBDatabase;
   private apiKeyPromise!: Promise<string>;
 
-  constructor() {
+  constructor(eventsClient?: EventBridgeClient) {
+    this.eventsClient = eventsClient ?? new EventBridgeClient();
     this.setup();
     if (!this.storage || !this.apiKeyPromise || !this.database) {
       throw Error('Storage, database or form Connector empty');
@@ -62,8 +66,7 @@ export class SubmissionHandler {
   }
 
   async sendEvent(reference: string) {
-    const client = new EventBridgeClient();
-    await client.send(new PutEventsCommand({
+    await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
           Source: 'Submissionstorage',
