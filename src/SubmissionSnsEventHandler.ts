@@ -74,11 +74,8 @@ export class SubmissionSnsEventHandler extends Construct {
     secret.grantRead(submissionLambda);
     const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
     key.grantDecrypt(submissionLambda);
-    submissionLambda.addToRolePolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['events:PutEvents'],
-      resources: [`arn:aws:events:${Stack.of(this).region}:${Stack.of(this).region}:event-bus/default`],
-    }));
+    const bus = EventBus.fromEventBusName(this, 'defaultbus', 'default');
+    bus.grantPutEventsTo(submissionLambda);
 
     for (const topic of topics) {
       topic.addSubscription(new LambdaSubscription(submissionLambda));

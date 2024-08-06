@@ -67,7 +67,7 @@ export class SubmissionHandler {
       Entries: [
         {
           Source: 'Submissionstorage',
-          DetailType: 'New Form Submitted',
+          DetailType: 'New Form Processed',
           Detail: JSON.stringify({
             Reference: reference,
           }),

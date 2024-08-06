@@ -49,7 +49,7 @@ export class SubmissionZgwForwarder extends Construct {
       description: 'Subscribe to new form events from the submission storage',
       eventPattern: {
         source: ['Submissionstorage'],
-        detailType: ['New Form Submitted'],
+        detailType: ['New Form Processed'],
       },
       targets: [
         new LambdaFunction(this.lambda, {
