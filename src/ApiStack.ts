@@ -27,7 +27,9 @@ export class ApiStack extends Stack {
     });
 
     if (props.configuration.forwardToZgw) {
-      new SubmissionZgwForwarder(this, 'zgw-forwarder', {});
+      new SubmissionZgwForwarder(this, 'zgw-forwarder', {
+        configuration: props.configuration,
+      });
     }
 
     new Api(this, 'api', { subdomain: props.configuration.subdomain, configuration: props.configuration });
