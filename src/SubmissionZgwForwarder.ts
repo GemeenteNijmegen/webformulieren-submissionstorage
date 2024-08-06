@@ -55,7 +55,7 @@ export class SubmissionZgwForwarder extends Construct {
       },
       timeout: Duration.minutes(5),
     });
-    bucket.grantWrite(zgwLambda);
+    bucket.grantRead(zgwLambda);
     clientsecret.grantRead(zgwLambda);
     table.grantReadData(zgwLambda);
 
