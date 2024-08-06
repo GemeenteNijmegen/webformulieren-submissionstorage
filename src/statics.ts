@@ -70,7 +70,7 @@ export abstract class Statics {
   static readonly ssmZgwClientId = '/webform/zgw/client-id';
   static readonly ssmZgwZaaktype = '/webform/zgw/zaaktype';
   static readonly ssmZgwZaakstatus = '/webform/zgw/zaakstatus';
-  static readonly ssmZgwClientSecret = '/webform/zgw/client-secret';
+  static readonly ssmZgwClientSecret = '/webform/zgw/clientsecret';
   static readonly ssmZgwDocumentenApiUrl = '/webform/zgw/documenten-api-url';
   static readonly ssmZgwInformatieObjectType = '/webform/zgw/informatieobjecttype';
 
