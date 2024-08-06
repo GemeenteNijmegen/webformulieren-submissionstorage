@@ -69,6 +69,12 @@ export interface Configuration {
    * @default false
    */
   readonly forwardToZgw?: boolean;
+
+  /**
+   * Enable dubug mode for some lambdas
+   * @default false
+   */
+  readonly debug?: boolean;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -97,6 +103,7 @@ const configurations: { [name: string] : Configuration } = {
     ],
     useGatewayAuthorizer: false,
     forwardToZgw: true,
+    debug: true,
   },
   acceptance: {
     branchName: 'acceptance',

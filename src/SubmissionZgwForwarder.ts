@@ -10,17 +10,19 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { ZgwFunction } from './app/zgw/zgw-function';
+import { Configurable } from './Configuration';
 import { Statics } from './statics';
 
-interface SubmissionZgwForwarderProps {
-}
+interface SubmissionZgwForwarderProps extends Configurable {}
 
 export class SubmissionZgwForwarder extends Construct {
 
   public lambda: Function;
+  private props: SubmissionZgwForwarderProps;
 
-  constructor(scope: Construct, id: string, _props: SubmissionZgwForwarderProps) {
+  constructor(scope: Construct, id: string, props: SubmissionZgwForwarderProps) {
     super(scope, id);
+    this.props = props;
 
     const table = Table.fromTableName(this, 'table', StringParameter.valueForStringParameter(this, Statics.ssmSubmissionTableName));
     const key = Key.fromKeyArn(this, 'key', StringParameter.valueForStringParameter(this, Statics.ssmDataKeyArn));
@@ -49,6 +51,7 @@ export class SubmissionZgwForwarder extends Construct {
         ZAKEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwApiUrl),
         DOCUMENTEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwDocumentenApiUrl),
         OBJECTINFORMATIETYPE: StringParameter.valueForStringParameter(this, Statics.ssmZgwInformatieObjectType),
+        DEBUG: this.props.configuration.debug ? 'true' : 'false',
       },
       timeout: Duration.minutes(5),
     });
