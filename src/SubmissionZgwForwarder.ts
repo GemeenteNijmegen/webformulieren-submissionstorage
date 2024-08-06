@@ -48,7 +48,7 @@ export class SubmissionZgwForwarder extends Construct {
         ZGW_CLIENT_SECRET_ARN: clientsecret.secretArn,
         ZAAKTYPE: StringParameter.valueForStringParameter(this, Statics.ssmZgwZaaktype),
         ZAAKSTATUS: StringParameter.valueForStringParameter(this, Statics.ssmZgwZaakstatus),
-        ZAKEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwApiUrl),
+        ZAKEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwZakenApiUrl),
         DOCUMENTEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmZgwDocumentenApiUrl),
         OBJECTINFORMATIETYPE: StringParameter.valueForStringParameter(this, Statics.ssmZgwInformatieObjectType),
         DEBUG: this.props.configuration.debug ? 'true' : 'false',

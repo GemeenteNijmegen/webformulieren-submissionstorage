@@ -66,7 +66,7 @@ export abstract class Statics {
   static secretFormIoApiKey: string = `/${this.projectName}/FormIoAPIKey`;
 
   // ZGW APIs
-  static readonly ssmZgwApiUrl = '/webform/zgw/api-url';
+  static readonly ssmZgwZakenApiUrl = '/webform/zgw/zaken-api-url';
   static readonly ssmZgwClientId = '/webform/zgw/client-id';
   static readonly ssmZgwZaaktype = '/webform/zgw/zaaktype';
   static readonly ssmZgwZaakstatus = '/webform/zgw/zaakstatus';
