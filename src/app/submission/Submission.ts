@@ -26,6 +26,7 @@ export class Submission {
   private formConnector: FormConnector;
   private database: Database;
 
+  public reference?: string;
   public bsn?: string;
   public kvk?: string;
   public pdf?: { bucket: string; key: string };
@@ -65,6 +66,7 @@ export class Submission {
     };
     this.key = this.parsedSubmission.reference;
     this.attachments = await this.getAttachments();
+    this.reference = this.parsedSubmission.reference;
   }
 
   /**
