@@ -17,6 +17,10 @@
       "type": "build"
     },
     {
+      "name": "@types/jsonwebtoken",
+      "type": "build"
+    },
+    {
       "name": "@types/node",
       "version": "^18",
       "type": "build"
@@ -100,6 +104,10 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-sdk/client-eventbridge",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-sdk/client-s3",
       "type": "runtime"
     },
@@ -151,6 +159,10 @@
     },
     {
       "name": "jose",
+      "type": "runtime"
+    },
+    {
+      "name": "jsonwebtoken",
       "type": "runtime"
     },
     {

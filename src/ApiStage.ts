@@ -3,6 +3,7 @@ import { Aspects, Stage, StageProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { ApiStack } from './ApiStack';
 import { Configurable } from './Configuration';
+import { ParameterStack } from './ParameterStack';
 import { Statics } from './statics';
 import { StorageStack } from './StorageStack';
 import { UsEastStack } from './UsEastStack';
@@ -23,11 +24,14 @@ export class ApiStage extends Stage {
 
     const configuration = props.configuration;
 
-    const storageStack = new StorageStack(this, 'storage', { configuration });
+    const parameters = new ParameterStack(this, 'parameters', { configuration });
 
+    const storageStack = new StorageStack(this, 'storage', { configuration });
 
     const apiStack = new ApiStack(this, 'api', { configuration } );
     apiStack.addDependency(storageStack);
+    apiStack.addDependency(parameters);
+
     if (configuration.subdomain) {
       const usEastStack = new UsEastStack(this, 'us-east', {
         env: { region: 'us-east-1' },

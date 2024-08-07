@@ -63,6 +63,18 @@ export interface Configuration {
    * This authorizer uses tokens provided by our auth service.
    */
   readonly useGatewayAuthorizer?: boolean;
+
+  /**
+   * Forward submission to ZGW APIs feature flag
+   * @default false
+   */
+  readonly forwardToZgw?: boolean;
+
+  /**
+   * Enable dubug mode for some lambdas
+   * @default false
+   */
+  readonly debug?: boolean;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -89,7 +101,9 @@ const configurations: { [name: string] : Configuration } = {
     subscribeToTopicArns: [
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
-    useGatewayAuthorizer: true,
+    useGatewayAuthorizer: false,
+    forwardToZgw: true,
+    debug: true,
   },
   acceptance: {
     branchName: 'acceptance',

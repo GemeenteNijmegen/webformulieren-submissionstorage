@@ -10,6 +10,7 @@ const project = new GemeenteNijmegenCdkApp({
     'aws-sdk-client-mock',
     'testcontainers',
     '@testcontainers/localstack',
+    '@types/jsonwebtoken',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
@@ -20,21 +21,30 @@ const project = new GemeenteNijmegenCdkApp({
     'sns-validator',
     'zod',
     '@aws-sdk/client-s3',
+    '@aws-sdk/client-eventbridge',
     '@aws-sdk/client-dynamodb',
     '@aws-sdk/s3-request-presigner',
     'axios',
     'dotenv',
     'cdk-remote-stack',
     'jose', // 🌮
+    'jsonwebtoken',
   ],
   jestOptions: {
     jestConfig: {
       setupFiles: ['dotenv/config'],
+      roots: ['test', 'src'],
     },
   },
   gitignore: [
     'src/app/submission/test/docker/',
   ],
+  depsUpgradeOptions: {
+    workflowOptions: {
+      branches: ['development'],
+      labels: ['auto-merge'],
+    },
+  },
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // packageName: undefined,  /* The "name" in package.json. */

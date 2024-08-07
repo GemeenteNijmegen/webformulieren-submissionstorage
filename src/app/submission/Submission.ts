@@ -30,6 +30,11 @@ export class Submission {
   public kvk?: string;
   public pdf?: { bucket: string; key: string };
   public attachments?: s3Object[];
+
+  /**
+   * Unique identifier for the submission.
+   * Filled with reference number in form submission.
+   */
   public key?: string;
 
   constructor(props: SubmissionProps) {

@@ -1,5 +1,6 @@
 import { Duration } from 'aws-cdk-lib';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { EventBus } from 'aws-cdk-lib/aws-events';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Function } from 'aws-cdk-lib/aws-lambda';
@@ -74,6 +75,8 @@ export class SubmissionSnsEventHandler extends Construct {
     secret.grantRead(submissionLambda);
     const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
     key.grantDecrypt(submissionLambda);
+    const bus = EventBus.fromEventBusName(this, 'defaultbus', 'default');
+    bus.grantPutEventsTo(submissionLambda);
 
     for (const topic of topics) {
       topic.addSubscription(new LambdaSubscription(submissionLambda));

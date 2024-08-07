@@ -5,6 +5,7 @@ import { Api } from './Api';
 import { Configurable } from './Configuration';
 import { SubmissionSnsEventHandler } from './SubmissionSnsEventHandler';
 import { SubmissionsTopic } from './SubmissionsTopic';
+import { SubmissionZgwForwarder } from './SubmissionZgwForwarder';
 
 interface ApiStackProps extends StackProps, Configurable {};
 /**
@@ -24,6 +25,12 @@ export class ApiStack extends Stack {
     new SubmissionSnsEventHandler(this, 'submissionhandler', {
       topicArns: topicArns,
     });
+
+    if (props.configuration.forwardToZgw) {
+      new SubmissionZgwForwarder(this, 'zgw-forwarder', {
+        configuration: props.configuration,
+      });
+    }
 
     new Api(this, 'api', { subdomain: props.configuration.subdomain, configuration: props.configuration });
   }

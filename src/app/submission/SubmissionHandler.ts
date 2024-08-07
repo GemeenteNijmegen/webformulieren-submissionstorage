@@ -1,3 +1,4 @@
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { S3Storage, Storage, AWS } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
@@ -5,11 +6,15 @@ import { Submission } from './Submission';
 
 
 export class SubmissionHandler {
+
+  private readonly eventsClient: EventBridgeClient;
+
   private storage!: Storage;
   private database!: DynamoDBDatabase;
   private apiKeyPromise!: Promise<string>;
 
-  constructor() {
+  constructor(eventsClient?: EventBridgeClient) {
+    this.eventsClient = eventsClient ?? new EventBridgeClient();
     this.setup();
     if (!this.storage || !this.apiKeyPromise || !this.database) {
       throw Error('Storage, database or form Connector empty');
@@ -35,6 +40,13 @@ export class SubmissionHandler {
     this.apiKeyPromise = AWS.getSecret(process.env.FORMIO_API_KEY_ARN);
   }
 
+  /**
+   * A number of actions is performed:
+   * - Retrieve form definition and store in S3
+   * - Retrieve attachments and store in S3
+   * - Store submission in DynamoDB
+   * @param message
+   */
   async handleRequest(message: any) {
     const key = await this.apiKeyPromise;
     if (process.env.FORMIO_BASE_URL == undefined) {
@@ -47,10 +59,25 @@ export class SubmissionHandler {
 
     await submission.parse(message);
     await submission.save();
-    //Retrieve form definition and store in S3
-
-    //Retrieve attachments and store in S3
-
-    //Store submission in DynamoDB
+    await this.sendEvent(submission);
   }
+
+  async sendEvent(submission: Submission) {
+    await this.eventsClient.send(new PutEventsCommand({
+      Entries: [
+        {
+          Source: 'Submissionstorage',
+          DetailType: 'New Form Processed',
+          Detail: JSON.stringify({
+            Reference: submission.key,
+            UserId: submission.bsn ?? submission.kvk, // Can only be a BSN or KVK?
+            Key: submission.key,
+          }),
+        },
+      ],
+    }));
+  }
+
 }
+
+
