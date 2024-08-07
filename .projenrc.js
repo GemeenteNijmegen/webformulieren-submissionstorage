@@ -39,6 +39,12 @@ const project = new GemeenteNijmegenCdkApp({
   gitignore: [
     'src/app/submission/test/docker/',
   ],
+  depsUpgradeOptions: {
+    workflowOptions: {
+      branches: ['development'],
+      labels: ['auto-merge'],
+    },
+  },
   // deps: [],                /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // packageName: undefined,  /* The "name" in package.json. */
