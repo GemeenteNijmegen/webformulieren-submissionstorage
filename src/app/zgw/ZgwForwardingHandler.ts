@@ -60,6 +60,7 @@ export class ZgwForwarderHandler {
     const zaken = await this.zgw.getZaken(key);
     if (zaken && zaken.count > 0) {
       console.log('Zaak already exits skipping creation of zaak', key);
+      return;
     }
 
     // Create zaak
@@ -72,13 +73,13 @@ export class ZgwForwarderHandler {
 
     // Upload attachments
     await this.uploadAttachment(key, zaak.url, `${key}.pdf`);
-    const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, attachment));
+    const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, 'attachments/' + attachment));
     await Promise.all(uploads);
 
   }
 
   async uploadAttachment(key: string, zaak: string, attachment: string) {
-    const attachmentKey = `${key}/attachments/${attachment}`;
+    const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
     const base64 = await inhoud?.Body?.transformToString('base64');
     return this.zgw.addDocumentToZaak(zaak, attachment, base64 ?? '');
