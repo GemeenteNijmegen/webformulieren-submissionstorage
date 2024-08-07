@@ -170,10 +170,6 @@
       "type": "runtime"
     },
     {
-      "name": "url-join",
-      "type": "runtime"
-    },
-    {
       "name": "zod",
       "type": "runtime"
     }

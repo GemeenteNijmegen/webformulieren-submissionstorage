@@ -29,11 +29,11 @@ const project = new GemeenteNijmegenCdkApp({
     'cdk-remote-stack',
     'jose', // 🌮
     'jsonwebtoken',
-    'url-join',
   ],
   jestOptions: {
     jestConfig: {
       setupFiles: ['dotenv/config'],
+      roots: ['test', 'src'],
     },
   },
   gitignore: [

@@ -468,13 +468,13 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,sns-validator,url-join,zod"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @testcontainers/localstack @types/jest @types/jsonwebtoken @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen standard-version testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-eventbridge @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv jose jsonwebtoken sns-validator url-join zod"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @testcontainers/localstack @types/jest @types/jsonwebtoken @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen standard-version testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-eventbridge @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv jose jsonwebtoken sns-validator zod"
         },
         {
           "exec": "npx projen"

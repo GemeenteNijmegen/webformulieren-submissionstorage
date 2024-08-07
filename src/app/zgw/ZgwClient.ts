@@ -1,6 +1,5 @@
 import { AWS } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
-import urljoin from 'url-join';
 
 interface ZgwClientOptions {
   /**
@@ -60,6 +59,8 @@ export class ZgwClient {
 
   constructor(options: ZgwClientOptions) {
     this.options = options;
+    this.clientId = options.clientId;
+    this.clientSecret = options.clientSecret;
   }
 
   async init() {
@@ -70,8 +71,14 @@ export class ZgwClient {
     this.clientSecret = await AWS.getSecret(process.env.ZGW_CLIENT_SECRET_ARN!);
   }
 
-  async getZaken(identificatie: string) {
-    return this.callZaakApi('GET', `zaken?identificatie=${identificatie}`);
+  async getZaak(identificatie: string) {
+    const zaken = await this.callZaakApi('GET', `zaken?identificatie=${identificatie}`);
+    if (!zaken || zaken.count == 0) {
+      throw Error('Zaak not found');
+    } else if (zaken.count > 1) {
+      throw Error('Multiple zaken found');
+    }
+    return zaken.results[0];
   }
 
   async createZaak(identificatie: string, formulier: string) {
@@ -134,7 +141,7 @@ export class ZgwClient {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
-    const url = urljoin(this.options.zakenApiUrl, path);
+    const url = this.joinUrl(this.options.zakenApiUrl, path);
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(data),
@@ -158,7 +165,7 @@ export class ZgwClient {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
-    const url = urljoin(this.options.documentenApiUrl, path);
+    const url = this.joinUrl(this.options.documentenApiUrl, path);
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(data),
@@ -186,5 +193,10 @@ export class ZgwClient {
   private datestemp() {
     return new Date().toISOString().substring(0, 'yyyy-mm-dd'.length);
   }
+
+  private joinUrl(start: string, ...args: string[]) {
+    return start + '/' + args.map( pathPart => pathPart.replace(/(^\/|\/$)/g, '') ).join('/');
+  }
+
 
 }

@@ -57,7 +57,7 @@ export class ZgwForwarderHandler {
     }
 
     // Handle idempotency
-    const zaken = await this.zgw.getZaken(key);
+    const zaken = await this.zgw.getZaak(key);
     if (zaken && zaken.count > 0) {
       console.log('Zaak already exits skipping creation of zaak', key);
       return;
