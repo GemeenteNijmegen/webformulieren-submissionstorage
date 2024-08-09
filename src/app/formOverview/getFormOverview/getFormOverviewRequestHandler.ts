@@ -62,44 +62,31 @@ export class FormOverviewRequestHandler {
     }
 
     const submissionBucketObjects:GetObjectCommandOutput[] = await this.getSubmissionsFromKeys(submissions);
-
-    if (params.responseformat == 'json') {
-      console.log(`Format Response as json ${params.responseformat}`);
-      try {
-        const {
-          submissionsArray,
-          failedProcessing,
-          headerAndFieldMismatches,
-        } = await this.processSubmissionsToArray(formParser, submissionBucketObjects);
-        console.log(`
-        Done processing submissions. 
-        Number of processed rows: ${(submissionsArray.length - 1)}. 
-        Number of failed submission transformations: ${failedProcessing.length}. 
-        Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
-        Response.json(JSON.stringify(submissionsArray), 200);
-      } catch {
-        throw Error('Cannot retrieve formOverview. Parsing forms to json and returning json failed.');
-      }
-    }
-    return await this.createCSV(submissionBucketObjects, formParser, parsedFormDefinition, params) as Promise<ApiGatewayV2Response>;
+    return this.createResponse(submissionBucketObjects, formParser, parsedFormDefinition, params);
 
   }
 
-  private async createCSV(
+  private async createResponse(
     submissionBucketObjects: GetObjectCommandOutput[],
     formParser: FormParser,
     parsedFormDefinition: FormDefinitionParser,
     params: EventParameters,
   ): Promise<ApiGatewayV2Response> {
-    let csvResponse: ApiGatewayV2Response;
+    let response: ApiGatewayV2Response;
     try {
-      const csvFile = await this.compileCsvFile(submissionBucketObjects, formParser);
-      const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile, params);
-      csvResponse = this.getCsvResponse(csvFileName);
+      const submissionsArray = await this.processSubmissionsToArray(formParser, submissionBucketObjects);
+      if (params.responseformat == 'json') {
+        const convertToJSON = await this.convertToJSON(submissionsArray);
+        response = Response.json(convertToJSON, 200);
+      } else {
+        const csvFile = await this.compileCsvFile(submissionsArray);
+        const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile, params);
+        response = this.getCsvResponse(csvFileName);
+      }
     } catch {
       throw Error('Cannot retrieve formOverview. Parsing forms to csv or saving csvfile to downloadbucket failed.');
     }
-    return csvResponse;
+    return response;
   }
 
   private async saveCsvFile( parsedFormDefinition: FormDefinitionParser, csvFile: string, params: EventParameters) {
@@ -146,24 +133,35 @@ export class FormOverviewRequestHandler {
     return this.storage.getBatch(allKeys);
   }
 
-  async compileCsvFile(bucketObjects: GetObjectCommandOutput[], formParser: FormParser): Promise<string> {
-    var { submissionsArray, failedProcessing, headerAndFieldMismatches } = await this.processSubmissionsToArray(formParser, bucketObjects);
-
+  async compileCsvFile(submissionsArray: string[][]): Promise<string> {
     let csvContent: string = '';
     submissionsArray.forEach(row => {
       csvContent += row.join(';') + '\n';
     });
-    console.log(`
-      Done processing submissions. 
-      Number of processed rows: ${(submissionsArray.length - 1)}. 
-      Number of failed submission transformations: ${failedProcessing.length}. 
-      Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
-
     return csvContent;
   }
+  /**
+   * Convert a string[][] with the first array being the headers to JSON key value pairs
+   * @param data
+   * @returns
+   */
+  async convertToJSON(data: string[][]): Promise<string> {
+    if (data.length === 0) return '[]'; // Handle empty data case
 
+    const [headers, ...rows] = data;
 
-  private async processSubmissionsToArray(formParser: FormParser, bucketObjects: GetObjectCommandOutput[]) {
+    const jsonArray = rows.map(row => {
+      const obj: { [key: string]: string } = {};
+      headers.forEach((header, index) => {
+        obj[header] = row[index];
+      });
+      return obj;
+    });
+
+    return JSON.stringify(jsonArray, null, 2); // Pretty-print JSON with 2 spaces
+  }
+
+  private async processSubmissionsToArray(formParser: FormParser, bucketObjects: GetObjectCommandOutput[]): Promise<string[][]> {
     const submissionsArray = [];
     const headers = formParser.getHeaders();
     submissionsArray.push(headers);
@@ -180,7 +178,13 @@ export class FormOverviewRequestHandler {
         failedProcessing.push(`No form body retrieved from body. Possibly only metadata retrieved with requestId: ${bucketObject.$metadata.requestId}`);
       }
     }
-    return { submissionsArray, failedProcessing, headerAndFieldMismatches };
+    console.log(`
+      Done processing submissions. 
+      Number of processed rows: ${(submissionsArray.length - 1)}. 
+      Number of failed submission transformations: ${failedProcessing.length}. 
+      Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
+
+    return submissionsArray;
   }
 }
 
