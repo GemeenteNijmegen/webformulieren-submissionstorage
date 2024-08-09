@@ -112,7 +112,7 @@ describe('FormNameIndexQueryBuilder with Prefix Filter', () => {
         ':prefix': { S: 'SP1' },
       },
       KeyConditionExpression: '#formName = :name',
-      FilterExpression: '#sk begins_with :prefix',
+      FilterExpression: 'begins_with(#sk, :prefix)',
     });
   });
 
@@ -139,7 +139,7 @@ describe('FormNameIndexQueryBuilder with Prefix Filter', () => {
         ':prefix': { S: 'SP1' },
       },
       KeyConditionExpression: '#formName = :name AND #sortKeyName BETWEEN :endDate AND :startDate',
-      FilterExpression: '#sk begins_with :prefix',
+      FilterExpression: 'begins_with(#sk, :prefix)',
     });
   });
 
@@ -159,7 +159,7 @@ describe('FormNameIndexQueryBuilder with Prefix Filter', () => {
         ':prefix': { S: 'SP1' },
       },
       KeyConditionExpression: '#formName = :name',
-      FilterExpression: '#sk begins_with :prefix',
+      FilterExpression: 'begins_with(#sk, :prefix)',
     });
   });
 

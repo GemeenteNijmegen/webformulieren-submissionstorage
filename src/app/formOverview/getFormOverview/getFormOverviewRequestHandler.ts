@@ -63,20 +63,26 @@ export class FormOverviewRequestHandler {
 
     const submissionBucketObjects:GetObjectCommandOutput[] = await this.getSubmissionsFromKeys(submissions);
 
-    if (params.responseformat === 'json') {
-      const {
-        submissionsArray,
-        failedProcessing,
-        headerAndFieldMismatches,
-      } = await this.processSubmissionsToArray(formParser, submissionBucketObjects);
-      console.log(`
+    if (params.responseformat == 'json') {
+      console.log(`Format Response as json ${params.responseformat}`);
+      try {
+        const {
+          submissionsArray,
+          failedProcessing,
+          headerAndFieldMismatches,
+        } = await this.processSubmissionsToArray(formParser, submissionBucketObjects);
+        console.log(`
         Done processing submissions. 
         Number of processed rows: ${(submissionsArray.length - 1)}. 
         Number of failed submission transformations: ${failedProcessing.length}. 
         Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
-      Response.json(JSON.stringify(submissionsArray), 200);
+        Response.json(JSON.stringify(submissionsArray), 200);
+      } catch {
+        throw Error('Cannot retrieve formOverview. Parsing forms to json and returning json failed.');
+      }
     }
-    return this.createCSV(submissionBucketObjects, formParser, parsedFormDefinition, params);
+    return await this.createCSV(submissionBucketObjects, formParser, parsedFormDefinition, params) as Promise<ApiGatewayV2Response>;
+
   }
 
   private async createCSV(
@@ -84,7 +90,7 @@ export class FormOverviewRequestHandler {
     formParser: FormParser,
     parsedFormDefinition: FormDefinitionParser,
     params: EventParameters,
-  ) {
+  ): Promise<ApiGatewayV2Response> {
     let csvResponse: ApiGatewayV2Response;
     try {
       const csvFile = await this.compileCsvFile(submissionBucketObjects, formParser);

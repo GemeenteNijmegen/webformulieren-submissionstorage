@@ -65,17 +65,17 @@ export class FormNameIndexQueryBuilder {
   }
 
   /**
-   * Adds an optional filter for the `sk` value to start with a given prefix.
-   * The prefix is the appId. For example SP1.
-   *
-   * @param prefix The optional prefix for filtering the `sk` value.
-   * @returns This instance of the query builder for method chaining.
-   */
+ * Adds an optional filter for the `sk` value to start with a given prefix.
+ * The prefix is the appId. For example SP1.
+ *
+ * @param prefix The optional prefix for filtering the `sk` value.
+ * @returns This instance of the query builder for method chaining.
+ */
   withPrefixFilter(prefix?: string): FormNameIndexQueryBuilder {
     if (prefix) {
       this.setExpressionAttributeName('sk', 'sk');
-      this.setExpressionAttributeStringValue('prefix', prefix + ''); // Ensure prefix is a string
-      this.filterExpression += '#sk begins_with :prefix';
+      this.setExpressionAttributeStringValue('prefix', prefix); // Ensure prefix is a string
+      this.filterExpression += 'begins_with(#sk, :prefix)';
     }
     return this;
   }
