@@ -145,8 +145,8 @@ export class FormOverviewRequestHandler {
    * @param data
    * @returns
    */
-  async convertToJSON(data: string[][]): Promise<string> {
-    if (data.length === 0) return '[]'; // Handle empty data case
+  async convertToJSON(data: string[][]): Promise<{[key: string]: string}[]> {
+    if (data.length === 0) return []; // Handle empty data case
 
     const [headers, ...rows] = data;
 
@@ -158,7 +158,7 @@ export class FormOverviewRequestHandler {
       return obj;
     });
 
-    return JSON.stringify(jsonArray);
+    return jsonArray;
   }
 
   private async processSubmissionsToArray(formParser: FormParser, bucketObjects: GetObjectCommandOutput[]): Promise<string[][]> {
