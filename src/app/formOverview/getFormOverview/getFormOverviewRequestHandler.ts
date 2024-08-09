@@ -158,7 +158,7 @@ export class FormOverviewRequestHandler {
       return obj;
     });
 
-    return JSON.stringify(jsonArray, null, 2); // Pretty-print JSON with 2 spaces
+    return JSON.stringify(jsonArray);
   }
 
   private async processSubmissionsToArray(formParser: FormParser, bucketObjects: GetObjectCommandOutput[]): Promise<string[][]> {
