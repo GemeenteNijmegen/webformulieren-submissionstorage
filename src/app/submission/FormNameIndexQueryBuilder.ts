@@ -10,44 +10,45 @@ export class FormNameIndexQueryBuilder {
   private expressionAttributeNames: { [key: string]: string } = {};
   private expressionAttributeValues: { [key: string]: { S: string } } = {};
   private keyConditionExpression: string = '';
+  private filterExpression: string = '';
 
   /**
-     * Constructor to initialize the query builder with the DynamoDB table name.
-     *
-     * @param tableName The name of the DynamoDB table containing form submissions.
-     */
+   * Constructor to initialize the query builder with the DynamoDB table name.
+   *
+   * @param tableName The name of the DynamoDB table containing form submissions.
+   */
   constructor(tableName: string) {
     this.tableName = tableName;
   }
 
-
   private setExpressionAttributeName(attributeName: string, columnName: string): void {
     this.expressionAttributeNames['#' + attributeName] = columnName;
   }
-  private setExpressionAttributStringValue(attributeName: string, attributeValue: string): void {
+
+  private setExpressionAttributeStringValue(attributeName: string, attributeValue: string): void {
     this.expressionAttributeValues[':' + attributeName] = { S: attributeValue };
   }
 
   /**
-     * Adds the `formName` condition to the query.
-     *
-     * @param formName The name of the form to filter submissions by.
-     * @returns This instance of the query builder for method chaining.
-     */
+   * Adds the `formName` condition to the query.
+   *
+   * @param formName The name of the form to filter submissions by.
+   * @returns This instance of the query builder for method chaining.
+   */
   withFormName(formName: string): FormNameIndexQueryBuilder {
     this.setExpressionAttributeName('formName', 'formName');
-    this.setExpressionAttributStringValue('name', formName);
+    this.setExpressionAttributeStringValue('name', formName);
     this.keyConditionExpression += '#formName = :name';
     return this;
   }
 
   /**
-     * Adds optional date filters (startDate and/or endDate) to the query.
-     *
-     * @param startDate The optional start date for filtering submissions (ISO 8601 format).
-     * @param endDate The optional end date for filtering submissions (ISO 8601 format).
-     * @returns This instance of the query builder for method chaining.
-     */
+   * Adds optional date filters (startDate and/or endDate) to the query.
+   *
+   * @param startDate The optional start date for filtering submissions (ISO 8601 format).
+   * @param endDate The optional end date for filtering submissions (ISO 8601 format).
+   * @returns This instance of the query builder for method chaining.
+   */
   withDateRange(startDate?: string, endDate?: string): FormNameIndexQueryBuilder {
     if (startDate || endDate) {
       this.setExpressionAttributeName('sortKeyName', 'dateSubmitted');
@@ -64,17 +65,40 @@ export class FormNameIndexQueryBuilder {
   }
 
   /**
-     * Builds the final DynamoDB query input object based on the specified parameters.
-     *
-     * @returns The query input object containing all necessary parameters for the DynamoDB query.
-     */
+   * Adds an optional filter for the `sk` value to start with a given prefix.
+   * The prefix is the appId. For example SP1.
+   *
+   * @param prefix The optional prefix for filtering the `sk` value.
+   * @returns This instance of the query builder for method chaining.
+   */
+  withPrefixFilter(prefix?: string): FormNameIndexQueryBuilder {
+    if (prefix) {
+      this.setExpressionAttributeName('sk', 'sk');
+      this.setExpressionAttributeStringValue('prefix', prefix + ''); // Ensure prefix is a string
+      this.filterExpression += '#sk begins_with :prefix';
+    }
+    return this;
+  }
+
+  /**
+   * Builds the final DynamoDB query input object based on the specified parameters.
+   *
+   * @returns The query input object containing all necessary parameters for the DynamoDB query.
+   */
   build(): QueryCommandInput {
-    return {
+    const queryInput: QueryCommandInput = {
       TableName: this.tableName,
       IndexName: 'formNameIndex', // Assuming you have a secondary index named formNameIndex
       ExpressionAttributeNames: this.expressionAttributeNames,
       ExpressionAttributeValues: this.expressionAttributeValues,
       KeyConditionExpression: this.keyConditionExpression,
     };
+
+    // Only add FilterExpression if it's defined
+    if (this.filterExpression) {
+      queryInput.FilterExpression = this.filterExpression;
+    }
+
+    return queryInput;
   }
 }

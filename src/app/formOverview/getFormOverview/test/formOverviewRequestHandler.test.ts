@@ -87,7 +87,9 @@ describe('FormOverviewRequestHandler Tests', () => {
           headers: { 'Content-type': 'application/json' },
         } as ApiGatewayV2Response);
         expect(mockS3Store).toHaveBeenCalledWith(expect.stringContaining('aanmeldenSportactiviteit.csv'), expect.stringContaining('een volwassene (18 jaar of ouder);;;;;;;TestVoornaam01'));
-        expect(logSpy).toHaveBeenCalledWith('Done processing csv file. Number of processed rows: 1. Number of failed csv transformations: 0. Number of header and form fields length mismatches:  0.');
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Number of processed rows: 1.'));
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Number of failed submission transformations: 0.'));
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Number of header and form fields length mismatches:  0.'));
         logSpy.mockRestore();
       });
     });
@@ -108,50 +110,6 @@ describe('FormOverviewRequestHandler Tests', () => {
         const formOverviewRequestHandler = new FormOverviewRequestHandler();
         await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).rejects.toThrow({ name: 'error', message: 'Cannot retrieve formOverview. DatabaseResult is false or not the expected array.' });
       });
-    });
-  });
-  describe('setup errors', () => {
-    beforeEach(() => {
-      jest.resetModules();
-    });
-    afterEach(() => {
-      process.env = originalEnv;
-    });
-    test('tablename error', () => {
-      process.env = {
-        ...originalEnv,
-        BUCKET_NAME: 'MockBucketname',
-        DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
-        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
-      };
-      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No submissions table NAME provided, retrieving submissions will fail.' });
-    });
-    test('bucketname error', () => {
-      process.env = {
-        ...originalEnv,
-        TABLE_NAME: 'MockTableName',
-        DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
-        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
-      };
-      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No bucket NAME provided, retrieving submissions will fail.' });
-    });
-    test('downloadbucketname error', () => {
-      process.env = {
-        ...originalEnv,
-        TABLE_NAME: 'MockTableName',
-        BUCKET_NAME: 'MockBucketname',
-        FORM_OVERVIEW_TABLE_NAME: 'MockFormOverviewTableName',
-      };
-      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No download bucket NAME provided, storing formOverview will fail.' });
-    });
-    test('formoverviewtable error', () => {
-      process.env = {
-        ...originalEnv,
-        TABLE_NAME: 'MockTableName',
-        BUCKET_NAME: 'MockBucketname',
-        DOWNLOAD_BUCKET_NAME: 'MockDownloadbucketname',
-      };
-      expect(() => {new FormOverviewRequestHandler();}).toThrow({ name: 'error', message: 'No form overview table NAME provided, storing formOverview metadata will fail.' });
     });
   });
 });

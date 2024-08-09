@@ -5,6 +5,7 @@ import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
+import { getEnvVariables } from '../../../utils/getEnvVariables/getEnvVariables';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormOverviewDatabase';
 
@@ -20,23 +21,13 @@ export class FormOverviewRequestHandler {
   }
 
   private getEvironmentVariables() {
-    if (process.env.TABLE_NAME == undefined) {
-      throw Error('No submissions table NAME provided, retrieving submissions will fail.');
-    }
-    if (process.env.BUCKET_NAME == undefined) {
-      throw Error('No bucket NAME provided, retrieving submissions will fail.');
-    }
-    if (process.env.DOWNLOAD_BUCKET_NAME == undefined) {
-      throw Error('No download bucket NAME provided, storing formOverview will fail.');
-    }
-    if (process.env.FORM_OVERVIEW_TABLE_NAME == undefined) {
-      throw Error('No form overview table NAME provided, storing formOverview metadata will fail.');
-    }
+
+    const env = getEnvVariables(['TABLE_NAME', 'BUCKET_NAME', 'DOWNLOAD_BUCKET_NAME', 'FORM_OVERVIEW_TABLE_NAME'] as const);
     return {
-      tableName: process.env.TABLE_NAME,
-      bucketName: process.env.BUCKET_NAME,
-      downloadBucketName: process.env.DOWNLOAD_BUCKET_NAME,
-      formOverviewTableName: process.env.FORM_OVERVIEW_TABLE_NAME,
+      tableName: env.TABLE_NAME,
+      bucketName: env.BUCKET_NAME,
+      downloadBucketName: env.DOWNLOAD_BUCKET_NAME,
+      formOverviewTableName: env.FORM_OVERVIEW_TABLE_NAME,
     };
   }
 
@@ -72,6 +63,28 @@ export class FormOverviewRequestHandler {
 
     const submissionBucketObjects:GetObjectCommandOutput[] = await this.getSubmissionsFromKeys(submissions);
 
+    if (params.responseformat === 'json') {
+      const {
+        submissionsArray,
+        failedProcessing,
+        headerAndFieldMismatches,
+      } = await this.processSubmissionsToArray(formParser, submissionBucketObjects);
+      console.log(`
+        Done processing submissions. 
+        Number of processed rows: ${(submissionsArray.length - 1)}. 
+        Number of failed submission transformations: ${failedProcessing.length}. 
+        Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
+      Response.json(JSON.stringify(submissionsArray), 200);
+    }
+    return this.createCSV(submissionBucketObjects, formParser, parsedFormDefinition, params);
+  }
+
+  private async createCSV(
+    submissionBucketObjects: GetObjectCommandOutput[],
+    formParser: FormParser,
+    parsedFormDefinition: FormDefinitionParser,
+    params: EventParameters,
+  ) {
     let csvResponse: ApiGatewayV2Response;
     try {
       const csvFile = await this.compileCsvFile(submissionBucketObjects, formParser);
@@ -87,7 +100,6 @@ export class FormOverviewRequestHandler {
     const epochTime = new Date().getTime();
     const csvFileName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
     await this.downloadStorage.store(csvFileName, csvFile);
-    console.log('Database');
     await this.formOverviewDatabase.storeFormOverview({
       fileName: csvFileName,
       createdBy: 'default_change_to_api_queryparam',
@@ -95,6 +107,7 @@ export class FormOverviewRequestHandler {
       formTitle: parsedFormDefinition.allMetadata.formTitle,
       queryStartDate: params.startdatum,
       queryEndDate: params.einddatum,
+      appId: params.appid,
     });
     return csvFileName;
   }
@@ -108,6 +121,7 @@ export class FormOverviewRequestHandler {
       formName: params.formuliernaam,
       startDate: params.startdatum,
       endDate: params.einddatum,
+      appId: params.appid,
     });
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
@@ -127,31 +141,41 @@ export class FormOverviewRequestHandler {
   }
 
   async compileCsvFile(bucketObjects: GetObjectCommandOutput[], formParser: FormParser): Promise<string> {
-    const csvArray = [];
-    const headers = formParser.getHeaders();
-    csvArray.push(headers);
+    var { submissionsArray, failedProcessing, headerAndFieldMismatches } = await this.processSubmissionsToArray(formParser, bucketObjects);
 
-    const failedCsvProcessing = [];
+    let csvContent: string = '';
+    submissionsArray.forEach(row => {
+      csvContent += row.join(';') + '\n';
+    });
+    console.log(`
+      Done processing submissions. 
+      Number of processed rows: ${(submissionsArray.length - 1)}. 
+      Number of failed submission transformations: ${failedProcessing.length}. 
+      Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
+
+    return csvContent;
+  }
+
+
+  private async processSubmissionsToArray(formParser: FormParser, bucketObjects: GetObjectCommandOutput[]) {
+    const submissionsArray = [];
+    const headers = formParser.getHeaders();
+    submissionsArray.push(headers);
+
+    const failedProcessing = [];
     let headerAndFieldMismatches = 0;
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
         const parsedForm = formParser.parseForm(bodyString);
-        if (parsedForm.length !== headers.length) { headerAndFieldMismatches++;}
-        csvArray.push(parsedForm);
+        if (parsedForm.length !== headers.length) { headerAndFieldMismatches++; }
+        submissionsArray.push(parsedForm);
       } else {
-        failedCsvProcessing.push(`No form body retrieved from body. Possibly only metadata retrieved with requestId: ${bucketObject.$metadata.requestId}`);
+        failedProcessing.push(`No form body retrieved from body. Possibly only metadata retrieved with requestId: ${bucketObject.$metadata.requestId}`);
       }
     }
-
-    let csvContent: string = '';
-    csvArray.forEach(row => {
-      csvContent += row.join(';') + '\n';
-    });
-    console.log(`Done processing csv file. Number of processed rows: ${(csvArray.length - 1)}. Number of failed csv transformations: ${failedCsvProcessing.length}. Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
-    return csvContent;
+    return { submissionsArray, failedProcessing, headerAndFieldMismatches };
   }
-
 }
 
 
