@@ -27,12 +27,26 @@ export class ListOverviewsRequestHandler {
   }
 
   async handleRequest(params: EventParameters): Promise<ApiGatewayV2Response> {
-    console.log('Maxresults: ', params.maxresults);
-    const databaseResult = await this.formOverviewDatabase.getFormOverviews();
+    const filterValues: {[key:string]:string}|undefined = this.getFilterValues(params);
+    const databaseResult = await this.formOverviewDatabase.getFormOverviews(filterValues);
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
     //TODO: nog goed naar kijken
     return Response.json(databaseResult, 200);
+  }
+  private getFilterValues(params: EventParameters) :{[key:string]:string}|undefined {
+    // Create a result object to hold the key-value pairs
+    const result: {[key: string]: string} = {};
+    // Check if 'formuliernaam' is present and map it to 'formName'
+    if (params.formuliernaam) {
+      result.formName = params.formuliernaam.toLowerCase();
+    }
+    // Check if 'appid' is present and map it to 'appId'
+    if (params.appid) {
+      result.appId = params.appid.toUpperCase();
+    }
+    // Return undefined if result object is empty
+    return Object.keys(result).length > 0 ? result : undefined;
   }
 }

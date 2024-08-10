@@ -13,7 +13,7 @@ export interface FormOverviewData {
 
 export interface FormOverviewDatabase {
   storeFormOverview(formOverview: any): Promise<boolean>;
-  getFormOverviews(): Promise<FormOverviewData[]>;
+  getFormOverviews(filters: {[key:string]:string} | undefined): Promise<FormOverviewData[]>;
 }
 
 export class DDBFormOverviewDatabase implements FormOverviewDatabase {
@@ -54,7 +54,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
       return false;
     }
   }
-  async getFormOverviews(_filters: {[key:string]:string} | undefined = undefined): Promise<FormOverviewData[]> {
+  async getFormOverviews(filters: {[key:string]:string} | undefined = undefined): Promise<FormOverviewData[]> {
 
     const queryInput: QueryCommandInput = {
       TableName: this.tableName,
@@ -69,13 +69,13 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
 
 
     //Test and if it works move to own method
-    if (_filters) {
+    if (filters) {
       // Dynamically build the FilterExpression and ExpressionAttributeValues
       const filterExpressions: string[] = [];
       const expressionAttributeValues: { [key: string]: any } = {};
 
       // Using a loop to reduce repetition
-      for (const [key, value] of Object.entries(_filters)) {
+      for (const [key, value] of Object.entries(filters)) {
         if (value) {
           const attrName = `:${key}`;
           filterExpressions.push(`${key} = ${attrName}`);
@@ -103,7 +103,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
             formTitle: item.formTitle?.S ?? '',
             queryStartDate: item?.queryStartDate.S ?? '',
             queryEndDate: item?.queryEndDate.S ?? '',
-            appId: item?.queryEndDate.S ?? '',
+            appId: item?.appId.S ?? '',
           } as FormOverviewData;
         });
         return items;

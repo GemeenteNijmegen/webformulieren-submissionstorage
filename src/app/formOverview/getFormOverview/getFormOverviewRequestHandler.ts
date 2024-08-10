@@ -96,11 +96,11 @@ export class FormOverviewRequestHandler {
     await this.formOverviewDatabase.storeFormOverview({
       fileName: csvFileName,
       createdBy: 'default_change_to_api_queryparam',
-      formName: parsedFormDefinition.allMetadata.formName,
+      formName: parsedFormDefinition.allMetadata.formName.toLowerCase(),
       formTitle: parsedFormDefinition.allMetadata.formTitle,
       queryStartDate: params.startdatum,
       queryEndDate: params.einddatum,
-      appId: params.appid,
+      appId: params.appid?.toUpperCase(),
     });
     return csvFileName;
   }
