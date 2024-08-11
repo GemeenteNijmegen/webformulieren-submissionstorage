@@ -101,9 +101,9 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
             createdBy: item?.createdBy.S ?? '',
             formName: item.formName?.S ?? 'onbekende formuliernaam',
             formTitle: item.formTitle?.S ?? '',
-            queryStartDate: item?.queryStartDate.S ?? '',
-            queryEndDate: item?.queryEndDate.S ?? '',
-            appId: item?.appId.S ?? '',
+            queryStartDate: item?.queryStartDate?.S ?? '',
+            queryEndDate: item?.queryEndDate?.S ?? '',
+            appId: item?.appId?.S ?? '',
           } as FormOverviewData;
         });
         return items;
