@@ -5,6 +5,7 @@ import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
+import { getEnvVariables } from '../../../utils/getEnvVariables/getEnvVariables';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormOverviewDatabase';
 
@@ -20,23 +21,13 @@ export class FormOverviewRequestHandler {
   }
 
   private getEvironmentVariables() {
-    if (process.env.TABLE_NAME == undefined) {
-      throw Error('No submissions table NAME provided, retrieving submissions will fail.');
-    }
-    if (process.env.BUCKET_NAME == undefined) {
-      throw Error('No bucket NAME provided, retrieving submissions will fail.');
-    }
-    if (process.env.DOWNLOAD_BUCKET_NAME == undefined) {
-      throw Error('No download bucket NAME provided, storing formOverview will fail.');
-    }
-    if (process.env.FORM_OVERVIEW_TABLE_NAME == undefined) {
-      throw Error('No form overview table NAME provided, storing formOverview metadata will fail.');
-    }
+
+    const env = getEnvVariables(['TABLE_NAME', 'BUCKET_NAME', 'DOWNLOAD_BUCKET_NAME', 'FORM_OVERVIEW_TABLE_NAME'] as const);
     return {
-      tableName: process.env.TABLE_NAME,
-      bucketName: process.env.BUCKET_NAME,
-      downloadBucketName: process.env.DOWNLOAD_BUCKET_NAME,
-      formOverviewTableName: process.env.FORM_OVERVIEW_TABLE_NAME,
+      tableName: env.TABLE_NAME,
+      bucketName: env.BUCKET_NAME,
+      downloadBucketName: env.DOWNLOAD_BUCKET_NAME,
+      formOverviewTableName: env.FORM_OVERVIEW_TABLE_NAME,
     };
   }
 
@@ -71,30 +62,45 @@ export class FormOverviewRequestHandler {
     }
 
     const submissionBucketObjects:GetObjectCommandOutput[] = await this.getSubmissionsFromKeys(submissions);
+    return this.createResponse(submissionBucketObjects, formParser, parsedFormDefinition, params);
 
-    let csvResponse: ApiGatewayV2Response;
+  }
+
+  private async createResponse(
+    submissionBucketObjects: GetObjectCommandOutput[],
+    formParser: FormParser,
+    parsedFormDefinition: FormDefinitionParser,
+    params: EventParameters,
+  ): Promise<ApiGatewayV2Response> {
+    let response: ApiGatewayV2Response;
     try {
-      const csvFile = await this.compileCsvFile(submissionBucketObjects, formParser);
-      const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile, params);
-      csvResponse = this.getCsvResponse(csvFileName);
+      const submissionsArray = await this.processSubmissionsToArray(formParser, submissionBucketObjects);
+      if (params.responseformat == 'json') {
+        const convertToJSON = await this.convertToJSON(submissionsArray);
+        response = Response.json(convertToJSON, 200);
+      } else {
+        const csvFile = await this.compileCsvFile(submissionsArray);
+        const csvFileName = await this.saveCsvFile(parsedFormDefinition, csvFile, params);
+        response = this.getCsvResponse(csvFileName);
+      }
     } catch {
       throw Error('Cannot retrieve formOverview. Parsing forms to csv or saving csvfile to downloadbucket failed.');
     }
-    return csvResponse;
+    return response;
   }
 
   private async saveCsvFile( parsedFormDefinition: FormDefinitionParser, csvFile: string, params: EventParameters) {
     const epochTime = new Date().getTime();
     const csvFileName = `FormOverview-${epochTime}-${parsedFormDefinition.allMetadata.formName}.csv`;
     await this.downloadStorage.store(csvFileName, csvFile);
-    console.log('Database');
     await this.formOverviewDatabase.storeFormOverview({
       fileName: csvFileName,
       createdBy: 'default_change_to_api_queryparam',
-      formName: parsedFormDefinition.allMetadata.formName,
+      formName: parsedFormDefinition.allMetadata.formName.toLowerCase(),
       formTitle: parsedFormDefinition.allMetadata.formTitle,
       queryStartDate: params.startdatum,
       queryEndDate: params.einddatum,
+      appId: params.appid?.toUpperCase(),
     });
     return csvFileName;
   }
@@ -108,12 +114,18 @@ export class FormOverviewRequestHandler {
       formName: params.formuliernaam,
       startDate: params.startdatum,
       endDate: params.einddatum,
+      appId: params.appid,
     });
     if (!databaseResult || !Array.isArray(databaseResult)) {
       throw Error('Cannot retrieve formOverview. DatabaseResult is false or not the expected array.');
     }
     // No results from database should return an empty object to throw a 204
     if (!databaseResult.length) { return { submissions: [], formdefinition: '' };}
+
+    // Sort databaseResult by dateSubmitted in descending order (newest first)
+    databaseResult.sort((a, b) => {
+      return b.dateSubmitted > a.dateSubmitted ? 1 : -1;
+    });
 
     const submissions: string[] = databaseResult.map((dbItem) => {
       return `${dbItem.key}/submission.json`;
@@ -126,32 +138,59 @@ export class FormOverviewRequestHandler {
     return this.storage.getBatch(allKeys);
   }
 
-  async compileCsvFile(bucketObjects: GetObjectCommandOutput[], formParser: FormParser): Promise<string> {
-    const csvArray = [];
-    const headers = formParser.getHeaders();
-    csvArray.push(headers);
+  async compileCsvFile(submissionsArray: string[][]): Promise<string> {
+    let csvContent: string = '';
+    submissionsArray.forEach(row => {
+      csvContent += row.join(';') + '\n';
+    });
+    return csvContent;
+  }
+  /**
+   * Convert a string[][] with the first array being the headers to JSON key value pairs
+   * @param data
+   * @returns
+   */
+  async convertToJSON(data: string[][]): Promise<{[key: string]: string}[]> {
+    if (data.length === 0) return []; // Handle empty data case
 
-    const failedCsvProcessing = [];
+    const [headers, ...rows] = data;
+
+    const jsonArray = rows.map(row => {
+      const obj: { [key: string]: string } = {};
+      headers.forEach((header, index) => {
+        obj[header] = row[index];
+      });
+      return obj;
+    });
+
+    return jsonArray;
+  }
+
+  private async processSubmissionsToArray(formParser: FormParser, bucketObjects: GetObjectCommandOutput[]): Promise<string[][]> {
+    const submissionsArray = [];
+    const headers = formParser.getHeaders();
+    submissionsArray.push(headers);
+
+    const failedProcessing = [];
     let headerAndFieldMismatches = 0;
     for (const bucketObject of bucketObjects) {
       if (bucketObject.Body) {
         const bodyString = await bucketObject.Body.transformToString();
         const parsedForm = formParser.parseForm(bodyString);
-        if (parsedForm.length !== headers.length) { headerAndFieldMismatches++;}
-        csvArray.push(parsedForm);
+        if (parsedForm.length !== headers.length) { headerAndFieldMismatches++; }
+        submissionsArray.push(parsedForm);
       } else {
-        failedCsvProcessing.push(`No form body retrieved from body. Possibly only metadata retrieved with requestId: ${bucketObject.$metadata.requestId}`);
+        failedProcessing.push(`No form body retrieved from body. Possibly only metadata retrieved with requestId: ${bucketObject.$metadata.requestId}`);
       }
     }
+    console.log(`
+      Done processing submissions. 
+      Number of processed rows: ${(submissionsArray.length - 1)}. 
+      Number of failed submission transformations: ${failedProcessing.length}. 
+      Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
 
-    let csvContent: string = '';
-    csvArray.forEach(row => {
-      csvContent += row.join(';') + '\n';
-    });
-    console.log(`Done processing csv file. Number of processed rows: ${(csvArray.length - 1)}. Number of failed csv transformations: ${failedCsvProcessing.length}. Number of header and form fields length mismatches:  ${headerAndFieldMismatches}.`);
-    return csvContent;
+    return submissionsArray;
   }
-
 }
 
 

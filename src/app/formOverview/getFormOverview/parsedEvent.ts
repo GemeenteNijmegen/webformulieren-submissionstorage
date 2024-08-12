@@ -8,6 +8,8 @@ const EventParametersSchema = z.object({
   }),
   startdatum: z.optional(z.string().date('Startdatum moet het formaat JJJJ-MM-DD hebben')),
   einddatum: z.optional(z.string().date('Einddatum moet het formaat JJJJ-MM-DD hebben')),
+  appid: z.optional(z.string()),
+  responseformat: z.optional(z.string()),
 });
 export type EventParameters = z.infer<typeof EventParametersSchema>;
 
@@ -16,6 +18,8 @@ export function parsedEvent(event: APIGatewayProxyEventV2): EventParameters {
     formuliernaam: event.queryStringParameters?.formuliernaam,
     startdatum: event.queryStringParameters?.startdatum,
     einddatum: event.queryStringParameters?.einddatum,
+    appid: event.queryStringParameters?.appid,
+    responseformat: event.queryStringParameters?.responseformat,
   });
   if (params.startdatum && params.einddatum) {
     if (new Date(params.startdatum) < new Date(params.einddatum)) {

@@ -94,3 +94,85 @@ describe('FormNameIndexQueryBuilder', () => {
     });
   });
 });
+
+describe('FormNameIndexQueryBuilder with Prefix Filter', () => {
+  test('should build a query with prefix filter only', () => {
+    const builder = new FormNameIndexQueryBuilder('myTable');
+    const query = builder.withFormName('testForm').withPrefixFilter('SP1').build();
+
+    expect(query).toEqual({
+      TableName: 'myTable',
+      IndexName: 'formNameIndex',
+      ExpressionAttributeNames: {
+        '#formName': 'formName',
+        '#sk': 'sk',
+      },
+      ExpressionAttributeValues: {
+        ':name': { S: 'testForm' },
+        ':prefix': { S: 'SP1' },
+      },
+      KeyConditionExpression: '#formName = :name',
+      FilterExpression: 'begins_with(#sk, :prefix)',
+    });
+  });
+
+  test('should build a query with formName, date range, and prefix filter', () => {
+    const builder = new FormNameIndexQueryBuilder('myTable');
+    const query = builder
+      .withFormName('testForm')
+      .withDateRange('2024-05-28', '2024-05-24')
+      .withPrefixFilter('SP1')
+      .build();
+
+    expect(query).toEqual({
+      TableName: 'myTable',
+      IndexName: 'formNameIndex',
+      ExpressionAttributeNames: {
+        '#formName': 'formName',
+        '#sortKeyName': 'dateSubmitted',
+        '#sk': 'sk',
+      },
+      ExpressionAttributeValues: {
+        ':name': { S: 'testForm' },
+        ':startDate': { S: '2024-05-28' },
+        ':endDate': { S: '2024-05-24' },
+        ':prefix': { S: 'SP1' },
+      },
+      KeyConditionExpression: '#formName = :name AND #sortKeyName BETWEEN :endDate AND :startDate',
+      FilterExpression: 'begins_with(#sk, :prefix)',
+    });
+  });
+
+  test('should build a query with prefix filter and no date range', () => {
+    const builder = new FormNameIndexQueryBuilder('myTable');
+    const query = builder.withFormName('testForm').withPrefixFilter('SP1').build();
+
+    expect(query).toEqual({
+      TableName: 'myTable',
+      IndexName: 'formNameIndex',
+      ExpressionAttributeNames: {
+        '#formName': 'formName',
+        '#sk': 'sk',
+      },
+      ExpressionAttributeValues: {
+        ':name': { S: 'testForm' },
+        ':prefix': { S: 'SP1' },
+      },
+      KeyConditionExpression: '#formName = :name',
+      FilterExpression: 'begins_with(#sk, :prefix)',
+    });
+  });
+
+
+  test.each([
+    undefined,
+    null,
+    '',
+  ])('should build a query with prefix filter and prefix value %p', (prefix) => {
+    const builder = new FormNameIndexQueryBuilder('myTable');
+    const query = builder.withFormName('testForm').withPrefixFilter(prefix as any).build();
+    const expectedQuery = { TableName: 'myTable', IndexName: 'formNameIndex', ExpressionAttributeNames: { '#formName': 'formName' }, ExpressionAttributeValues: { ':name': { S: 'testForm' } }, KeyConditionExpression: '#formName = :name' };
+    expect(query).toEqual(expectedQuery);
+  });
+
+});
