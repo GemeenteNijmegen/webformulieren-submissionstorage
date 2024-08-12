@@ -55,6 +55,7 @@ export interface GetSubmissionsByFormNameParameters {
   formName: string;
   startDate?: string;
   endDate?: string;
+  appId?: string;
 }
 
 export interface Database {
@@ -205,7 +206,11 @@ export class DynamoDBDatabase implements Database {
 
   async getSubmissionsByFormName(parameters: GetSubmissionsByFormNameParameters): Promise<FormNameSubmissionData[] | false> {
     const builder = new FormNameIndexQueryBuilder(this.table);
-    const queryInput: QueryCommandInput = builder.withFormName(parameters.formName).withDateRange(parameters.startDate, parameters.endDate).build();
+    const queryInput: QueryCommandInput =
+    builder.withFormName(parameters.formName)
+      .withDateRange(parameters.startDate, parameters.endDate)
+      .withPrefixFilter(parameters.appId)
+      .build();
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
       if (results.Items) {

@@ -8,11 +8,12 @@ export interface FormOverviewData {
   formTitle?: string;
   queryStartDate?: string;
   queryEndDate?: string;
+  appId?: string;
 }
 
 export interface FormOverviewDatabase {
   storeFormOverview(formOverview: any): Promise<boolean>;
-  getFormOverviews(): Promise<FormOverviewData[]>;
+  getFormOverviews(filters: {[key:string]:string} | undefined): Promise<FormOverviewData[]>;
 }
 
 export class DDBFormOverviewDatabase implements FormOverviewDatabase {
@@ -39,6 +40,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
         formTitle: { S: formOverview.formTitle ?? '' },
         queryStartDate: { S: formOverview.queryStartDate ?? '' },
         queryEndDate: { S: formOverview.queryEndDate ?? '' },
+        appId: { S: formOverview.appId ?? '' },
         ttl: { N: ttl.toString() },
       },
       TableName: this.tableName,
@@ -52,7 +54,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
       return false;
     }
   }
-  async getFormOverviews(): Promise<FormOverviewData[]> {
+  async getFormOverviews(filters: {[key:string]:string} | undefined = undefined): Promise<FormOverviewData[]> {
 
     const queryInput: QueryCommandInput = {
       TableName: this.tableName,
@@ -65,6 +67,29 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
       KeyConditionExpression: '#id = :id',
     };
 
+
+    //Test and if it works move to own method
+    if (filters) {
+      // Dynamically build the FilterExpression and ExpressionAttributeValues
+      const filterExpressions: string[] = [];
+      const expressionAttributeValues: { [key: string]: any } = {};
+
+      // Using a loop to reduce repetition
+      for (const [key, value] of Object.entries(filters)) {
+        if (value) {
+          const attrName = `:${key}`;
+          filterExpressions.push(`${key} = ${attrName}`);
+          expressionAttributeValues[attrName] = { S: value };
+        }
+      }
+
+      if (filterExpressions.length > 0) {
+        queryInput.FilterExpression = filterExpressions.join(' AND ');
+        queryInput.ExpressionAttributeValues = { ...queryInput.ExpressionAttributeValues, ...expressionAttributeValues };
+      }
+    }
+
+
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
       if (results.Items) {
@@ -76,8 +101,9 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
             createdBy: item?.createdBy.S ?? '',
             formName: item.formName?.S ?? 'onbekende formuliernaam',
             formTitle: item.formTitle?.S ?? '',
-            queryStartDate: item?.queryStartDate.S ?? '',
-            queryEndDate: item?.queryEndDate.S ?? '',
+            queryStartDate: item?.queryStartDate?.S ?? '',
+            queryEndDate: item?.queryEndDate?.S ?? '',
+            appId: item?.appId?.S ?? '',
           } as FormOverviewData;
         });
         return items;

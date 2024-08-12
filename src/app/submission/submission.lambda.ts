@@ -1,7 +1,9 @@
+import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { SNSEvent } from 'aws-lambda';
 import { SubmissionHandler } from './SubmissionHandler';
 
-const submissionHandler = new SubmissionHandler();
+const eventsClient = new EventBridgeClient();
+const submissionHandler = new SubmissionHandler(eventsClient);
 
 export async function handler(event: SNSEvent) {
   try {

@@ -1,4 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { S3Client } from '@aws-sdk/client-s3';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { mockClient } from 'aws-sdk-client-mock';
@@ -19,6 +20,7 @@ jest.mock('../FormConnector', () => {
 const secretsMock = mockClient(SecretsManagerClient);
 const dbMock = mockClient(DynamoDBClient);
 const s3Mock = mockClient(S3Client);
+const eventsMock = mockClient(EventBridgeClient);
 
 const messages = snsSample.Records.map(record => record.Sns);
 const message = messages.pop();
@@ -35,6 +37,7 @@ beforeAll(() => {
   });
   dbMock.callsFake(() => {});
   s3Mock.callsFake(() => {});
+  eventsMock.callsFake(() => {});
 });
 
 describe('Submission', () => {

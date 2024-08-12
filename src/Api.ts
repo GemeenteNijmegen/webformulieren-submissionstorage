@@ -259,6 +259,8 @@ export class Api extends Construct {
         'method.request.querystring.formuliernaam': true,
         'method.request.querystring.startdatum': false,
         'method.request.querystring.einddatum': false,
+        'method.request.querystring.appid': false,
+        'method.request.querystring.responseformat': false,
       },
     });
   }
@@ -283,6 +285,8 @@ export class Api extends Construct {
       authorizer: this.authorizer,
       requestParameters: {
         'method.request.querystring.maxresults': false,
+        'method.request.querystring.appid': false,
+        'method.request.querystring.formuliernaam': false,
       },
     });
   }
