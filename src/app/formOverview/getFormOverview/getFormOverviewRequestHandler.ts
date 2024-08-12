@@ -122,6 +122,11 @@ export class FormOverviewRequestHandler {
     // No results from database should return an empty object to throw a 204
     if (!databaseResult.length) { return { submissions: [], formdefinition: '' };}
 
+    // Sort databaseResult by dateSubmitted in descending order (newest first)
+    databaseResult.sort((a, b) => {
+      return b.dateSubmitted > a.dateSubmitted ? 1 : -1;
+    });
+
     const submissions: string[] = databaseResult.map((dbItem) => {
       return `${dbItem.key}/submission.json`;
     });
