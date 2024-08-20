@@ -74,7 +74,7 @@ export class ZgwClient {
   async getZaak(identificatie: string) {
     const zaken = await this.callZaakApi('GET', `zaken?identificatie=${identificatie}`);
     if (!zaken || zaken.count == 0) {
-      throw Error('Zaak not found');
+      throw new ZaakNotFoundError();
     } else if (zaken.count > 1) {
       throw Error('Multiple zaken found');
     }
@@ -195,8 +195,14 @@ export class ZgwClient {
   }
 
   private joinUrl(start: string, ...args: string[]) {
-    return start + '/' + args.map( pathPart => pathPart.replace(/(^\/|\/$)/g, '') ).join('/');
+    if (!start.endsWith('/')) {
+      start = `${start}/`;
+    }
+    return start + args.map( pathPart => pathPart.replace(/(^\/|\/$)/g, '') ).join('/');
   }
 
 
 }
+
+
+export class ZaakNotFoundError extends Error {}

@@ -1,5 +1,5 @@
 import { S3Storage } from '@gemeentenijmegen/utils';
-import { ZgwClient } from './ZgwClient';
+import { ZaakNotFoundError, ZgwClient } from './ZgwClient';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 
 export class ZgwForwarderHandler {
@@ -56,11 +56,16 @@ export class ZgwForwarderHandler {
       throw Error(`Could not find submission ${key}`);
     }
 
-    // Handle idempotency
-    const zaken = await this.zgw.getZaak(key);
-    if (zaken && zaken.count > 0) {
-      console.log('Zaak already exits skipping creation of zaak', key);
-      return;
+    // Handle idempotency by checking if the zaak already exists
+    try {
+      await this.zgw.getZaak(key);
+    } catch (error) {
+      // If zaak not found is thrown that's a good thing we can continue
+      // Otherwise log the error and stop processing
+      if (!(error instanceof ZaakNotFoundError)) {
+        console.error(error);
+        return;
+      }
     }
 
     // Create zaak
