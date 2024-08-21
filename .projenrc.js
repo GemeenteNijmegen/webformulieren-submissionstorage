@@ -8,8 +8,6 @@ const project = new GemeenteNijmegenCdkApp({
     '@aws-sdk/client-secrets-manager',
     '@types/sns-validator',
     'aws-sdk-client-mock',
-    'testcontainers',
-    '@testcontainers/localstack',
     '@types/jsonwebtoken',
   ],
   deps: [
