@@ -1,6 +1,7 @@
-import { S3Storage } from '@gemeentenijmegen/utils';
+import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import { ZaakNotFoundError, ZgwClient } from './ZgwClient';
 import { Database, DynamoDBDatabase } from '../submission/Database';
+import { SubmissionSchema } from '../submission/SubmissionSchema';
 
 export class ZgwForwarderHandler {
 
@@ -26,22 +27,24 @@ export class ZgwForwarderHandler {
     this.storage = new S3Storage(process.env.BUCKET_NAME);
     this.database = new DynamoDBDatabase(process.env.TABLE_NAME);
 
-    if (
-      !process.env.ZAAKTYPE ||
-      !process.env.ZAAKSTATUS ||
-      !process.env.INFORMATIEOBJECTTYPE ||
-      !process.env.ZAKEN_API_URL ||
-      !process.env.DOCUMENTEN_API_URL
-    ) {
-      throw Error('ZGW Client is misconfigured!');
-    }
+    const env = environmentVariables(
+      [
+        'ZAAKTYPE',
+        'ROLTYPE',
+        'ZAAKSTATUS',
+        'INFORMATIEOBJECTTYPE',
+        'ZAKEN_API_URL',
+        'DOCUMENTEN_API_URL',
+      ],
+    );
 
     this.zgw = new ZgwClient({
-      zaaktype: process.env.ZAAKTYPE,
-      zaakstatus: process.env.ZAAKSTATUS,
-      informatieobjecttype: process.env.INFORMATIEOBJECTTYPE,
-      zakenApiUrl: process.env.ZAKEN_API_URL,
-      documentenApiUrl: process.env.DOCUMENTEN_API_URL,
+      zaaktype: env.ZAAKTYPE,
+      zaakstatus: env.ZAAKSTATUS,
+      roltype: env.ROLTYPE,
+      informatieobjecttype: env.INFORMATIEOBJECTTYPE,
+      zakenApiUrl: env.ZAKEN_API_URL,
+      documentenApiUrl: env.DOCUMENTEN_API_URL,
       name: 'Webformulieren',
     });
 
@@ -70,6 +73,12 @@ export class ZgwForwarderHandler {
 
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
+    const parsedSubmission = SubmissionSchema.passthrough().parse(this.submissionData(key));
+
+    //TODO: Handle kvk
+    if (parsedSubmission.bsn) {
+      await this.zgw.addRoleToZaak(zaak.url, new Bsn(submission.userId));
+    }
 
     // Check if the zaak has attachments
     if (!submission.attachments) {
@@ -81,6 +90,15 @@ export class ZgwForwarderHandler {
     const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, 'attachments/' + attachment));
     await Promise.all(uploads);
 
+  }
+
+  async submissionData(key: string) {
+    const jsonFile = await this.storage.get(`${key}/submission.json`);
+    if (jsonFile && jsonFile.Body) {
+      const contents = await jsonFile.Body.transformToString();
+      return JSON.parse(contents);
+    }
+    throw Error('No submission file');
   }
 
   async uploadAttachment(key: string, zaak: string, attachment: string) {

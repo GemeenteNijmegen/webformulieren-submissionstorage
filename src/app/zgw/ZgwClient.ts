@@ -1,4 +1,4 @@
-import { AWS } from '@gemeentenijmegen/utils';
+import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
 
 interface ZgwClientOptions {
@@ -31,6 +31,11 @@ interface ZgwClientOptions {
    * Zaaktype url for the zaak to create
    */
   zaaktype: string;
+
+  /**
+   * Roltype url for the zaak to create for natural persons
+   */
+  roltype: string;
 
   /**
    * Zaakstatus url for the zaak to create
@@ -123,6 +128,19 @@ export class ZgwClient {
       zaak: zaak,
     };
     await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
+  }
+
+  async addRoleToZaak(zaak: string, bsn: Bsn) {
+    const roleRequest = {
+      zaak,
+      betrokkeneType: 'natuurlijk_persoon',
+      roltype: this.options.roltype,
+      roltoelichting: '',
+      betrokkeneIdentificatie: {
+        inpBsn: bsn.bsn,
+      },
+    };
+    await this.callZaakApi('POST', 'rollen', roleRequest);
   }
 
 
