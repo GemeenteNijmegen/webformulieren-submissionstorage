@@ -25,7 +25,6 @@ export class PipelineStack extends Stack {
     const pipeline = this.pipeline(source);
     const apiStage = new ApiStage(this, 'api', { env: this.configuration.deployToEnvironment, configuration: this.configuration });
     pipeline.addStage(apiStage);
-
   }
 
   pipeline(source: pipelines.CodePipelineSource): pipelines.CodePipeline {
@@ -35,7 +34,6 @@ export class PipelineStack extends Stack {
         BRANCH_NAME: this.configuration.branchName,
       },
       commands: [
-        'node -v',
         'yarn install --frozen-lockfile',
         'npx projen build',
         'npx projen synth',
