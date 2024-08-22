@@ -49,6 +49,11 @@ export class ParameterStack extends Stack {
       stringValue: '-',
     });
 
+    new StringParameter(this, 'ssm-zgw-7', {
+      parameterName: Statics.ssmZgwRoltype,
+      stringValue: '-',
+    });
+
     new Secret(this, 'secret-zgw-1', {
       secretName: Statics.ssmZgwClientSecret,
     });
