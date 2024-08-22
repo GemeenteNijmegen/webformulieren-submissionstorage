@@ -55,13 +55,19 @@ export class ZgwForwarderHandler {
 
     // Get submission
     const submission = await this.database.getSubmission({ key, userId });
+    const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
+
     if (!submission) {
       throw Error(`Could not find submission ${key}`);
     }
 
     // Handle idempotency by checking if the zaak already exists
     try {
-      await this.zgw.getZaak(key);
+      const existingZaak = await this.zgw.getZaak(key);
+      if (existingZaak) {
+        console.log('Zaak exists, skipping');
+        return;
+      }
     } catch (error) {
       // If zaak not found is thrown that's a good thing we can continue
       // Otherwise log the error and stop processing
@@ -73,7 +79,6 @@ export class ZgwForwarderHandler {
 
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
-    const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
 
     //TODO: Handle kvk
     if (parsedSubmission.bsn) {
@@ -96,6 +101,7 @@ export class ZgwForwarderHandler {
     const jsonFile = await this.storage.get(`${key}/submission.json`);
     if (jsonFile && jsonFile.Body) {
       const contents = await jsonFile.Body.transformToString();
+      console.debug(contents);
       return JSON.parse(contents);
     }
     throw Error('No submission file');
