@@ -1,4 +1,4 @@
-import { AWS } from '@gemeentenijmegen/utils';
+import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
 
 interface ZgwClientOptions {
@@ -31,6 +31,11 @@ interface ZgwClientOptions {
    * Zaaktype url for the zaak to create
    */
   zaaktype: string;
+
+  /**
+   * Roltype url for the zaak to create for natural persons
+   */
+  roltype: string;
 
   /**
    * Zaakstatus url for the zaak to create
@@ -74,7 +79,7 @@ export class ZgwClient {
   async getZaak(identificatie: string) {
     const zaken = await this.callZaakApi('GET', `zaken?identificatie=${identificatie}`);
     if (!zaken || zaken.count == 0) {
-      throw Error('Zaak not found');
+      throw new ZaakNotFoundError();
     } else if (zaken.count > 1) {
       throw Error('Multiple zaken found');
     }
@@ -123,6 +128,19 @@ export class ZgwClient {
       zaak: zaak,
     };
     await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
+  }
+
+  async addRoleToZaak(zaak: string, bsn: Bsn) {
+    const roleRequest = {
+      zaak,
+      betrokkeneType: 'natuurlijk_persoon',
+      roltype: this.options.roltype,
+      roltoelichting: 'aanvrager',
+      betrokkeneIdentificatie: {
+        inpBsn: bsn.bsn,
+      },
+    };
+    await this.callZaakApi('POST', 'rollen', roleRequest);
   }
 
 
@@ -195,8 +213,14 @@ export class ZgwClient {
   }
 
   private joinUrl(start: string, ...args: string[]) {
-    return start + '/' + args.map( pathPart => pathPart.replace(/(^\/|\/$)/g, '') ).join('/');
+    if (!start.endsWith('/')) {
+      start = `${start}/`;
+    }
+    return start + args.map( pathPart => pathPart.replace(/(^\/|\/$)/g, '') ).join('/');
   }
 
 
 }
+
+
+export class ZaakNotFoundError extends Error {}

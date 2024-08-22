@@ -17,6 +17,7 @@ describe('ZGW Client', () => {
     name: 'Test',
     clientId: 'id',
     clientSecret: 'secret',
+    roltype: 'https://roltype',
   });
 
   test('GET zaak', async () => {
