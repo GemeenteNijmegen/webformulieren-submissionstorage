@@ -73,7 +73,7 @@ export class ZgwForwarderHandler {
 
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
-    const parsedSubmission = SubmissionSchema.passthrough().parse(this.submissionData(key));
+    const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
 
     //TODO: Handle kvk
     if (parsedSubmission.bsn) {
