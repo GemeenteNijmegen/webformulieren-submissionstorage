@@ -135,7 +135,7 @@ export class ZgwClient {
       zaak,
       betrokkeneType: 'natuurlijk_persoon',
       roltype: this.options.roltype,
-      roltoelichting: '',
+      roltoelichting: 'aanvrager',
       betrokkeneIdentificatie: {
         inpBsn: bsn.bsn,
       },
