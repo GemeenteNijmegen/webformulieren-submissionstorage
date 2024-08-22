@@ -103,7 +103,7 @@ export class ZgwForwarderHandler {
       const contents = await jsonFile.Body.transformToString();
       console.debug(contents);
       const message = JSON.parse(contents);
-      return message.Message;
+      return JSON.parse(message.Message);
     }
     throw Error('No submission file');
   }
