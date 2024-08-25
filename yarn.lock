@@ -26,9 +26,9 @@
   integrity sha512-twhuEG+JPOYCYPx/xy5uH2+VUsIEhPTzDY0F1KuB+ocjWWB/KEDiOVL19nHvbPCB6fhWnkykXEMJ4HHcKvjtvg==
 
 "@aws-cdk/cloud-assembly-schema@^36.0.5":
-  version "36.0.14"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-36.0.14.tgz#e16b73ebca95016cca7953466ed119be6340c79a"
-  integrity sha512-8ecWc6vjOXzQjFuzLOX4L28u8ZQn13vNOd6N2cYu26+LuZHoxZAIyyITldLNazxbiqJ1aNSsa++GlvO/wEpGjQ==
+  version "36.0.15"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-36.0.15.tgz#b86fb49a0d45a5f0ec045b1e6d4498df33d7c30d"
+  integrity sha512-hblt0SNCYVeWKqSFi7d+xUaowCnpQWOiJuG2EGoNfj/kdkXnBPsy3gkqudwEafuiv8xJS5jHplLPfEqbdTEnYA==
   dependencies:
     jsonschema "^1.4.1"
     semver "^7.6.3"
@@ -1760,7 +1760,7 @@
   dependencies:
     type-detect "4.0.8"
 
-"@sinonjs/commons@^3.0.0":
+"@sinonjs/commons@^3.0.0", "@sinonjs/commons@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-3.0.1.tgz#1029357e44ca901a615585f6d27738dbc89084cd"
   integrity sha512-K3mCHKQ9sVh8o1C9cxkwxaOmXoAMlDxC1mYyHrjqOWEcBjYr76t96zL2zlj5dUGZ3HSw240X1qgH3Mjf1yJWpQ==
@@ -1775,11 +1775,11 @@
     "@sinonjs/commons" "^3.0.0"
 
 "@sinonjs/fake-timers@^11.2.2":
-  version "11.2.2"
-  resolved "https://registry.yarnpkg.com/@sinonjs/fake-timers/-/fake-timers-11.2.2.tgz#50063cc3574f4a27bd8453180a04171c85cc9699"
-  integrity sha512-G2piCSxQ7oWOxwGSAyFHfPIsyeJGXYtc6mFbnFA+kRXkiEnTl8c/8jul2S329iFBnDI9HGoeWWAZvuvOkZccgw==
+  version "11.3.1"
+  resolved "https://registry.yarnpkg.com/@sinonjs/fake-timers/-/fake-timers-11.3.1.tgz#51d6e8d83ca261ff02c0ab0e68e9db23d5cd5999"
+  integrity sha512-EVJO7nW5M/F5Tur0Rf2z/QoMo+1Ia963RiMtapiQrEWvY0iBUvADo8Beegwjpnle5BHkyHuoxSTW3jF43H1XRA==
   dependencies:
-    "@sinonjs/commons" "^3.0.0"
+    "@sinonjs/commons" "^3.0.1"
 
 "@sinonjs/samsam@^8.0.0":
   version "8.0.0"
@@ -2285,12 +2285,12 @@
     "@smithy/types" "^3.3.0"
     tslib "^2.6.2"
 
-"@testcontainers/localstack@^10.11.0":
-  version "10.11.0"
-  resolved "https://registry.yarnpkg.com/@testcontainers/localstack/-/localstack-10.11.0.tgz#629d13f17e2cf877d24cdb28501641710879b847"
-  integrity sha512-hmqzZutIOmgB/ytHtdCTJGITASBDsNKy5/+OcpvOiFh87D+fRPzuY5dK4H4x2WNqsdEAsiWk7+9BgQhnH33W8Q==
+"@testcontainers/localstack@^10.12.0":
+  version "10.12.0"
+  resolved "https://registry.yarnpkg.com/@testcontainers/localstack/-/localstack-10.12.0.tgz#501e336695d3a1bf90bc2f6f0a46edb1bb6c8781"
+  integrity sha512-rVSqAG/emAHiDMtiogmHMsna5So4pgtXzSOC3qf4jS1CgbfKp7Ng9AC/wlN/h3HGHghUjTtUONKdsuUT9J7KAQ==
   dependencies:
-    testcontainers "^10.11.0"
+    testcontainers "^10.12.0"
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.11"
@@ -6882,10 +6882,10 @@ test-exclude@^6.0.0:
     glob "^7.1.4"
     minimatch "^3.0.4"
 
-testcontainers@^10.11.0:
-  version "10.11.0"
-  resolved "https://registry.yarnpkg.com/testcontainers/-/testcontainers-10.11.0.tgz#53fb19b2922ae02374df384077e27c3e5b5f4850"
-  integrity sha512-TYgpR+MjZSuX7kSUxTa0f/CsN6eErbMFrAFumW08IvOnU8b+EoRzpzEu7mF0d29M1ItnHfHPUP44HYiE4yP3Zg==
+testcontainers@^10.12.0:
+  version "10.12.0"
+  resolved "https://registry.yarnpkg.com/testcontainers/-/testcontainers-10.12.0.tgz#493f70796df929b8f5440b78fdfef50de5f1afd0"
+  integrity sha512-KEtFj7VvfZPZuyugYJe5aYC/frFN2LRHwQVOVbdZf1vYYGDa4VQt6d0/bM3PcgTE1BOAY6cWBD/S41yu4JQ1Kg==
   dependencies:
     "@balena/dockerignore" "^1.0.2"
     "@types/dockerode" "^3.3.29"
