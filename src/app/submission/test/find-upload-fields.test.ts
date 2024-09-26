@@ -1,5 +1,5 @@
-import * as snsSample from './samples/sns.sample.json';
 import { getSubObjectsWithKey } from '../getSubObjectsWithKey';
+import * as snsSample from './samples/sns.sample.json';
 const messages = snsSample.Records.map(record => record.Sns);
 const message = JSON.parse(messages.pop()!.Message);
 

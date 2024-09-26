@@ -1,10 +1,10 @@
 import { S3Storage } from '@gemeentenijmegen/utils';
 import { MockDatabase } from './MockDatabase';
+import { MockFormConnector } from '../FormConnector';
+import { Submission } from '../Submission';
 import * as snsSampleAnonymous from './samples/sns.sample-anonymous.json';
 import * as snsSamplePayment from './samples/sns.sample-payment.json';
 import * as snsSample from './samples/sns.sample.json';
-import { MockFormConnector } from '../FormConnector';
-import { Submission } from '../Submission';
 
 const messages = snsSample.Records.map(record => record.Sns);
 const message = messages.pop();
