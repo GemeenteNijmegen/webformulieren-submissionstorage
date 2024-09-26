@@ -3,8 +3,8 @@ import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import { S3Client } from '@aws-sdk/client-s3';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { mockClient } from 'aws-sdk-client-mock';
-import * as snsSample from './samples/sns.sample.json';
 import { SubmissionHandler } from '../SubmissionHandler';
+import * as snsSample from './samples/sns.sample.json';
 
 let mockDefinition = jest.fn().mockResolvedValue({ title: 'testTitel', name: 'testName' });
 jest.mock('../FormConnector', () => {
