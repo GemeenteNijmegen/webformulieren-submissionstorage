@@ -141,6 +141,7 @@ export class ZgwClient {
       },
       contactpersoonRol: {
         emailadres: email,
+        naam: email,
       },
     };
     await this.callZaakApi('POST', 'rollen', roleRequest);
