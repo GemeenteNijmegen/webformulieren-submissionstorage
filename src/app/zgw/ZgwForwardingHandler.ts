@@ -93,8 +93,10 @@ export class ZgwForwarderHandler {
 
     if (parsedSubmission.bsn) {
       await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, name);
-    } else if (parsedSubmission.kvk) {
+    } else if (parsedSubmission.kvknummer) {
       await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email, name);
+    } else {
+      console.warn('No BSN or KVK found so a rol will not be created.');
     }
 
     // Check if the zaak has attachments
