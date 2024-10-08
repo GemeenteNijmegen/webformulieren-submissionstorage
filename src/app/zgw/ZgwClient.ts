@@ -150,7 +150,7 @@ export class ZgwClient {
       roltype: this.options.roltype,
       roltoelichting: 'aanvrager',
       betrokkeneIdentificatie: {
-        anpIdentificatie: kvk,
+        annIdentificatie: kvk,
       },
     };
     await this.callZaakApi('POST', 'rollen', roleRequest);

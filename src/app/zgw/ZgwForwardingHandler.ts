@@ -86,7 +86,6 @@ export class ZgwForwarderHandler {
       await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId);
     }
 
-
     // Check if the zaak has attachments
     if (!submission.attachments) {
       throw Error('No attachments found');
