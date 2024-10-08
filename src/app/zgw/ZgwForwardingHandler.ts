@@ -62,6 +62,15 @@ export class ZgwForwarderHandler {
       throw Error(`Could not find submission ${key}`);
     }
 
+    // Collect information for creating the role
+    const email = SubmissionUtils.findEmail(submission);
+    if (!email) {
+      if (process.env.DEBUG==='true') {
+        console.debug('Submission', submission);
+      }
+      console.log('No contact information found in submission. Notifications cannot be send.');
+    }
+
     // Handle idempotency by checking if the zaak already exists
     try {
       const existingZaak = await this.zgw.getZaak(key);
@@ -80,13 +89,6 @@ export class ZgwForwarderHandler {
 
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
-
-
-    // Collect information for creating the role
-    const email = SubmissionUtils.findEmail(submission);
-    if (!email) {
-      console.log('No contact information found in submission. Notifications cannot be send.');
-    }
 
     if (parsedSubmission.bsn) {
       await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email);
