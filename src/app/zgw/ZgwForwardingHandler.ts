@@ -57,6 +57,9 @@ export class ZgwForwarderHandler {
     // Get submission
     const submission = await this.database.getSubmission({ key, userId });
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
+    if (process.env.DEBUG==='true') {
+      console.debug('Submission', parsedSubmission);
+    }
 
     if (!submission) {
       throw Error(`Could not find submission ${key}`);
@@ -64,10 +67,8 @@ export class ZgwForwarderHandler {
 
     // Collect information for creating the role
     const email = SubmissionUtils.findEmail(parsedSubmission);
-    if (!email) {
-      if (process.env.DEBUG==='true') {
-        console.debug('Submission', parsedSubmission);
-      }
+    const name = parsedSubmission.data.naamIngelogdeGebruiker;
+    if (!email && !name) {
       console.log('No contact information found in submission. Notifications cannot be send.');
     }
 
@@ -91,9 +92,9 @@ export class ZgwForwarderHandler {
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
 
     if (parsedSubmission.bsn) {
-      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email);
+      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, name);
     } else if (parsedSubmission.kvk) {
-      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email);
+      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email, name);
     }
 
     // Check if the zaak has attachments

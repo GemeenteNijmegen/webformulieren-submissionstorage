@@ -130,7 +130,7 @@ export class ZgwClient {
     await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
   }
 
-  async addBsnRoleToZaak(zaak: string, bsn: Bsn, email: string) {
+  async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, name?: string) {
     const roleRequest = {
       zaak,
       betrokkeneType: 'natuurlijk_persoon',
@@ -139,15 +139,20 @@ export class ZgwClient {
       betrokkeneIdentificatie: {
         inpBsn: bsn.bsn,
       },
-      contactpersoonRol: {
-        emailadres: email,
-        naam: email,
-      },
     };
-    await this.callZaakApi('POST', 'rollen', roleRequest);
+
+    const contactpersoonRol = email && name ? {
+      emailadres: email,
+      naam: name,
+    } : undefined;
+
+    await this.callZaakApi('POST', 'rollen', {
+      ...roleRequest,
+      contactpersoonRol,
+    });
   }
 
-  async addKvkRoleToZaak(zaak: string, kvk: string, email: string) {
+  async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, name?: string) {
     const roleRequest = {
       zaak,
       betrokkeneType: 'niet_natuurlijk_persoon',
@@ -156,12 +161,17 @@ export class ZgwClient {
       betrokkeneIdentificatie: {
         annIdentificatie: kvk,
       },
-      contactpersoonRol: {
-        emailadres: email,
-        naam: email,
-      },
     };
-    await this.callZaakApi('POST', 'rollen', roleRequest);
+
+    const contactpersoonRol = email && name ? {
+      emailadres: email,
+      naam: name,
+    } : undefined;
+
+    await this.callZaakApi('POST', 'rollen', {
+      ...roleRequest,
+      contactpersoonRol,
+    });
   }
 
 
