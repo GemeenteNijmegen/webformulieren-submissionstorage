@@ -80,10 +80,12 @@ export class ZgwForwarderHandler {
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
 
-    //TODO: Handle kvk
     if (parsedSubmission.bsn) {
-      await this.zgw.addRoleToZaak(zaak.url, new Bsn(submission.userId));
+      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId));
+    } else if (parsedSubmission.kvk) {
+      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId);
     }
+
 
     // Check if the zaak has attachments
     if (!submission.attachments) {
