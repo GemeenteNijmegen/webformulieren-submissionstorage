@@ -63,10 +63,10 @@ export class ZgwForwarderHandler {
     }
 
     // Collect information for creating the role
-    const email = SubmissionUtils.findEmail(submission);
+    const email = SubmissionUtils.findEmail(parsedSubmission);
     if (!email) {
       if (process.env.DEBUG==='true') {
-        console.debug('Submission', submission);
+        console.debug('Submission', parsedSubmission);
       }
       console.log('No contact information found in submission. Notifications cannot be send.');
     }
