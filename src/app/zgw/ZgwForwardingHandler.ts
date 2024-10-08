@@ -1,4 +1,5 @@
 import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
+import { SubmissionUtils } from './SubmissionUtils';
 import { ZaakNotFoundError, ZgwClient } from './ZgwClient';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 import { SubmissionSchema } from '../submission/SubmissionSchema';
@@ -80,10 +81,17 @@ export class ZgwForwarderHandler {
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
 
+
+    // Collect information for creating the role
+    const email = SubmissionUtils.findEmail(submission);
+    if (!email) {
+      console.log('No contact information found in submission. Notifications cannot be send.');
+    }
+
     if (parsedSubmission.bsn) {
-      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId));
+      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email);
     } else if (parsedSubmission.kvk) {
-      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId);
+      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email);
     }
 
     // Check if the zaak has attachments
