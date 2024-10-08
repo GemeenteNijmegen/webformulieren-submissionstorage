@@ -21,7 +21,7 @@ export const SubmissionSchema = z.object({
     bucketName: z.string(),
   }),
   bsn: z.string().optional(),
-  kvk: z.string().optional(),
+  kvknummer: z.string().optional(),
   metadata: z.object({
     timestamp: z.array(z.number()),
   }).passthrough(),

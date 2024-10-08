@@ -63,6 +63,10 @@ export class SubmissionHandler {
   }
 
   async sendEvent(submission: Submission) {
+    if (!submission.bsn && !submission.kvk) {
+      console.warn('Cannot send this to event to the zgw forwarder as there is no BSN or KVK number.');
+      return;
+    }
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
