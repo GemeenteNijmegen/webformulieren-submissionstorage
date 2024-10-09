@@ -49,4 +49,20 @@ export class SubmissionUtils {
 
     return undefined;
   }
+
+
+  static findKanaalvoorkeur(submission: any) {
+    const kanaalvoorkeur = SubmissionUtils.findField(submission, [
+      'hoeWiltUOpDeHoogteGehoudenWorden',
+    ]);
+    if (!kanaalvoorkeur) {
+      return undefined;
+    } else if ( ['SMS', 'sms'].includes(kanaalvoorkeur)) {
+      return 'sms';
+    } else if ( ['E-mail', 'e-mail', 'email', 'EMAIL'].includes(kanaalvoorkeur)) {
+      return 'email';
+    }
+    return undefined;
+  }
+
 }

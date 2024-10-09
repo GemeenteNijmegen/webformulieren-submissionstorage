@@ -110,6 +110,12 @@ export class ZgwClient {
     return zaak;
   }
 
+  async addZaakEigenschap(zaak: string, eigenschap: string, waarde: string) {
+    const addEigenschap = { zaak, eigenschap, waarde };
+    const response = await this.callZaakApi('POST', zaak + '/zaakeigenschappen', addEigenschap);
+    return response;
+  }
+
   async addDocumentToZaak(zaak: string, documentName: string, documentBase64: string) {
     const documentRequest = {
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
@@ -188,11 +194,15 @@ export class ZgwClient {
     return token;
   }
 
-  private async callZaakApi(method: string, path: string, data?: any) {
+  private async callZaakApi(method: string, pathOrUrl: string, data?: any) {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
-    const url = this.joinUrl(this.options.zakenApiUrl, path);
+    let url = pathOrUrl;
+    if (!pathOrUrl.startsWith('https://')) {
+      url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
+    }
+
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(data),

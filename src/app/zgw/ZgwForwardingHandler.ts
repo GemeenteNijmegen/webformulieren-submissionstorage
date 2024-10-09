@@ -111,6 +111,14 @@ export class ZgwForwarderHandler {
     const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, 'attachments/' + attachment));
     await Promise.all(uploads);
 
+    // Check for voorkeurskanaal eigenschap and store it
+    if (process.env.KANAALVOORKEUR_EIGENSCHAP) {
+      const voorkeur = SubmissionUtils.findKanaalvoorkeur(parsedSubmission);
+      if (voorkeur) {
+        await this.zgw.addZaakEigenschap(zaak.url, process.env.KANAALVOORKEUR_EIGENSCHAP, voorkeur);
+      }
+    }
+
   }
 
   async submissionData(key: string) {
