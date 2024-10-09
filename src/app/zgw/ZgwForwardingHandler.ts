@@ -67,8 +67,10 @@ export class ZgwForwarderHandler {
 
     // Collect information for creating the role
     const email = SubmissionUtils.findEmail(parsedSubmission);
+    const telefoon = SubmissionUtils.findTelefoon(parsedSubmission);
     const name = parsedSubmission.data.naamIngelogdeGebruiker;
-    if (!email && !name) {
+    const hasContactDetails = !!email || !!telefoon;
+    if (!hasContactDetails || !name) {
       console.log('No contact information found in submission. Notifications cannot be send.');
     }
 
@@ -92,9 +94,9 @@ export class ZgwForwarderHandler {
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
 
     if (parsedSubmission.bsn) {
-      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, name);
+      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, telefoon, name);
     } else if (parsedSubmission.kvknummer) {
-      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email, name);
+      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email, telefoon, name);
     } else {
       console.warn('No BSN or KVK found so a rol will not be created.');
     }

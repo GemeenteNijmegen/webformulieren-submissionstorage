@@ -9,6 +9,14 @@ export class SubmissionUtils {
     return this.findField(submission, options);
   }
 
+  static findTelefoon(submission: any) {
+    const options = [
+      'telefoonnummer',
+      'telefoon',
+    ];
+    return this.findField(submission, options);
+  }
+
   static findField(submission: any, fields: string[]) {
     for (const field of fields) {
       const email = SubmissionUtils.findValueByKey(submission, field);
