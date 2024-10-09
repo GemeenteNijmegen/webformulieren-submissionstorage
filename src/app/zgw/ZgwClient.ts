@@ -94,8 +94,8 @@ export class ZgwClient {
       zaaktype: this.options.zaaktype,
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       startdatum: this.datestemp(),
-      omschrijving: `Webformulier ${identificatie}`,
-      toelichting: `Webformulier ${formulier}`,
+      omschrijving: formulier,
+      toelichting: `Formulier: "${formulier}" met kenmerk ${identificatie}.`,
     };
     const zaak = await this.callZaakApi('POST', 'zaken', zaakRequest);
 
