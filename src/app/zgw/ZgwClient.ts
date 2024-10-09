@@ -131,44 +131,44 @@ export class ZgwClient {
   }
 
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
-    const roleRequest = {
-      zaak,
-      betrokkeneType: 'natuurlijk_persoon',
-      roltype: this.options.roltype,
-      roltoelichting: 'aanvrager',
-      betrokkeneIdentificatie: {
-        inpBsn: bsn.bsn,
-      },
+    const betrokkeneIdentificatie = {
+      inpBsn: bsn.bsn,
     };
-
-    const contactpersoonRol = email && name ? {
-      emailadres: email,
-      telefoonnummer: telefoon,
-      naam: name,
-    } : undefined;
-
-    await this.callZaakApi('POST', 'rollen', {
-      ...roleRequest,
-      contactpersoonRol,
-    });
+    return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
+  }
+  async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
+    const betrokkeneIdentificatie = {
+      annIdentificatie: kvk,
+    };
+    return this.addRoleToZaak(zaak, 'niet_natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
   }
 
-  async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
+  private async addRoleToZaak(
+    zaak: string,
+    betrokkeneType: string,
+    betrokkeneIdentificatie: any,
+    email?: string,
+    telefoon?: string,
+    name?: string,
+  ) {
     const roleRequest = {
       zaak,
-      betrokkeneType: 'niet_natuurlijk_persoon',
+      betrokkeneType: betrokkeneType,
       roltype: this.options.roltype,
       roltoelichting: 'aanvrager',
-      betrokkeneIdentificatie: {
-        annIdentificatie: kvk,
-      },
+      betrokkeneIdentificatie,
     };
 
-    const contactpersoonRol = email && name ? {
+    // Construct the contactpersoonRol object.
+    // When no name is provided keep it undefined as this is a required field.
+    let contactpersoonRol: any = {
       emailadres: email,
       telefoonnummer: telefoon,
       naam: name,
-    } : undefined;
+    };
+    if (!name) {
+      contactpersoonRol = undefined;
+    }
 
     await this.callZaakApi('POST', 'rollen', {
       ...roleRequest,
