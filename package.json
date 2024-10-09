@@ -46,7 +46,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.666.0",
+    "@aws-sdk/client-secrets-manager": "^3.667.0",
     "@gemeentenijmegen/projen-project-type": "^1.8.1",
     "@types/jest": "^29.5.13",
     "@types/jsonwebtoken": "^9.0.7",
@@ -66,13 +66,13 @@
     "projen": "^0.88.1",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.666.0",
-    "@aws-sdk/client-eventbridge": "^3.666.0",
-    "@aws-sdk/client-s3": "^3.666.0",
-    "@aws-sdk/s3-request-presigner": "^3.666.0",
+    "@aws-sdk/client-dynamodb": "^3.667.0",
+    "@aws-sdk/client-eventbridge": "^3.667.0",
+    "@aws-sdk/client-s3": "^3.667.0",
+    "@aws-sdk/s3-request-presigner": "^3.667.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.16",
     "@gemeentenijmegen/aws-constructs": "^0.0.22",
     "@gemeentenijmegen/dnssec-record": "^0.0.21",
