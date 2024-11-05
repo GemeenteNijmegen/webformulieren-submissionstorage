@@ -66,10 +66,6 @@ export class SubmissionHandler {
     //TODO: bsn of kvk eruit, dit moet apart gecontroleerd worden in de generieke ZGW forwarder (zodat rxmission het zelf kan bepalen)
     //TODO: in Detail ook apart appId toevoegen en misschien zelfs formuliernaam als de appID niet. Formuliernaam zou niet nodig moeten zijn als de APPID's uniek genoeg zijn.
 
-    if (!submission.bsn && !submission.kvk) {
-      console.warn('Cannot send this to event to the zgw forwarder as there is no BSN or KVK number.');
-      return;
-    }
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
