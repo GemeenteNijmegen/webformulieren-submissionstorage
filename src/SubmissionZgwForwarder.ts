@@ -36,6 +36,9 @@ export class SubmissionZgwForwarder extends Construct {
     this.addEventSubscription();
   }
 
+
+  // TODO: eerst aparte lambda RxMission en dan samenvoegen
+
   private submissionHandlerLambda(bucket: IBucket, table: ITable) {
     const clientsecret = Secret.fromSecretNameV2(this, 'client-secret', Statics.ssmZgwClientSecret);
 
@@ -62,6 +65,9 @@ export class SubmissionZgwForwarder extends Construct {
 
     return zgwLambda;
   }
+
+
+  //TODO: nieuwe subscription toevoegen die voor rxmission op appID filtert. De bestaande hieronder mag lekker algemeen blijven.
 
   private addEventSubscription() {
     return new Rule(this, 'rule', {
