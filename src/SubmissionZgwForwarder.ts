@@ -9,7 +9,7 @@ import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
-import { ZgwFunction } from './app/zgw/zgw-function';
+import { ZgwFunction } from './app/zgw/zgwForwardingHandler/zgw-function';
 import { Configurable } from './Configuration';
 import { Statics } from './statics';
 
