@@ -10,6 +10,7 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { RxmissionZgwFunction } from './app/zgw/rxMissionZgwHandler/rxmission-zgw-function';
+import { getAppIdsByBranchName } from './app/zgw/rxMissionZgwHandler/RxMissionZgwConfiguration';
 import { ZgwFunction } from './app/zgw/zgwForwardingHandler/zgw-function';
 import { Configurable } from './Configuration';
 import { Statics } from './statics';
@@ -126,14 +127,17 @@ export class SubmissionZgwForwarder extends Construct {
   // https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-pattern-operators.html
 
   private addRxMissionEventSubscription(rxMissionZgwLambda: Function) {
-    //const filterAppIds: string[] = getAppIdsByBranchName(this.props.configuration.branchName);
+    const filterAppIds: string[] = getAppIdsByBranchName(this.props.configuration.branchName);
+    console.log('filterappIds', filterAppIds);
     return new Rule(this, 'rxm-rule', {
       description: 'Subscribe to new form events from the submission storage',
       eventPattern: {
         source: ['Submissionstorage'],
         detailType: ['New Form Processed'],
         detail: {
-          Reference: ['TDL'],
+          Reference: filterAppIds.map((appId) => ({
+            prefix: appId,
+          })),
         },
       },
       targets: [
