@@ -127,17 +127,14 @@ export class SubmissionZgwForwarder extends Construct {
   // https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-pattern-operators.html
 
   private addRxMissionEventSubscription(rxMissionZgwLambda: Function) {
-    const filterAppIds: string[] = getAppIdsByBranchName(this.props.configuration.branchName);
-    console.log('filterappIds', filterAppIds);
+    //const filterAppIds: string[] = getAppIdsByBranchName(this.props.configuration.branchName);
     return new Rule(this, 'rxm-rule', {
       description: 'Subscribe to new form events from the submission storage',
       eventPattern: {
         source: ['Submissionstorage'],
         detailType: ['New Form Processed'],
         detail: {
-          Reference: filterAppIds.map((appId) => ({
-            prefix: appId,
-          })),
+          Reference: ['TDL'],
         },
       },
       targets: [
