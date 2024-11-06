@@ -128,17 +128,16 @@ export class SubmissionZgwForwarder extends Construct {
 
   private addRxMissionEventSubscription(rxMissionZgwLambda: Function) {
     const filterAppIds: string[] = getAppIdsByBranchName(this.props.configuration.branchName);
+    console.log('filterappIds', filterAppIds);
     return new Rule(this, 'rxm-rule', {
       description: 'Subscribe to new form events from the submission storage',
       eventPattern: {
         source: ['Submissionstorage'],
         detailType: ['New Form Processed'],
         detail: {
-          Reference: [
-            {
-              prefix: filterAppIds,
-            },
-          ],
+          Reference: filterAppIds.map((appId) => ({
+            prefix: appId,
+          })),
         },
       },
       targets: [
