@@ -13,6 +13,7 @@ export class ParameterStack extends Stack {
     super(scope, id, props);
 
     this.zgwParameters();
+    this.rxMissionZgwParameters();
 
   }
 
@@ -58,6 +59,47 @@ export class ParameterStack extends Stack {
       secretName: Statics.ssmZgwClientSecret,
     });
 
+  }
+  private rxMissionZgwParameters() {
+
+    new StringParameter(this, 'ssm-rxmission-zgw-1', {
+      parameterName: Statics.ssmRxMissionZgwZakenApiUrl,
+      stringValue: '-',
+    });
+
+    new StringParameter(this, 'ssm-rxmission-zgw-2', {
+      parameterName: Statics.ssmRxMissionZgwDocumentenApiUrl,
+      stringValue: '-',
+    });
+
+    new StringParameter(this, 'ssm-rxmission-zgw-3', {
+      parameterName: Statics.ssmRxMissionZgwZaaktype,
+      stringValue: '-',
+    });
+
+    new StringParameter(this, 'ssm-rxmission-zgw-4', {
+      parameterName: Statics.ssmRxMissionZgwZaakstatus,
+      stringValue: '-',
+    });
+
+    new StringParameter(this, 'ssm-rxmission-zgw-5', {
+      parameterName: Statics.ssmRxMissionZgwInformatieObjectType,
+      stringValue: '-',
+    });
+
+    new StringParameter(this, 'ssm-rxmission-zgw-6', {
+      parameterName: Statics.ssmRxMissionZgwClientId,
+      stringValue: '-',
+    });
+
+    new StringParameter(this, 'ssm-rxmission-zgw-7', {
+      parameterName: Statics.ssmRxMissionZgwRoltype,
+      stringValue: '-',
+    });
+
+    new Secret(this, 'secret-rxmission-zgw-1', {
+      secretName: Statics.ssmRxMissionZgwClientSecret,
+    });
   }
 
 }

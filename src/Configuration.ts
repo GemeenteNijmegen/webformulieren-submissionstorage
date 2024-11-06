@@ -71,6 +71,13 @@ export interface Configuration {
   readonly forwardToZgw?: boolean;
 
   /**
+   * RxMission application zgw forwarding of submissions enabled
+   * Feature flag
+   * Additional specific RxMission Configuration in rxMissionZgwHandler
+   */
+  readonly enableRxMissionZwgHandler?: boolean;
+
+  /**
    * Enable dubug mode for some lambdas
    * @default false
    */
@@ -103,6 +110,7 @@ const configurations: { [name: string] : Configuration } = {
     ],
     useGatewayAuthorizer: false,
     forwardToZgw: true,
+    enableRxMissionZwgHandler: true,
     debug: true,
   },
   acceptance: {
@@ -118,6 +126,7 @@ const configurations: { [name: string] : Configuration } = {
       'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
     ],
     useGatewayAuthorizer: false,
+    enableRxMissionZwgHandler: false,
   },
   production: {
     branchName: 'main',
@@ -133,5 +142,6 @@ const configurations: { [name: string] : Configuration } = {
     ],
     useDnsSec: true,
     useGatewayAuthorizer: false,
+    enableRxMissionZwgHandler: false,
   },
 };

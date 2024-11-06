@@ -86,6 +86,8 @@ export class ZgwClient {
     return zaken.results[0];
   }
 
+  // Optioneel zaaktype toevoegen
+  // Andere velden optioneel maken en duidelijke interfaces maken
   async createZaak(identificatie: string, formulier: string) {
 
     const zaakRequest = {

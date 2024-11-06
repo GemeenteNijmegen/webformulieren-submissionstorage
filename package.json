@@ -18,6 +18,8 @@
     "bundle:app/listSubmissions/listSubmissions.lambda:watch": "npx projen bundle:app/listSubmissions/listSubmissions.lambda:watch",
     "bundle:app/submission/submission.lambda": "npx projen bundle:app/submission/submission.lambda",
     "bundle:app/submission/submission.lambda:watch": "npx projen bundle:app/submission/submission.lambda:watch",
+    "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda": "npx projen bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda",
+    "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda:watch": "npx projen bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda:watch",
     "bundle:app/zgw/zgwForwardingHandler/zgw.lambda": "npx projen bundle:app/zgw/zgwForwardingHandler/zgw.lambda",
     "bundle:app/zgw/zgwForwardingHandler/zgw.lambda:watch": "npx projen bundle:app/zgw/zgwForwardingHandler/zgw.lambda:watch",
     "bundle:migrations/migration-2024-02-06-enrich-table.lambda": "npx projen bundle:migrations/migration-2024-02-06-enrich-table.lambda",
