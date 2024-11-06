@@ -136,9 +136,7 @@ export class SubmissionZgwForwarder extends Construct {
         detail: {
           Reference: [
             {
-              prefix: {
-                'equals-ignore-case': filterAppIds,
-              },
+              prefix: filterAppIds,
             },
           ],
         },
@@ -148,8 +146,4 @@ export class SubmissionZgwForwarder extends Construct {
       ],
     });
   }
-  getFilterAppIds() {
-
-  }
-
 }
