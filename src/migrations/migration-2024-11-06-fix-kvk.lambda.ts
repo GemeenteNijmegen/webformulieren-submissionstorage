@@ -10,7 +10,12 @@ import { hashString } from '../app/submission/hash';
  *
  * We then store
  * - userType field: Which type of user (person, organisation or anonymous)
- * - userId (overwrite existing) formatted like 'PERSON#hashedBSN' or 'ORG#hashedKVK' or 'ANONYMOUS'
+ * - pk formatted like 'PERSON#hashedBSN' or 'ORG#hashedKVK' or 'ANONYMOUS'
+ *
+ * We create new records, updating PK is not supported in dynamoDB. To ensure idempotency, we add a migrated-flag to
+ * each processed entry, AFTER we create the new record.
+ *
+ * TODO: After this migration, the store and retrieve functionality will need to be modified to use the new PK format.
  *
  * All items in the table are processed, by performing a [scan operation](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html):
  * - Get a batch of results
@@ -18,12 +23,7 @@ import { hashString } from '../app/submission/hash';
  * - update the items (batch update)
  * - retrieve the next set (using the previous operations `LastEvaluatedKey` as the `ExclusiveStartKey`)
  *
- * Filter the scan on one of the attributes we will add, to make this operation idempotent and to be able to update items added during the scan
  *
- * TODO:
- * POSSIBLE FAILURE MODES:
- * - Scan returning too many items for the rest of the lambda to process (too many S3 objects, too high memory use). This would be annoying, since it would stall and never complete on retry.
- *   Possible solution: Put items to be updated on a queue, process one by one / in batches. Overkill?
  */
 
 export async function handler(event: any) {
