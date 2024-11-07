@@ -156,7 +156,8 @@
           "src/app/submission/submission.lambda.ts",
           "src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
           "src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
-          "src/migrations/migration-2024-02-06-enrich-table.lambda.ts"
+          "src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
+          "src/migrations/migration-2024-11-06-fix-kvk.lambda.ts"
         ],
         "optionalDependencies": false,
         "peerDependencies": true
