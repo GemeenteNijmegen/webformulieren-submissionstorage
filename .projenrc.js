@@ -8,8 +8,8 @@ const project = new GemeenteNijmegenCdkApp({
     '@aws-sdk/client-secrets-manager',
     '@types/sns-validator',
     'aws-sdk-client-mock',
-    // 'testcontainers',
-    // '@testcontainers/localstack',  creates issues with modules and builds in this version 10.13.1 wrap ansi errors
+    'testcontainers',
+    '@testcontainers/localstack',
     '@types/jsonwebtoken',
   ],
   deps: [

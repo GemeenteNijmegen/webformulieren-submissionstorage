@@ -7,6 +7,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { Configurable } from './Configuration';
 import { Migration20240206EnrichTableFunction } from './migrations/migration-2024-02-06-enrich-table-function';
+import { Migration20241106FixKvkFunction } from './migrations/migration-2024-11-06-fix-kvk-function';
 import { Statics } from './statics';
 
 interface StorageStackProps extends StackProps, Configurable {};
@@ -105,6 +106,16 @@ export class StorageStack extends Stack {
     });
     table.grantReadWriteData(migration);
     bucket.grantRead(migration);
+
+    const migration20241106 = new Migration20241106FixKvkFunction(this, 'migration-20241106', {
+      environment: {
+        TABLE_NAME: table.tableName,
+        BUCKET_NAME: bucket.bucketName,
+      },
+      memorySize: 2048,
+    });
+    table.grantReadWriteData(migration20241106);
+    bucket.grantRead(migration20241106);
   }
 
   private key() {
