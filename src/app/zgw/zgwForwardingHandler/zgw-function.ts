@@ -10,16 +10,16 @@ export interface ZgwFunctionProps extends lambda.FunctionOptions {
 }
 
 /**
- * An AWS Lambda function which executes src/app/zgw/zgw.
+ * An AWS Lambda function which executes src/app/zgw/zgwForwardingHandler/zgw.
  */
 export class ZgwFunction extends lambda.Function {
   constructor(scope: Construct, id: string, props?: ZgwFunctionProps) {
     super(scope, id, {
-      description: 'src/app/zgw/zgw.lambda.ts',
+      description: 'src/app/zgw/zgwForwardingHandler/zgw.lambda.ts',
       ...props,
       runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS),
       handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../../assets/app/zgw/zgw.lambda')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../../../assets/app/zgw/zgwForwardingHandler/zgw.lambda')),
     });
     this.addEnvironment('AWS_NODEJS_CONNECTION_REUSE_ENABLED', '1', { removeInEdge: true });
   }

@@ -86,6 +86,8 @@ export class ZgwClient {
     return zaken.results[0];
   }
 
+  // Optioneel zaaktype toevoegen
+  // Andere velden optioneel maken en duidelijke interfaces maken
   async createZaak(identificatie: string, formulier: string) {
 
     const zaakRequest = {
@@ -94,8 +96,8 @@ export class ZgwClient {
       zaaktype: this.options.zaaktype,
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       startdatum: this.datestemp(),
-      omschrijving: `Webformulier ${identificatie}`,
-      toelichting: `Webformulier ${formulier}`,
+      omschrijving: formulier,
+      toelichting: `Formulier: "${formulier}" met kenmerk ${identificatie}.`,
     };
     const zaak = await this.callZaakApi('POST', 'zaken', zaakRequest);
 
@@ -108,6 +110,12 @@ export class ZgwClient {
     await this.callZaakApi('POST', 'statussen', statusRequest);
 
     return zaak;
+  }
+
+  async addZaakEigenschap(zaak: string, eigenschap: string, waarde: string) {
+    const addEigenschap = { zaak, eigenschap, waarde };
+    const response = await this.callZaakApi('POST', zaak + '/zaakeigenschappen', addEigenschap);
+    return response;
   }
 
   async addDocumentToZaak(zaak: string, documentName: string, documentBase64: string) {
@@ -130,17 +138,50 @@ export class ZgwClient {
     await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
   }
 
-  async addRoleToZaak(zaak: string, bsn: Bsn) {
+  async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
+    const betrokkeneIdentificatie = {
+      inpBsn: bsn.bsn,
+    };
+    return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
+  }
+  async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
+    const betrokkeneIdentificatie = {
+      annIdentificatie: kvk,
+    };
+    return this.addRoleToZaak(zaak, 'niet_natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
+  }
+
+  private async addRoleToZaak(
+    zaak: string,
+    betrokkeneType: string,
+    betrokkeneIdentificatie: any,
+    email?: string,
+    telefoon?: string,
+    name?: string,
+  ) {
     const roleRequest = {
       zaak,
-      betrokkeneType: 'natuurlijk_persoon',
+      betrokkeneType: betrokkeneType,
       roltype: this.options.roltype,
       roltoelichting: 'aanvrager',
-      betrokkeneIdentificatie: {
-        inpBsn: bsn.bsn,
-      },
+      betrokkeneIdentificatie,
     };
-    await this.callZaakApi('POST', 'rollen', roleRequest);
+
+    // Construct the contactpersoonRol object.
+    // When no name is provided keep it undefined as this is a required field.
+    let contactpersoonRol: any = {
+      emailadres: email,
+      telefoonnummer: telefoon,
+      naam: name,
+    };
+    if (!name) {
+      contactpersoonRol = undefined;
+    }
+
+    await this.callZaakApi('POST', 'rollen', {
+      ...roleRequest,
+      contactpersoonRol,
+    });
   }
 
 
@@ -155,11 +196,15 @@ export class ZgwClient {
     return token;
   }
 
-  private async callZaakApi(method: string, path: string, data?: any) {
+  private async callZaakApi(method: string, pathOrUrl: string, data?: any) {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
-    const url = this.joinUrl(this.options.zakenApiUrl, path);
+    let url = pathOrUrl;
+    if (!pathOrUrl.startsWith('https://')) {
+      url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
+    }
+
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(data),

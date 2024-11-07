@@ -26,7 +26,12 @@ export class ApiStack extends Stack {
       topicArns: topicArns,
     });
 
-    if (props.configuration.forwardToZgw) {
+    // TODO: resubmit
+    // idee om hier de api aan te maken en een nieuw resubmit endpoint aan te maken voor de RxMissionZgwForwarder die
+    // dezelfde lambda aanroept als de eventbridge events.
+    // Andere optie is een apart endpoint met een lambda die een event inschiet maar dan als resubmit ipv new form (lijkt beter idee)
+    // Maakt het testen ook gemakkelijker opnieuw in te kunnen schieten
+    if (props.configuration.forwardToZgw || props.configuration.enableRxMissionZwgHandler) {
       new SubmissionZgwForwarder(this, 'zgw-forwarder', {
         configuration: props.configuration,
       });

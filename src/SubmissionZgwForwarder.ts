@@ -9,7 +9,9 @@ import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
-import { ZgwFunction } from './app/zgw/zgw-function';
+import { RxmissionZgwFunction } from './app/zgw/rxMissionZgwHandler/rxmission-zgw-function';
+import { getAppIdsByBranchName } from './app/zgw/rxMissionZgwHandler/RxMissionZgwConfiguration';
+import { ZgwFunction } from './app/zgw/zgwForwardingHandler/zgw-function';
 import { Configurable } from './Configuration';
 import { Statics } from './statics';
 
@@ -17,7 +19,6 @@ interface SubmissionZgwForwarderProps extends Configurable {}
 
 export class SubmissionZgwForwarder extends Construct {
 
-  public lambda: Function;
   private props: SubmissionZgwForwarderProps;
 
   constructor(scope: Construct, id: string, props: SubmissionZgwForwarderProps) {
@@ -32,11 +33,22 @@ export class SubmissionZgwForwarder extends Construct {
       encryptionKey: key,
     });
 
-    this.lambda = this.submissionHandlerLambda(storageBucket, table);
-    this.addEventSubscription();
+    // Feature flag to send all submissions to mijn services open zaak
+    if (this.props.configuration.forwardToZgw) {
+      const zgwForwardHandlerLambda = this.zgwForwardingHandlerLambda(storageBucket, table);
+      this.addEventSubscription(zgwForwardHandlerLambda);
+    }
+    // Feature flag to send all relevant submissions to RxMission application
+    if (this.props.configuration.enableRxMissionZwgHandler) {
+      const rxMissionZgwLambda = this.createRxMissionZgwHandlerLambda(storageBucket, table);
+      this.addRxMissionEventSubscription(rxMissionZgwLambda);
+    }
   }
 
-  private submissionHandlerLambda(bucket: IBucket, table: ITable) {
+
+  // TODO: eerst aparte lambda RxMission en dan samenvoegen
+
+  private zgwForwardingHandlerLambda(bucket: IBucket, table: ITable) {
     const clientsecret = Secret.fromSecretNameV2(this, 'client-secret', Statics.ssmZgwClientSecret);
 
     const zgwLambda = new ZgwFunction(this, 'function', {
@@ -63,7 +75,8 @@ export class SubmissionZgwForwarder extends Construct {
     return zgwLambda;
   }
 
-  private addEventSubscription() {
+
+  private addEventSubscription(lambda: Function) {
     return new Rule(this, 'rule', {
       description: 'Subscribe to new form events from the submission storage',
       eventPattern: {
@@ -71,9 +84,65 @@ export class SubmissionZgwForwarder extends Construct {
         detailType: ['New Form Processed'],
       },
       targets: [
-        new LambdaFunction(this.lambda),
+        new LambdaFunction(lambda),
       ],
     });
   }
 
+  /**
+ * Create lambda function to process submissions for application RxMission
+ * @param bucket
+ * @param table
+ * @returns
+ */
+  private createRxMissionZgwHandlerLambda(bucket: IBucket, table: ITable) {
+    const clientsecret = Secret.fromSecretNameV2(this, 'client-secret-rxm', Statics.ssmRxMissionZgwClientSecret);
+
+    const rxmZgwLambda = new RxmissionZgwFunction(this, 'rxm-function', {
+      logRetention: RetentionDays.SIX_MONTHS,
+      environment: {
+        BUCKET_NAME: bucket.bucketName,
+        TABLE_NAME: table.tableName,
+        ZGW_CLIENT_ID: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwClientId),
+        ZGW_CLIENT_SECRET_ARN: clientsecret.secretArn,
+        ZAAKTYPE: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwZaaktype),
+        ZAAKSTATUS: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwZaakstatus),
+        ZAKEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwZakenApiUrl),
+        DOCUMENTEN_API_URL: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwDocumentenApiUrl),
+        INFORMATIEOBJECTTYPE: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwInformatieObjectType),
+        ROLTYPE: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwRoltype),
+        DEBUG: this.props.configuration.debug ? 'true' : 'false',
+        BRANCH: this.props.configuration.branchName,
+      },
+      timeout: Duration.minutes(5),
+    });
+    bucket.grantRead(rxmZgwLambda);
+    clientsecret.grantRead(rxmZgwLambda);
+    table.grantReadData(rxmZgwLambda);
+
+    return rxmZgwLambda;
+  }
+
+  // TODO: nieuwe subscription toevoegen die voor rxmission op appID filtert. De bestaande hieronder mag lekker algemeen blijven.
+  // https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-pattern-operators.html
+
+  private addRxMissionEventSubscription(rxMissionZgwLambda: Function) {
+    const filterAppIds: string[] = getAppIdsByBranchName(this.props.configuration.branchName);
+    console.log('filterappIds', filterAppIds);
+    return new Rule(this, 'rxm-rule', {
+      description: 'Subscribe to new form events from the submission storage',
+      eventPattern: {
+        source: ['Submissionstorage'],
+        detailType: ['New Form Processed'],
+        detail: {
+          Reference: filterAppIds.map((appId) => ({
+            prefix: appId,
+          })),
+        },
+      },
+      targets: [
+        new LambdaFunction(rxMissionZgwLambda),
+      ],
+    });
+  }
 }

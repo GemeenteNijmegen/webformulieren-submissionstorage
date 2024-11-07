@@ -63,7 +63,7 @@ export class Submission {
       throw Error('Payments are not handled by this class');
     }
     this.bsn = this.parsedSubmission.bsn;
-    this.kvk = this.parsedSubmission.kvk;
+    this.kvk = this.parsedSubmission.kvknummer;
     this.pdf = {
       bucket: this.parsedSubmission.pdf.bucketName,
       key: this.parsedSubmission.pdf.location,

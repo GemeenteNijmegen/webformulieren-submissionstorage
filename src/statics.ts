@@ -75,4 +75,14 @@ export abstract class Statics {
   static readonly ssmZgwInformatieObjectType = '/webform/zgw/informatieobjecttype';
   static readonly ssmZgwRoltype = '/webform/zgw/roltype';
 
+  // RxMission ZGW APIs
+  static readonly ssmRxMissionZgwZakenApiUrl = '/rxmission/zgw/zaken-api-url';
+  static readonly ssmRxMissionZgwClientId = '/rxmission/zgw/client-id';
+  static readonly ssmRxMissionZgwZaaktype = '/rxmission/zgw/zaaktype';
+  static readonly ssmRxMissionZgwZaakstatus = '/rxmission/zgw/zaakstatus';
+  static readonly ssmRxMissionZgwClientSecret = '/rxmission/zgw/clientsecret';
+  static readonly ssmRxMissionZgwDocumentenApiUrl = '/rxmission/zgw/documenten-api-url';
+  static readonly ssmRxMissionZgwInformatieObjectType = '/rxmission/zgw/informatieobjecttype';
+  static readonly ssmRxMissionZgwRoltype = '/rxmission/zgw/roltype';
+
 }

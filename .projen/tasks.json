@@ -68,7 +68,10 @@
           "spawn": "bundle:app/submission/submission.lambda"
         },
         {
-          "spawn": "bundle:app/zgw/zgw.lambda"
+          "spawn": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda"
+        },
+        {
+          "spawn": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda"
         },
         {
           "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
@@ -201,21 +204,39 @@
         }
       ]
     },
-    "bundle:app/zgw/zgw.lambda": {
-      "name": "bundle:app/zgw/zgw.lambda",
-      "description": "Create a JavaScript bundle from src/app/zgw/zgw.lambda.ts",
+    "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda": {
+      "name": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda",
+      "description": "Create a JavaScript bundle from src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
-    "bundle:app/zgw/zgw.lambda:watch": {
-      "name": "bundle:app/zgw/zgw.lambda:watch",
-      "description": "Continuously update the JavaScript bundle from src/app/zgw/zgw.lambda.ts",
+    "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda:watch": {
+      "name": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:app/zgw/zgwForwardingHandler/zgw.lambda": {
+      "name": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda",
+      "description": "Create a JavaScript bundle from src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/zgw/zgwForwardingHandler/zgw.lambda:watch": {
+      "name": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
