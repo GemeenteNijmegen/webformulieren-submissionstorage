@@ -77,8 +77,8 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.687.0",
     "@aws-sdk/client-eventbridge": "^3.687.0",
-    "@aws-sdk/client-s3": "^3.687.0",
-    "@aws-sdk/s3-request-presigner": "^3.687.0",
+    "@aws-sdk/client-s3": "^3.688.0",
+    "@aws-sdk/s3-request-presigner": "^3.688.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.16",
     "@gemeentenijmegen/aws-constructs": "^0.0.22",
     "@gemeentenijmegen/dnssec-record": "^0.0.21",
