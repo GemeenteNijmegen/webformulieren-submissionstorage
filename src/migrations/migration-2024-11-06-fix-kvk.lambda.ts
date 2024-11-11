@@ -29,7 +29,7 @@ import { hashString } from '../app/submission/hash';
 export async function handler(event: any) {
   const dryrun = event?.runlive === 'true' ? false: true; // Only update when the event object contains runlive: 'true'
   const batchSize = event?.batchSize ?? 50; // Only update when the event object contains runlive: 'true'
-  console.debug('dry run', dryrun);
+  console.info('dry run', dryrun);
   if (!process.env.BUCKET_NAME || !process.env.TABLE_NAME) {
     throw Error('No table name or bucket provided');
   }
@@ -135,7 +135,6 @@ export class Migration {
    */
   async enrichedItems(results: any) {
     const submissions = await this.getSubmissionObjectsFromBucket(results.map((result: any) => `${result.sk.S}/submission.json`));
-    console.debug('submissions ', submissions);
     const resultObjects = results.map((result: any) => {
       const key = result.sk.S;
       const submission = submissions[key];
@@ -216,9 +215,7 @@ export class Migration {
           Item: newItem,
           TableName: this.tableName,
         });
-        const response = await this.client.send(insertCommand);
-        console.debug('insert response', response);
-        console.debug('new item', newItem);
+        await this.client.send(insertCommand);
       } catch (error) {
         console.error('failed inserting', error);
         this.error(`Failed inserting item ${item.sk.S} \n`);
@@ -242,8 +239,7 @@ export class Migration {
           UpdateExpression: 'SET  #migrated20241106 = :migrated20241106',
           ReturnValues: 'ALL_NEW',
         });
-        const sendResult = await this.client.send(updateCommand);
-        console.debug('sendresult', sendResult);
+        await this.client.send(updateCommand);
         this.info(`Updated item ${item.sk.S}`);
         this._success = this._success.concat(`${item.sk.S} \n`);
       } catch (error) {
