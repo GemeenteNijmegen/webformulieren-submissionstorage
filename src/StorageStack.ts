@@ -113,6 +113,7 @@ export class StorageStack extends Stack {
         BUCKET_NAME: bucket.bucketName,
       },
       memorySize: 2048,
+      timeout: Duration.minutes(15),
     });
     table.grantReadWriteData(migration20241106);
     bucket.grantRead(migration20241106);
