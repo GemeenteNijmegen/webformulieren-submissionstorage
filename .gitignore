@@ -66,8 +66,10 @@ junit.xml
 !/src/app/formOverview/listFormOverviews/listFormOverviews-function.ts
 !/src/app/listSubmissions/listSubmissions-function.ts
 !/src/app/submission/submission-function.ts
-!/src/app/zgw/zgw-function.ts
+!/src/app/zgw/rxMissionZgwHandler/rxmission-zgw-function.ts
+!/src/app/zgw/zgwForwardingHandler/zgw-function.ts
 !/src/migrations/migration-2024-02-06-enrich-table-function.ts
+!/src/migrations/migration-2024-11-06-fix-kvk-function.ts
 !/.github/workflows/emergency.yml
 !/.github/workflows/auto-merge.yml
 !/.projenrc.js

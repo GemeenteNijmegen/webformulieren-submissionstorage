@@ -1,7 +1,8 @@
 import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
-import { ZaakNotFoundError, ZgwClient } from './ZgwClient';
-import { Database, DynamoDBDatabase } from '../submission/Database';
-import { SubmissionSchema } from '../submission/SubmissionSchema';
+import { Database, DynamoDBDatabase } from '../../submission/Database';
+import { SubmissionSchema } from '../../submission/SubmissionSchema';
+import { SubmissionUtils } from '../SubmissionUtils';
+import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
 
 export class ZgwForwarderHandler {
 
@@ -56,9 +57,21 @@ export class ZgwForwarderHandler {
     // Get submission
     const submission = await this.database.getSubmission({ key, userId });
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
+    if (process.env.DEBUG==='true') {
+      console.debug('Submission', parsedSubmission);
+    }
 
     if (!submission) {
       throw Error(`Could not find submission ${key}`);
+    }
+
+    // Collect information for creating the role
+    const email = SubmissionUtils.findEmail(parsedSubmission);
+    const telefoon = SubmissionUtils.findTelefoon(parsedSubmission);
+    const name = parsedSubmission.data.naamIngelogdeGebruiker;
+    const hasContactDetails = !!email || !!telefoon;
+    if (!hasContactDetails || !name) {
+      console.log('No contact information found in submission. Notifications cannot be send.');
     }
 
     // Handle idempotency by checking if the zaak already exists
@@ -80,9 +93,12 @@ export class ZgwForwarderHandler {
     // Create zaak
     const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
 
-    //TODO: Handle kvk
     if (parsedSubmission.bsn) {
-      await this.zgw.addRoleToZaak(zaak.url, new Bsn(submission.userId));
+      await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, telefoon, name);
+    } else if (parsedSubmission.kvknummer) {
+      await this.zgw.addKvkRoleToZaak(zaak.url, submission.userId, email, telefoon, name);
+    } else {
+      console.warn('No BSN or KVK found so a rol will not be created.');
     }
 
     // Check if the zaak has attachments
@@ -94,6 +110,14 @@ export class ZgwForwarderHandler {
     await this.uploadAttachment(key, zaak.url, `${key}.pdf`);
     const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, 'attachments/' + attachment));
     await Promise.all(uploads);
+
+    // Check for voorkeurskanaal eigenschap and store it
+    if (process.env.KANAALVOORKEUR_EIGENSCHAP) {
+      const voorkeur = SubmissionUtils.findKanaalvoorkeur(parsedSubmission);
+      if (voorkeur) {
+        await this.zgw.addZaakEigenschap(zaak.url, process.env.KANAALVOORKEUR_EIGENSCHAP, voorkeur);
+      }
+    }
 
   }
 

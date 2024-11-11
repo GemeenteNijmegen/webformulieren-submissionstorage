@@ -63,6 +63,9 @@ export class SubmissionHandler {
   }
 
   async sendEvent(submission: Submission) {
+    //TODO: bsn of kvk eruit, dit moet apart gecontroleerd worden in de generieke ZGW forwarder (zodat rxmission het zelf kan bepalen)
+    //TODO: in Detail ook apart appId toevoegen en misschien zelfs formuliernaam als de appID niet. Formuliernaam zou niet nodig moeten zijn als de APPID's uniek genoeg zijn.
+
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
@@ -70,7 +73,7 @@ export class SubmissionHandler {
           DetailType: 'New Form Processed',
           Detail: JSON.stringify({
             Reference: submission.key,
-            UserId: submission.bsn ?? submission.kvk, // Can only be a BSN or KVK?
+            UserId: submission.bsn ?? submission.kvk, // Can only be a BSN or KVK? Moeten we uberhaupt bsn of kvk meegeven hier?
             Key: submission.key,
           }),
         },

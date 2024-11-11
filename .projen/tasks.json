@@ -68,10 +68,16 @@
           "spawn": "bundle:app/submission/submission.lambda"
         },
         {
-          "spawn": "bundle:app/zgw/zgw.lambda"
+          "spawn": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda"
+        },
+        {
+          "spawn": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda"
         },
         {
           "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
+        },
+        {
+          "spawn": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda"
         }
       ]
     },
@@ -201,21 +207,39 @@
         }
       ]
     },
-    "bundle:app/zgw/zgw.lambda": {
-      "name": "bundle:app/zgw/zgw.lambda",
-      "description": "Create a JavaScript bundle from src/app/zgw/zgw.lambda.ts",
+    "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda": {
+      "name": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda",
+      "description": "Create a JavaScript bundle from src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
-    "bundle:app/zgw/zgw.lambda:watch": {
-      "name": "bundle:app/zgw/zgw.lambda:watch",
-      "description": "Continuously update the JavaScript bundle from src/app/zgw/zgw.lambda.ts",
+    "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda:watch": {
+      "name": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:app/zgw/zgwForwardingHandler/zgw.lambda": {
+      "name": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda",
+      "description": "Create a JavaScript bundle from src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/zgw/zgwForwardingHandler/zgw.lambda:watch": {
+      "name": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -234,6 +258,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:migrations/migration-2024-11-06-fix-kvk.lambda": {
+      "name": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda",
+      "description": "Create a JavaScript bundle from src/migrations/migration-2024-11-06-fix-kvk.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:migrations/migration-2024-11-06-fix-kvk.lambda:watch": {
+      "name": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-11-06-fix-kvk.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -478,13 +520,13 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@types/jest,@types/jsonwebtoken,@types/node,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,sns-validator,zod"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/node,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @types/jest @types/jsonwebtoken @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock commit-and-tag-version esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-eventbridge @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv jose jsonwebtoken sns-validator zod"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @testcontainers/localstack @types/jest @types/jsonwebtoken @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock commit-and-tag-version esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-eventbridge @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv jose jsonwebtoken sns-validator zod"
         },
         {
           "exec": "npx projen"

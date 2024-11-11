@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { S3Client } from '@aws-sdk/client-s3';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { mockClient } from 'aws-sdk-client-mock';
@@ -22,6 +22,7 @@ const dbMock = mockClient(DynamoDBClient);
 const s3Mock = mockClient(S3Client);
 const eventsMock = mockClient(EventBridgeClient);
 
+// TODO: andere test snsobjecten toevoegen zonder bsn of kvk zodra we deze eruit zouden halen.
 const messages = snsSample.Records.map(record => record.Sns);
 const message = messages.pop();
 
@@ -48,5 +49,31 @@ describe('Submission', () => {
   test('calling succeeds', async () => {
     const handler = new SubmissionHandler();
     await handler.handleRequest(message);
+  });
+  test('should call PutEventsCommand with expected details', async () => {
+    const handler = new SubmissionHandler(eventsMock as unknown as EventBridgeClient);
+
+    const sendSpy = jest.spyOn(eventsMock, 'send');
+    await handler.handleRequest(message);
+    expect(sendSpy).toHaveBeenCalledWith(expect.any(PutEventsCommand));
+
+    // Haal het argument op dat met `send` is aangeroepen
+    const putEventsCommand = sendSpy.mock.calls[0][0] as PutEventsCommand;
+    const commandInput = putEventsCommand.input;
+
+    expect(commandInput).toMatchObject({
+      Entries: [
+        {
+          Source: 'Submissionstorage',
+          DetailType: 'New Form Processed',
+          Detail: JSON.stringify({
+            Reference: 'TDL17.957',
+            UserId: '900026236',
+            Key: 'TDL17.957',
+          }),
+        },
+      ],
+    });
+    sendSpy.mockRestore();
   });
 });
