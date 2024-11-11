@@ -21,7 +21,6 @@ export class FormOverviewRequestHandler {
   }
 
   private getEvironmentVariables() {
-
     const env = getEnvVariables(['TABLE_NAME', 'BUCKET_NAME', 'DOWNLOAD_BUCKET_NAME', 'FORM_OVERVIEW_TABLE_NAME'] as const);
     return {
       tableName: env.TABLE_NAME,
