@@ -36,9 +36,9 @@ export class ListSubmissionsRequestHandler {
   async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
     let results;
     if (parameters.key) {
-      results = await this.database.getSubmission({ userId: parameters.userId, key: parameters.key });
+      results = await this.database.getSubmission({ userId: parameters.userId, userType: parameters.userType, key: parameters.key });
     } else {
-      results = await this.database.listSubmissions({ userId: parameters.userId });
+      results = await this.database.listSubmissions({ userId: parameters.userId, userType: parameters.userType });
     }
     return Response.json(results);
   }

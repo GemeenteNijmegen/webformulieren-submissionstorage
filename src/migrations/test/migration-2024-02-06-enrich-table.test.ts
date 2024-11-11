@@ -198,6 +198,7 @@ async function prefillDatabase(database: DynamoDBDatabase, items: number, startA
       key: `TDL17.${index}`,
       pdf: generateRandomString(10),
       userId: '900222670',
+      userType: 'person',
     });
   }
 
@@ -205,6 +206,7 @@ async function prefillDatabase(database: DynamoDBDatabase, items: number, startA
     key: 'TDL17.957',
     pdf: generateRandomString(1000),
     userId: '900222670',
+    userType: 'person',
   });
 }
 
