@@ -1,10 +1,11 @@
 
 import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http';
-import { environmentVariables, S3Storage, Storage } from '@gemeentenijmegen/utils';
+import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { FormDefinitionParser } from './formDefinition/FormDefinitionParser';
 import { FormParser } from './formParser/FormParser';
 import { EventParameters } from './parsedEvent';
+import { getEnvVariables } from '../../../utils/getEnvVariables/getEnvVariables';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { DDBFormOverviewDatabase, FormOverviewDatabase } from '../database/FormOverviewDatabase';
 
@@ -20,7 +21,7 @@ export class FormOverviewRequestHandler {
   }
 
   private getEvironmentVariables() {
-    const env = environmentVariables(['TABLE_NAME', 'BUCKET_NAME', 'DOWNLOAD_BUCKET_NAME', 'FORM_OVERVIEW_TABLE_NAME'] as const);
+    const env = getEnvVariables(['TABLE_NAME', 'BUCKET_NAME', 'DOWNLOAD_BUCKET_NAME', 'FORM_OVERVIEW_TABLE_NAME'] as const);
     return {
       tableName: env.TABLE_NAME,
       bucketName: env.BUCKET_NAME,
