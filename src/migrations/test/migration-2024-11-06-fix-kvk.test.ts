@@ -233,18 +233,21 @@ async function prefillDatabase(database: DynamoDBDatabase, _items: number, start
     key: 'TDL17.100',
     pdf: generateRandomString(1000),
     userId: '69599084',
+    userType: 'organisation',
   });
 
   await database.storeSubmission({
     key: 'TDL17.101',
     pdf: generateRandomString(1000),
     userId: 'anonymous',
+    userType: 'anonymous',
   });
 
   await database.storeSubmission({
     key: 'TDL17.957',
     pdf: generateRandomString(1000),
     userId: '900026236',
+    userType: 'person',
   });
 }
 

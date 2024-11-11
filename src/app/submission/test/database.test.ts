@@ -13,6 +13,7 @@ describe('Save object', () => {
     const db = new MockDatabase('mockTable');
     expect(await db.storeSubmission({
       userId: 'testuser',
+      userType: 'person',
       key: 'TDL.1234',
       pdf: 'test.pdf',
       attachments: [
@@ -28,6 +29,7 @@ describe('Save object', () => {
     const db = new MockDatabase('mockTable');
     expect(await db.listSubmissions({
       userId: 'testuser',
+      userType: 'person',
     })).toBeTruthy();
   });
 });

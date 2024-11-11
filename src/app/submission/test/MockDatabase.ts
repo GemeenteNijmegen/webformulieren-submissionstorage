@@ -14,6 +14,7 @@ export class MockDatabase implements Database {
   async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData> {
     return {
       userId: parameters.userId,
+      userType: parameters.userType,
       key: 'TDL123.001',
       pdf: 'submission.pdf',
       dateSubmitted: '2023-12-23T11:58:52.670Z',
@@ -35,6 +36,7 @@ export class MockDatabase implements Database {
   async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]> {
     return [{
       userId: parameters.userId,
+      userType: parameters.userType,
       key: 'TDL123.001',
       pdf: 'submission.pdf',
       dateSubmitted: '2023-12-23T11:58:52.670Z',
