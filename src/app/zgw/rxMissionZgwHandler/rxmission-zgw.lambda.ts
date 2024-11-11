@@ -8,6 +8,9 @@ if (process.env.DEBUG !== 'true') {
   console.dir = () => {};
 }
 
+/**
+ * Get specific config
+ */
 const env = environmentVariables(['BRANCH_NAME']);
 const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH_NAME!);
 
