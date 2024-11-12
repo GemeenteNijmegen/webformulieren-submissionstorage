@@ -51,11 +51,11 @@ export class ZgwForwarderHandler {
 
   }
 
-  async sendSubmissionToZgw(key: string, userId: string) {
+  async sendSubmissionToZgw(key: string, userId: string, userType: 'person' | 'organisation') {
     await this.zgw.init();
 
     // Get submission
-    const submission = await this.database.getSubmission({ key, userId });
+    const submission = await this.database.getSubmission({ key, userId, userType });
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
     if (process.env.DEBUG==='true') {
       console.debug('Submission', parsedSubmission);

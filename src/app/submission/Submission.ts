@@ -132,7 +132,7 @@ export class Submission {
     // Store in dynamodb
     await this.database.storeSubmission({
       userId: this.userId(),
-      userType: this.userType(),
+      userType: this.getUserType(),
       key: this.key,
       pdf: pdfKey,
       attachments: this.attachments?.map(attachment => attachment.originalName),
@@ -176,7 +176,7 @@ export class Submission {
    *
    * @returns bsn or kvk or 'anonymous'
    */
-  private userType() {
+  public getUserType() {
     if (this.bsn) {
       return 'person';
     } else if (this.kvk) {
