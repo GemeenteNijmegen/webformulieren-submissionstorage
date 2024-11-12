@@ -41,12 +41,12 @@ export class RxMissionZgwHandler {
   }
 
 
-  async sendSubmissionToRxMission(key: string, userId: string) {
+  async sendSubmissionToRxMission(key: string, userId: string, userType: 'person' | 'organisation') {
     await this.zgwClient.init();
 
     // Get submission
     // TODO: alleen op kunnen halen uit S3 met key en verwerken (parsedsubmission). Checken of dit echt nodig gaat zijn of altijd bsn/kvk aanwezig
-    const submission = await this.database.getSubmission({ key, userId });
+    const submission = await this.database.getSubmission({ key, userId, userType });
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
     if (process.env.DEBUG==='true') {
       console.debug('Submission', parsedSubmission);

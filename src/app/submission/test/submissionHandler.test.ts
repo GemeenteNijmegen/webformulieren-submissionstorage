@@ -69,6 +69,7 @@ describe('Submission', () => {
           Detail: JSON.stringify({
             Reference: 'TDL17.957',
             UserId: '900026236',
+            UserType: 'person',
             Key: 'TDL17.957',
           }),
         },
