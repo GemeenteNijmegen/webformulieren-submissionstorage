@@ -236,6 +236,7 @@ export class DynamoDBDatabase implements Database {
     builder.withFormName(parameters.formName)
       .withDateRange(parameters.startDate, parameters.endDate)
       .withPrefixFilter(parameters.appId)
+      .withUserTypeNotEmpty()
       .build();
     try {
       const results: QueryCommandOutput = await this.client.send(new QueryCommand(queryInput));
