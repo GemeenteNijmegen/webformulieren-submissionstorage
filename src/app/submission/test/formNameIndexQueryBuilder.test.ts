@@ -175,4 +175,60 @@ describe('FormNameIndexQueryBuilder with Prefix Filter', () => {
     expect(query).toEqual(expectedQuery);
   });
 
+  describe('FormNameIndexQueryBuilder with UserType Not Empty', () => {
+
+    test('should build a query with date range and userType not empty filter', () => {
+      const builder = new FormNameIndexQueryBuilder('myTable');
+      const query = builder
+        .withFormName('testForm')
+        .withDateRange('2024-05-28', '2024-05-24')
+        .withUserTypeNotEmpty()
+        .build();
+
+      expect(query).toEqual({
+        TableName: 'myTable',
+        IndexName: 'formNameIndex',
+        ExpressionAttributeNames: {
+          '#formName': 'formName',
+          '#sortKeyName': 'dateSubmitted',
+        },
+        ExpressionAttributeValues: {
+          ':name': { S: 'testForm' },
+          ':startDate': { S: '2024-05-28' },
+          ':endDate': { S: '2024-05-24' },
+        },
+        KeyConditionExpression: '#formName = :name AND #sortKeyName BETWEEN :endDate AND :startDate',
+        FilterExpression: 'attribute_exists(userType)',
+      });
+    });
+
+    test('should build a query with formName, date range, prefix filter, and userType not empty filter', () => {
+      const builder = new FormNameIndexQueryBuilder('myTable');
+      const query = builder
+        .withFormName('testForm')
+        .withDateRange('2024-05-28', '2024-05-24')
+        .withPrefixFilter('SP1')
+        .withUserTypeNotEmpty()
+        .build();
+
+      expect(query).toEqual({
+        TableName: 'myTable',
+        IndexName: 'formNameIndex',
+        ExpressionAttributeNames: {
+          '#formName': 'formName',
+          '#sortKeyName': 'dateSubmitted',
+          '#sk': 'sk',
+        },
+        ExpressionAttributeValues: {
+          ':name': { S: 'testForm' },
+          ':startDate': { S: '2024-05-28' },
+          ':endDate': { S: '2024-05-24' },
+          ':prefix': { S: 'SP1' },
+        },
+        KeyConditionExpression: '#formName = :name AND #sortKeyName BETWEEN :endDate AND :startDate',
+        FilterExpression: 'begins_with(#sk, :prefix) AND attribute_exists(userType)',
+      });
+    });
+  });
+
 });
