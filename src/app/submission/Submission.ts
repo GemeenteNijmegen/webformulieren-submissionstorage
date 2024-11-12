@@ -132,6 +132,7 @@ export class Submission {
     // Store in dynamodb
     await this.database.storeSubmission({
       userId: this.userId(),
+      userType: this.userType(),
       key: this.key,
       pdf: pdfKey,
       attachments: this.attachments?.map(attachment => attachment.originalName),
@@ -159,6 +160,27 @@ export class Submission {
       return this.bsn;
     } else if (this.kvk) {
       return this.kvk;
+    } else {
+      return 'anonymous';
+    }
+  }
+
+  /**
+   * Get the userid for this submission.
+   *
+   * Submissions can be done with bsn, kvk
+   * or anonymous (we ignore other logins for now).
+   * We store all submissions, but won't be able
+   * to retrieve anonymous submissions for regular
+   * users.
+   *
+   * @returns bsn or kvk or 'anonymous'
+   */
+  private userType() {
+    if (this.bsn) {
+      return 'person';
+    } else if (this.kvk) {
+      return 'organisation';
     } else {
       return 'anonymous';
     }

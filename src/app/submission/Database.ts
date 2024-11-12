@@ -5,6 +5,7 @@ import { hashString } from './hash';
 
 export interface SubmissionData {
   userId: string;
+  userType: 'organisation' | 'person' | 'anonymous';
   key: string;
   pdf: string;
   attachments?: string[];
@@ -45,10 +46,12 @@ const submissionTableItemsSchema = z.object({
 
 export interface ListSubmissionParameters {
   userId: string;
+  userType: 'organisation' | 'person';
 }
 
 export interface GetSubmissionParameters {
   userId: string;
+  userType: 'organisation' | 'person';
   key: string;
 }
 export interface GetSubmissionsByFormNameParameters {
@@ -113,11 +116,18 @@ export class DynamoDBDatabase implements Database {
 
   async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false> {
     const hashedId = hashString(parameters.userId);
+    let prefix;
+    if (parameters.userType == 'person') {
+      prefix = 'PERSON';
+    } else if (parameters.userType == 'organisation') {
+      prefix = 'ORG';
+    }
+    const pk = `${prefix}#${hashedId}`;
     const command = new GetItemCommand({
       TableName: this.table,
       Key: {
         pk: {
-          S: `USER#${hashedId}`,
+          S: pk,
         },
         sk: {
           S: parameters.key,
@@ -131,6 +141,7 @@ export class DynamoDBDatabase implements Database {
         const item = submissionTableItemSchema.parse(result.Item);
         return {
           userId: parameters.userId,
+          userType: parameters.userType,
           key: item?.sk.S ?? '',
           pdf: item?.pdfKey.S ?? '',
           dateSubmitted: item.dateSubmitted?.S ?? '',
@@ -149,8 +160,15 @@ export class DynamoDBDatabase implements Database {
 
   async storeSubmission(submission: SubmissionData): Promise<boolean> {
     const hashedId = hashString(submission.userId);
+    let pk;
+    if (submission.userType == 'person') {
+      pk = `PERSON#${hashedId}`;
+    } else if (submission.userType == 'organisation') {
+      pk = `ORG#${hashedId}`;
+    } else {
+      pk = 'ANONYMOUS';
+    }
     console.debug(`Storing object to table ${this.table} with primary key USER#${hashedId}`);
-    const pk = `USER#${hashedId}`;
     const sk = `${submission.key}`;
     let item: any = dynamoDBItem(pk, sk, submission);
     console.debug(JSON.stringify(item, null, 2));
@@ -165,6 +183,13 @@ export class DynamoDBDatabase implements Database {
 
   async listSubmissions(parameters: ListSubmissionParameters): Promise<SubmissionData[]|false> {
     const hashedId = hashString(parameters.userId);
+    let prefix;
+    if (parameters.userType == 'person') {
+      prefix = 'PERSON';
+    } else if (parameters.userType == 'organisation') {
+      prefix = 'ORG';
+    }
+    const pk = `${prefix}#${hashedId}`;
     const queryCommand = new QueryCommand({
       TableName: this.table,
       ExpressionAttributeNames: {
@@ -172,7 +197,7 @@ export class DynamoDBDatabase implements Database {
       },
       ExpressionAttributeValues: {
         ':id': {
-          S: `USER#${hashedId}`,
+          S: pk,
         },
       },
       KeyConditionExpression: '#pk = :id',
@@ -185,6 +210,7 @@ export class DynamoDBDatabase implements Database {
         const items = parsedResults.Items?.map((item) => {
           return {
             userId: parameters.userId,
+            userType: parameters.userType,
             key: item?.sk.S ?? '',
             pdf: item?.pdfKey.S ?? '',
             dateSubmitted: item.dateSubmitted?.S ?? new Date(1970, 0, 0).toISOString(),
