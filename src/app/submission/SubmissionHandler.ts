@@ -74,12 +74,14 @@ export class SubmissionHandler {
           Detail: JSON.stringify({
             Reference: submission.key,
             UserId: submission.bsn ?? submission.kvk, // Can only be a BSN or KVK? Moeten we uberhaupt bsn of kvk meegeven hier?
+            UserType: submission.getUserType(),
             Key: submission.key,
           }),
         },
       ],
     }));
   }
+
 
 }
 
