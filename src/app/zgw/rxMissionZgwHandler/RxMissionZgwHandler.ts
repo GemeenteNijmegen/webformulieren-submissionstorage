@@ -86,6 +86,11 @@ export class RxMissionZgwHandler {
     // Zaaktype meegeven
     console.debug('RxMissionZGWConfig. Which can be used to retrieve zaaktype from appId');
     console.dir(this.rxmConfig, { depth: null, colors: true, compact: false, showHidden: true });
+
+    // TODO: vanaf dit stuk moet het per formulier anders worden gedaan afhankelijk van de config.
+    // Deze zal steeds specifieker worden als we later bepaalde mappings toe gaan voegen.
+    // Ander zaaktype en eventueel ook verschillende rollen en zaakeigenschappen per type formulier
+
     const zaak = await this.zgwClient.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
 
     // Geen rol toevoegen indien geen bsn of kvk

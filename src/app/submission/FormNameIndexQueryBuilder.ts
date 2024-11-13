@@ -81,6 +81,19 @@ export class FormNameIndexQueryBuilder {
   }
 
   /**
+   * Adds a filter to ensure the `userType` attribute is not empty.
+   * After the database migration, records were duplicated.
+   * New records will have a userType (person | organisation | anonymous)
+   *
+   * @returns This instance of the query builder for method chaining.
+   */
+  withUserTypeNotEmpty(): FormNameIndexQueryBuilder {
+    this.filterExpression += this.filterExpression ? ' AND ' : ''; // Add "AND" if there's an existing filter expression
+    this.filterExpression += 'attribute_exists(userType)'; // Check for the existence of the userType attribute
+    return this;
+  }
+
+  /**
    * Builds the final DynamoDB query input object based on the specified parameters.
    *
    * @returns The query input object containing all necessary parameters for the DynamoDB query.
