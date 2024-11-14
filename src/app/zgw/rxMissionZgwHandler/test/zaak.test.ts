@@ -7,37 +7,11 @@ import { ZgwClient } from '../../zgwClient/ZgwClient';
 import { RXMissionZaak } from '../RxMissionZaak';
 
 
-const envKeys = [
-  'BUCKET_NAME',
-  'TABLE_NAME',
-  'ZAAKTYPE',
-  'ROLTYPE',
-  'ZAAKSTATUS',
-  'INFORMATIEOBJECTTYPE',
-  'ZAKEN_API_URL',
-  'DOCUMENTEN_API_URL',
-  'CLIENT_ID',
-  'CLIENT_SECRET',
-] as const;
-
-
-const database = new MockDatabase();
-const env = environmentVariables(envKeys);
-
-const zgwClient = new ZgwClient({
-  zaaktype: env.ZAAKTYPE,
-  zaakstatus: env.ZAAKSTATUS,
-  roltype: env.ROLTYPE,
-  informatieobjecttype: env.INFORMATIEOBJECTTYPE,
-  zakenApiUrl: env.ZAKEN_API_URL,
-  documentenApiUrl: env.DOCUMENTEN_API_URL,
-  name: 'Rxmission',
-  clientId: env.CLIENT_ID,
-  clientSecret: env.CLIENT_SECRET,
-});
-
 describeIntegration('RX Mission live tests', () => {
+
+
   test('Can create zaak object', async() => {
+    const { zgwClient, database } = testDependencies();
     const zaak = new RXMissionZaak(zgwClient);
 
     const submission = await database.getSubmission({ key: 'TDL12.345', userId: '900222670', userType: 'person' });
@@ -48,6 +22,7 @@ describeIntegration('RX Mission live tests', () => {
   });
 
   test('Can create mock zaak in ZGW store', async() => {
+    const { zgwClient, database } = testDependencies();
     const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
       headers: {
         test: 'test',
@@ -78,6 +53,7 @@ describeIntegration('RX Mission live tests', () => {
 
 
   test('Can create zaak in ZGW store', async() => {
+    const { zgwClient, database } = testDependencies();
     const spyOnFetch = jest.spyOn(global, 'fetch');
 
     const zaak = new RXMissionZaak(zgwClient);
@@ -89,3 +65,36 @@ describeIntegration('RX Mission live tests', () => {
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });
 });
+
+function testDependencies() {
+  const envKeys = [
+    'BUCKET_NAME',
+    'TABLE_NAME',
+    'ZAAKTYPE',
+    'ROLTYPE',
+    'ZAAKSTATUS',
+    'INFORMATIEOBJECTTYPE',
+    'ZAKEN_API_URL',
+    'DOCUMENTEN_API_URL',
+    'CLIENT_ID',
+    'CLIENT_SECRET',
+  ] as const;
+
+
+  const database = new MockDatabase();
+  const env = environmentVariables(envKeys);
+
+  const zgwClient = new ZgwClient({
+    zaaktype: env.ZAAKTYPE,
+    zaakstatus: env.ZAAKSTATUS,
+    roltype: env.ROLTYPE,
+    informatieobjecttype: env.INFORMATIEOBJECTTYPE,
+    zakenApiUrl: env.ZAKEN_API_URL,
+    documentenApiUrl: env.DOCUMENTEN_API_URL,
+    name: 'Rxmission',
+    clientId: env.CLIENT_ID,
+    clientSecret: env.CLIENT_SECRET,
+  });
+  return { zgwClient, database };
+}
+
