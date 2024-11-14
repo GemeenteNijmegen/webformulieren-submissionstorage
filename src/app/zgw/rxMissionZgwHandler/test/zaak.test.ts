@@ -1,8 +1,7 @@
 import { randomUUID } from 'crypto';
 import { environmentVariables } from '@gemeentenijmegen/utils';
 import { SubmissionData } from '../../../submission/Database';
-import { Submission, SubmissionSchema } from '../../../submission/SubmissionSchema';
-import * as snsSample from '../../../submission/test/samples/sns.sample.json';
+import { Submission } from '../../../submission/SubmissionSchema';
 import { describeIntegration } from '../../../test-utils/describeIntegration';
 import { ZgwClient } from '../../zgwClient/ZgwClient';
 import { RXMissionZaak } from '../RxMissionZaak';
@@ -13,44 +12,11 @@ describeIntegration('RX Mission live tests', () => {
     const zaak = new RXMissionZaak(zgwClient);
 
     const submission = getSampleSubmissionDataBaseData('12.345');
-    const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
+    const parsedSubmission = getSampleSubmission('12.345');
 
     console.debug(zaak, submission, parsedSubmission);
     expect(zaak).toBeTruthy();
   });
-
-  test('Can create mock zaak in ZGW store', async() => {
-    const zgwClient = testZgwClient();
-    const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
-      headers: {
-        test: 'test',
-      },
-      json: () => Promise.resolve({
-        count: 0,
-        next: null,
-        previous: null,
-        results: [],
-      }),
-    } as any as Response).mockResolvedValueOnce({
-      headers: {
-        test: 'test',
-      },
-      json: () => Promise.resolve({}),
-    } as any as Response).mockResolvedValueOnce({
-      json: () => Promise.resolve({}),
-    } as any as Response);
-
-    const zaak = new RXMissionZaak(zgwClient);
-
-    const zaakRefNo = '12.345';
-    const submission = getSampleSubmissionDataBaseData(zaakRefNo);
-
-    const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.create(parsedSubmission, submission);
-    console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
-    console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
-  });
-
 
   test('Can create zaak in ZGW store', async() => {
     const zgwClient = testZgwClient();
@@ -58,7 +24,6 @@ describeIntegration('RX Mission live tests', () => {
 
     const zaak = new RXMissionZaak(zgwClient);
     const zaakRefNo = '12.346';
-
 
     const submission = getSampleSubmissionDataBaseData(zaakRefNo);
     const parsedSubmission = getSampleSubmission(zaakRefNo);

@@ -29,6 +29,7 @@ const project = new GemeenteNijmegenCdkApp({
     'cdk-remote-stack',
     'jose', // 🌮
     'jsonwebtoken',
+    'form-data',
   ],
   jestOptions: {
     jestConfig: {
