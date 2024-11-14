@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { environmentVariables } from '@gemeentenijmegen/utils';
+import { SubmissionData } from '../../../submission/Database';
 import { Submission, SubmissionSchema } from '../../../submission/SubmissionSchema';
-import { MockDatabase } from '../../../submission/test/MockDatabase';
 import * as snsSample from '../../../submission/test/samples/sns.sample.json';
 import { describeIntegration } from '../../../test-utils/describeIntegration';
 import { ZgwClient } from '../../zgwClient/ZgwClient';
@@ -9,10 +9,10 @@ import { RXMissionZaak } from '../RxMissionZaak';
 
 describeIntegration('RX Mission live tests', () => {
   test('Can create zaak object', async() => {
-    const { zgwClient, database } = testDependencies();
+    const zgwClient = testZgwClient();
     const zaak = new RXMissionZaak(zgwClient);
 
-    const submission = await database.getSubmission({ key: 'TDL12.345', userId: '900222670', userType: 'person' });
+    const submission = getSampleSubmissionDataBaseData('12.345');
     const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
 
     console.debug(zaak, submission, parsedSubmission);
@@ -20,7 +20,7 @@ describeIntegration('RX Mission live tests', () => {
   });
 
   test('Can create mock zaak in ZGW store', async() => {
-    const { zgwClient, database } = testDependencies();
+    const zgwClient = testZgwClient();
     const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
       headers: {
         test: 'test',
@@ -43,7 +43,7 @@ describeIntegration('RX Mission live tests', () => {
     const zaak = new RXMissionZaak(zgwClient);
 
     const zaakRefNo = '12.345';
-    const submission = await database.getSubmission({ key: `TDL${zaakRefNo}`, userId: '900222670', userType: 'person' });
+    const submission = getSampleSubmissionDataBaseData(zaakRefNo);
 
     const parsedSubmission = getSampleSubmission(zaakRefNo);
     await zaak.createZaak(parsedSubmission, submission);
@@ -53,13 +53,14 @@ describeIntegration('RX Mission live tests', () => {
 
 
   test('Can create zaak in ZGW store', async() => {
-    const { zgwClient, database } = testDependencies();
+    const zgwClient = testZgwClient();
     const spyOnFetch = jest.spyOn(global, 'fetch');
 
     const zaak = new RXMissionZaak(zgwClient);
     const zaakRefNo = '12.346';
 
-    const submission = await database.getSubmission({ key: `TDL${zaakRefNo}`, userId: '900222670', userType: 'person' });
+
+    const submission = getSampleSubmissionDataBaseData(zaakRefNo);
     const parsedSubmission = getSampleSubmission(zaakRefNo);
     await zaak.createZaak(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
@@ -67,7 +68,7 @@ describeIntegration('RX Mission live tests', () => {
   });
 });
 
-function testDependencies() {
+function testZgwClient() {
   const envKeys = [
     'BUCKET_NAME',
     'TABLE_NAME',
@@ -81,8 +82,6 @@ function testDependencies() {
     'CLIENT_SECRET',
   ] as const;
 
-
-  const database = new MockDatabase();
   const env = environmentVariables(envKeys);
 
   const zgwClient = new ZgwClient({
@@ -96,7 +95,7 @@ function testDependencies() {
     clientId: env.CLIENT_ID,
     clientSecret: env.CLIENT_SECRET,
   });
-  return { zgwClient, database };
+  return zgwClient;
 }
 
 function getSampleSubmission(refNo: string) {
@@ -119,4 +118,16 @@ function getSampleSubmission(refNo: string) {
     bsn: '900222670',
   } as Submission;
   return sample;
+}
+
+function getSampleSubmissionDataBaseData(refNo: string) {
+  return {
+    userId: '900222670',
+    userType: 'person',
+    key: `TDL${refNo}`,
+    pdf: 'submission.pdf',
+    dateSubmitted: '2023-12-23T11:58:52.670Z',
+    formName: 'testDevops',
+    formTitle: 'DEVOPS testformulier',
+  } as SubmissionData;
 }
