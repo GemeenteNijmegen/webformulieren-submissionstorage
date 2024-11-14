@@ -46,7 +46,7 @@ describeIntegration('RX Mission live tests', () => {
     const submission = getSampleSubmissionDataBaseData(zaakRefNo);
 
     const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.createZaak(parsedSubmission, submission);
+    await zaak.create(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });
@@ -62,7 +62,7 @@ describeIntegration('RX Mission live tests', () => {
 
     const submission = getSampleSubmissionDataBaseData(zaakRefNo);
     const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.createZaak(parsedSubmission, submission);
+    await zaak.create(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });
