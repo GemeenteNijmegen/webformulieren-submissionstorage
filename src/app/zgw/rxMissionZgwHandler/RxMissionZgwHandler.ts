@@ -4,6 +4,7 @@ import { SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
 import { RxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
 import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
+import 'dotenv/config';
 
 const envKeys = [
   'BUCKET_NAME',

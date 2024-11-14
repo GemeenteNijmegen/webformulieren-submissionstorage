@@ -95,7 +95,7 @@ export class ZgwClient {
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       zaaktype: this.options.zaaktype,
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
-      startdatum: this.datestemp(),
+      startdatum: this.datestamp(),
       omschrijving: formulier,
       toelichting: `Formulier: "${formulier}" met kenmerk ${identificatie}.`,
     };
@@ -104,7 +104,7 @@ export class ZgwClient {
     const statusRequest = {
       zaak: zaak.url,
       statustype: this.options.zaakstatus,
-      datumStatusGezet: this.datestemp(),
+      datumStatusGezet: this.datestamp(),
       statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
     };
     await this.callZaakApi('POST', 'statussen', statusRequest);
@@ -121,7 +121,7 @@ export class ZgwClient {
   async addDocumentToZaak(zaak: string, documentName: string, documentBase64: string) {
     const documentRequest = {
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
-      creatiedatum: this.datestemp(),
+      creatiedatum: this.datestamp(),
       titel: documentName,
       auteur: this.options.name,
       taal: 'dut',
@@ -253,7 +253,7 @@ export class ZgwClient {
     }
   }
 
-  private datestemp() {
+  private datestamp() {
     return new Date().toISOString().substring(0, 'yyyy-mm-dd'.length);
   }
 
