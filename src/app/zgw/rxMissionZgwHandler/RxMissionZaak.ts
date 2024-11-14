@@ -28,6 +28,6 @@ export class RXMissionZaak {
     // Create zaak
     // Gebruikt database data die ook uit parsedSubmission kan komen
     // Zaaktype meegeven
-    await this.zgwClient.createZaak(submission.reference, submissionData.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
+    await this.zgwClient.createZaak(submission.reference, submissionData.formTitle ?? 'Onbekend formulier'); // TODO expand with useful fields
   }
 }

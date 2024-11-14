@@ -33,11 +33,17 @@ const zgwClient = new ZgwClient({
 });
 
 describeIntegration('RX Mission live tests', () => {
-  test('Can create zaak', async() => {
+  test('Can create zaak object', async() => {
     const zaak = new RXMissionZaak(zgwClient);
 
     const submission = await database.getSubmission({ key: 'TDL12.345', userId: '900222670', userType: 'person' });
-    const parsedSubmission = SubmissionSchema.passthrough().parse(snsSample);
+    const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
+
     console.debug(zaak, submission, parsedSubmission);
+    expect(zaak).toBeTruthy();
+  });
+
+  test('Can create zaak in ZGW store', async() => {
+
   });
 });
