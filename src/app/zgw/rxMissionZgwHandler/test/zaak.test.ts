@@ -16,6 +16,8 @@ const envKeys = [
   'INFORMATIEOBJECTTYPE',
   'ZAKEN_API_URL',
   'DOCUMENTEN_API_URL',
+  'CLIENT_ID',
+  'CLIENT_SECRET',
 ] as const;
 
 
@@ -30,6 +32,8 @@ const zgwClient = new ZgwClient({
   zakenApiUrl: env.ZAKEN_API_URL,
   documentenApiUrl: env.DOCUMENTEN_API_URL,
   name: 'Rxmission',
+  clientId: env.CLIENT_ID,
+  clientSecret: env.CLIENT_SECRET,
 });
 
 describeIntegration('RX Mission live tests', () => {
@@ -43,7 +47,45 @@ describeIntegration('RX Mission live tests', () => {
     expect(zaak).toBeTruthy();
   });
 
-  test('Can create zaak in ZGW store', async() => {
+  test('Can create mock zaak in ZGW store', async() => {
+    const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+      headers: {
+        test: 'test',
+      },
+      json: () => Promise.resolve({
+        count: 0,
+        next: null,
+        previous: null,
+        results: [],
+      }),
+    } as any as Response).mockResolvedValueOnce({
+      headers: {
+        test: 'test',
+      },
+      json: () => Promise.resolve({}),
+    } as any as Response).mockResolvedValueOnce({
+      json: () => Promise.resolve({}),
+    } as any as Response);
 
+    const zaak = new RXMissionZaak(zgwClient);
+
+    const submission = await database.getSubmission({ key: 'TDL12.345', userId: '900222670', userType: 'person' });
+    const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
+    await zaak.createZaak(parsedSubmission, submission);
+    console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
+    console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
+  });
+
+
+  test('Can create zaak in ZGW store', async() => {
+    const spyOnFetch = jest.spyOn(global, 'fetch');
+
+    const zaak = new RXMissionZaak(zgwClient);
+
+    const submission = await database.getSubmission({ key: 'TDL12.346', userId: '900222670', userType: 'person' });
+    const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
+    await zaak.createZaak(parsedSubmission, submission);
+    console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
+    console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });
 });
