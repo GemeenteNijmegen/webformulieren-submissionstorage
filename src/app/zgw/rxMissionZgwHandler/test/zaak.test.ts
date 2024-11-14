@@ -1,15 +1,13 @@
+import { randomUUID } from 'crypto';
 import { environmentVariables } from '@gemeentenijmegen/utils';
-import { SubmissionSchema } from '../../../submission/SubmissionSchema';
+import { Submission, SubmissionSchema } from '../../../submission/SubmissionSchema';
 import { MockDatabase } from '../../../submission/test/MockDatabase';
 import * as snsSample from '../../../submission/test/samples/sns.sample.json';
 import { describeIntegration } from '../../../test-utils/describeIntegration';
 import { ZgwClient } from '../../zgwClient/ZgwClient';
 import { RXMissionZaak } from '../RxMissionZaak';
 
-
 describeIntegration('RX Mission live tests', () => {
-
-
   test('Can create zaak object', async() => {
     const { zgwClient, database } = testDependencies();
     const zaak = new RXMissionZaak(zgwClient);
@@ -44,8 +42,10 @@ describeIntegration('RX Mission live tests', () => {
 
     const zaak = new RXMissionZaak(zgwClient);
 
-    const submission = await database.getSubmission({ key: 'TDL12.345', userId: '900222670', userType: 'person' });
-    const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
+    const zaakRefNo = '12.345';
+    const submission = await database.getSubmission({ key: `TDL${zaakRefNo}`, userId: '900222670', userType: 'person' });
+
+    const parsedSubmission = getSampleSubmission(zaakRefNo);
     await zaak.createZaak(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
@@ -57,9 +57,10 @@ describeIntegration('RX Mission live tests', () => {
     const spyOnFetch = jest.spyOn(global, 'fetch');
 
     const zaak = new RXMissionZaak(zgwClient);
+    const zaakRefNo = '12.346';
 
-    const submission = await database.getSubmission({ key: 'TDL12.346', userId: '900222670', userType: 'person' });
-    const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
+    const submission = await database.getSubmission({ key: `TDL${zaakRefNo}`, userId: '900222670', userType: 'person' });
+    const parsedSubmission = getSampleSubmission(zaakRefNo);
     await zaak.createZaak(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
@@ -98,3 +99,24 @@ function testDependencies() {
   return { zgwClient, database };
 }
 
+function getSampleSubmission(refNo: string) {
+  const sample = {
+    appId: 'TDL',
+    formId: randomUUID(),
+    formTypeId: 'DEVOPSTEST',
+    data: {
+      naamIngelogdeGebruiker: 'H. De Tester',
+    },
+    metadata: {
+      timestamp: [2024, 2, 1, 13, 19, 4, 11811229],
+    },
+    pdf: {
+      bucketName: 'TESTBUCKET',
+      location: 'someid/pdf/TDL',
+      reference: 'c07e4f3b36955bb31565fb1ef7bdefaf',
+    },
+    reference: `TDL${refNo}`,
+    bsn: '900222670',
+  } as Submission;
+  return sample;
+}
