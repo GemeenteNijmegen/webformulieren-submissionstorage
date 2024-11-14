@@ -72,7 +72,9 @@ export class RxMissionZgwHandler {
 
     // Geen rol toevoegen indien geen bsn of kvk
     // Nog checken bij RxMission of ze uberhaupt rollen hebben zonder bsn/kvk
-    await this.addRole(parsedSubmission, zgwZaak, submission);
+    if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, weghalen
+      await this.addRole(parsedSubmission, zgwZaak, submission);
+    }
 
     // Check if the zaak has attachments
     // TODO: checken in parsedsubmission of in S3
