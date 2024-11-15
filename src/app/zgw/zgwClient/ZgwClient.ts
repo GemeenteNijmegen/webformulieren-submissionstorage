@@ -224,11 +224,35 @@ export class ZgwClient {
     return json;
   }
 
-  private async callDocumentenApi(method: string, path: string, data?: any) {
+  async callBestandsdelenApi(method: string, url: string, data: FormData) {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
-    const url = this.joinUrl(this.options.documentenApiUrl, path);
+    const response = await fetch(url, {
+      method: method,
+      body: data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.debug(response);
+    const json = await response.json() as any;
+    console.debug(json);
+    if (response.status < 200 || response.status > 300) {
+      throw Error('Not a 2xx response');
+    }
+    return json;
+  }
+
+  async callDocumentenApi(method: string, pathOrUrl: string, data?: any) {
+    this.checkConfiguration();
+    const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
+
+    let url = pathOrUrl;
+    if (!pathOrUrl.startsWith('https://')) {
+      url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
+    }
+
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(data),
