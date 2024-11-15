@@ -18,7 +18,7 @@ export class ParameterStack extends Stack {
     new StringParameter(this, 'ssm-submitted-formoverview-formnames-list', {
       parameterName: Statics.ssmSubmittedFormoverviewFormnames,
       stringValue: '-',
-      description: 'Comma seperated list with formnames to be retrieved for the overview of submitted forms. To check if all submitted forms were processed in the backend.'
+      description: 'Comma separated list with formnames to be retrieved for the overview of submitted forms. To check if all submitted forms were processed in the backend.'
     });
 
   }
