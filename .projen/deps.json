@@ -116,6 +116,10 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-sdk/client-ssm",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-sdk/s3-request-presigner",
       "type": "runtime"
     },

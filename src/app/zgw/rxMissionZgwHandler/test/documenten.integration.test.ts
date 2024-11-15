@@ -40,21 +40,21 @@ describeIntegration('RX Mission live tests', () => {
           data.append('lock', lock);
           const result = await zgwClient.callBestandsdelenApi('put', bestandsDeelUrl, data);
           console.debug('bestandsdeel', result);
-          if (result.url) {
-            //TODO Gaat mis op url: https://documenten.preprod-rx-services.nl/api/v1/https://documenten.preprod-rx-services.nl/api/v1/enkelvoudiginformatieobjecten/{uuid}}/unlock
-            const unlockResult = await zgwClient.callDocumentenApi('POST', `${informatieObject.url}/unlock`, {
-              lock: lock,
-            });
-            console.debug('unlock', unlockResult);
-            const relateResult = await zgwClient.callZaakApi('POST', 'zaakinformatieobjecten', {
-              informatieobject: informatieObject.url,
-              zaak: 'https://zaken.preprod-rx-services.nl/api/v1/zaken/7a89ea95-a167-415f-80d8-6b9bb0c61da7',
-              titel: 'test.pdf',
-              beschrijving: 'test DEVOPS nijmegen',
-            },
-            );
-            console.debug(relateResult);
-          }
+          // if (result.url) {
+          //   //TODO Gaat mis op url: https://documenten.preprod-rx-services.nl/api/v1/https://documenten.preprod-rx-services.nl/api/v1/enkelvoudiginformatieobjecten/{uuid}}/unlock
+          //   const unlockResult = await zgwClient.callDocumentenApi('POST', `${informatieObject.url}/unlock`, {
+          //     lock: lock,
+          //   });
+          //   console.debug('unlock', unlockResult);
+          //   const relateResult = await zgwClient.callZaakApi('POST', 'zaakinformatieobjecten', {
+          //     informatieobject: informatieObject.url,
+          //     zaak: 'https://zaken.preprod-rx-services.nl/api/v1/zaken/7a89ea95-a167-415f-80d8-6b9bb0c61da7',
+          //     titel: 'test.pdf',
+          //     beschrijving: 'test DEVOPS nijmegen',
+          //   },
+          //   );
+          //   console.debug(relateResult);
+          // }
         }
 
 

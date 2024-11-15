@@ -12,7 +12,7 @@ export interface FormOverviewData {
 }
 
 export interface FormOverviewDatabase {
-  storeFormOverview(formOverview: any): Promise<boolean>;
+  storeFormOverview(formOverview: FormOverviewData): Promise<boolean>;
   getFormOverviews(filters: {[key:string]:string} | undefined): Promise<FormOverviewData[]>;
 }
 
