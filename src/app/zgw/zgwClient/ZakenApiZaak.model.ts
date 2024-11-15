@@ -125,7 +125,7 @@ const zakenApiZaakSchema = z.object({
     .nullable()
     .optional()
     .refine((val) => !val || !isNaN(Date.parse(val)), 'StartdatumBewaartermijn must be a valid date string or null.'),
-});
+}).passthrough();
 
 export type ZakenApiZaak = z.infer<typeof zakenApiZaakSchema>;
 export { zakenApiZaakSchema };
