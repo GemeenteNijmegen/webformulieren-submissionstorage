@@ -243,6 +243,12 @@ export class Api extends Construct {
     formOverviewTable.grantReadWriteData(submittedFormOverviewFunction);
     table.grantReadData(submittedFormOverviewFunction);
     downloadBucket.grantReadWrite(submittedFormOverviewFunction);
+    // Grant read access to SSM param to retrieve formnames to include in overview
+    StringParameter.fromStringParameterName(
+      this,
+      'SubmittedFormOverviewParam',
+      Statics.ssmSubmittedFormoverviewFormnames
+    ).grantRead(submittedFormOverviewFunction);
 
     new Rule(this, 'submitted-cronjob', {
       description: 'Weekly submitted forms creation',
