@@ -35,8 +35,8 @@ const zakenApiZaakSchema = z.object({
 
   registratiedatum: z
     .string()
-    .optional()
-    .transform((val) => (val ? new Date(val) : new Date())),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "registratiedatum Datum moet in het formaat YYYY-MM-DD zijn." })
+    .optional(),
 
   verantwoordelijkeOrganisatie: z
     .string()
@@ -47,26 +47,25 @@ const zakenApiZaakSchema = z.object({
   startdatum: z
     .string()
     .min(1, 'Startdatum is required.')
-    .refine((val) => !isNaN(Date.parse(val)), 'Startdatum must be a valid date string.'),
-
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "startdatum Datum moet in het formaat YYYY-MM-DD zijn." }),
 
   einddatumGepland: z
     .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "einddatumGepland Datum moet in het formaat YYYY-MM-DD zijn." })
     .nullable()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'EinddatumGepland must be a valid date string or null.'),
+    .optional(),
 
   uiterlijkeEinddatumAfdoening: z
     .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "uiterlijkeEinddatumAfdoening Datum moet in het formaat YYYY-MM-DD zijn." })
     .nullable()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'UiterlijkeEinddatumAfdoening must be a valid date string or null.'),
+    .optional(),
 
   publicatiedatum: z
     .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "publicatiedatum Datum moet in het formaat YYYY-MM-DD zijn." })
     .nullable()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'Publicatiedatum must be a valid date string or null.'),
+    .optional(),
 
   communicatiekanaal: z
     .string()
@@ -107,6 +106,7 @@ const zakenApiZaakSchema = z.object({
 
   archiefactiedatum: z
     .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "archiefactiedatum Datum moet in het formaat YYYY-MM-DD zijn." })
     .nullable()
     .optional(),
 
@@ -122,9 +122,9 @@ const zakenApiZaakSchema = z.object({
 
   startdatumBewaartermijn: z
     .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "startdatumBewaartermijn Datum moet in het formaat YYYY-MM-DD zijn." })
     .nullable()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), 'StartdatumBewaartermijn must be a valid date string or null.'),
+    .optional(),
 }).passthrough();
 
 export type ZakenApiZaak = z.infer<typeof zakenApiZaakSchema>;

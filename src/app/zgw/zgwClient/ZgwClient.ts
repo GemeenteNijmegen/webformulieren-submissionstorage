@@ -89,7 +89,7 @@ export class ZgwClient {
   // Optioneel zaaktype toevoegen
   // Andere velden optioneel maken en duidelijke interfaces maken
   async createZaak(identificatie: string, formulier: string) {
-
+    console.log('CREATEZAAK');
     const zaakRequest = {
       identificatie: identificatie,
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
