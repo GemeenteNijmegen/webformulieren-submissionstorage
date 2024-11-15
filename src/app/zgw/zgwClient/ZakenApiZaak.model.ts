@@ -35,7 +35,7 @@ const zakenApiZaakSchema = z.object({
 
   registratiedatum: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "registratiedatum Datum moet in het formaat YYYY-MM-DD zijn." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'registratiedatum Datum moet in het formaat YYYY-MM-DD zijn.' })
     .optional(),
 
   verantwoordelijkeOrganisatie: z
@@ -47,23 +47,23 @@ const zakenApiZaakSchema = z.object({
   startdatum: z
     .string()
     .min(1, 'Startdatum is required.')
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "startdatum Datum moet in het formaat YYYY-MM-DD zijn." }),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'startdatum Datum moet in het formaat YYYY-MM-DD zijn.' }),
 
   einddatumGepland: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "einddatumGepland Datum moet in het formaat YYYY-MM-DD zijn." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'einddatumGepland Datum moet in het formaat YYYY-MM-DD zijn.' })
     .nullable()
     .optional(),
 
   uiterlijkeEinddatumAfdoening: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "uiterlijkeEinddatumAfdoening Datum moet in het formaat YYYY-MM-DD zijn." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'uiterlijkeEinddatumAfdoening Datum moet in het formaat YYYY-MM-DD zijn.' })
     .nullable()
     .optional(),
 
   publicatiedatum: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "publicatiedatum Datum moet in het formaat YYYY-MM-DD zijn." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'publicatiedatum Datum moet in het formaat YYYY-MM-DD zijn.' })
     .nullable()
     .optional(),
 
@@ -106,7 +106,7 @@ const zakenApiZaakSchema = z.object({
 
   archiefactiedatum: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "archiefactiedatum Datum moet in het formaat YYYY-MM-DD zijn." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'archiefactiedatum Datum moet in het formaat YYYY-MM-DD zijn.' })
     .nullable()
     .optional(),
 
@@ -122,7 +122,7 @@ const zakenApiZaakSchema = z.object({
 
   startdatumBewaartermijn: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "startdatumBewaartermijn Datum moet in het formaat YYYY-MM-DD zijn." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'startdatumBewaartermijn Datum moet in het formaat YYYY-MM-DD zijn.' })
     .nullable()
     .optional(),
 }).passthrough();
