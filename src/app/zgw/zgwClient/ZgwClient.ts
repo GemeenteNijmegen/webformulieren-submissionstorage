@@ -138,6 +138,16 @@ export class ZgwClient {
     await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
   }
 
+  async relateDocumentToZaak(zaakUrl: string, informatieObjectUrl: string, fileName: string) {
+    const documentZaakRequest = {
+      informatieobject: informatieObjectUrl,
+      zaak: zaakUrl,
+      titel: fileName,
+      omschrijving: 'TEST Devops',
+    };
+    await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
+  }
+
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       inpBsn: bsn.bsn,
@@ -250,7 +260,7 @@ export class ZgwClient {
 
     let url = pathOrUrl;
     if (!pathOrUrl.startsWith('https://')) {
-      url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
+      url = this.joinUrl(this.options.documentenApiUrl, pathOrUrl);
     }
 
     const response = await fetch(url, {
@@ -262,6 +272,9 @@ export class ZgwClient {
       },
     });
     console.debug(response);
+    if (response.status == 204) {
+      return;
+    }
     const json = await response.json() as any;
     console.debug(json);
     if (response.status < 200 || response.status > 300) {

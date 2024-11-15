@@ -247,7 +247,7 @@ export class Api extends Construct {
     StringParameter.fromStringParameterName(
       this,
       'SubmittedFormOverviewParam',
-      Statics.ssmSubmittedFormoverviewFormnames
+      Statics.ssmSubmittedFormoverviewFormnames,
     ).grantRead(submittedFormOverviewFunction);
 
     new Rule(this, 'submitted-cronjob', {
