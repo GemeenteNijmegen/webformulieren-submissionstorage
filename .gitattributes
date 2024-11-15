@@ -25,6 +25,7 @@
 /src/app/formOverview/getFormCount/getFormCountExpired-function.ts linguist-generated
 /src/app/formOverview/getFormOverview/getFormOverview-function.ts linguist-generated
 /src/app/formOverview/listFormOverviews/listFormOverviews-function.ts linguist-generated
+/src/app/formOverview/submittedFormOverview/submittedFormOverview-function.ts linguist-generated
 /src/app/listSubmissions/listSubmissions-function.ts linguist-generated
 /src/app/submission/submission-function.ts linguist-generated
 /src/app/zgw/rxMissionZgwHandler/rxmission-zgw-function.ts linguist-generated

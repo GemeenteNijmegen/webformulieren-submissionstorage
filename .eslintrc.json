@@ -153,6 +153,7 @@
           "src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts",
           "src/app/formOverview/getFormOverview/getFormOverview.lambda.ts",
           "src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts",
+          "src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts",
           "src/app/listSubmissions/listSubmissions.lambda.ts",
           "src/app/submission/submission.lambda.ts",
           "src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
