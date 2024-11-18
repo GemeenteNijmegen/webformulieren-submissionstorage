@@ -6,9 +6,24 @@ import { RXMissionDocument } from '../RXMissionDocument';
 
 const sampleFilePath = path.resolve(__dirname, 'samples/test.pdf');
 
+
+
+
 describe('Document upload test', () => {
-  const env = environmentVariables(['INFORMATIEOBJECTTYPE']);
+  const originalEnv = process.env;
+  beforeEach(() => {
+    process.env = {
+      ...originalEnv,
+      INFORMATIEOBJECTTYPE: 'https://mockinfoobject'
+    };
+  });
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+
   test('Can create document in ZGW store', async() => {
+    const env = environmentVariables(['INFORMATIEOBJECTTYPE']);
     const zgwClient = zgwTestClient();
     setFetchMockResponse({});
     const spyOnFetch = jest.spyOn(global, 'fetch');
@@ -82,6 +97,7 @@ describeIntegration('Live document upload test', () => {
     console.debug(spyOnFetch.mock.calls);
   });
 });
+
 
 function zgwTestClient() {
   const client = new ZgwClient({
