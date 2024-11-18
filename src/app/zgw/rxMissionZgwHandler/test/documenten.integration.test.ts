@@ -7,14 +7,12 @@ import { RXMissionDocument } from '../RXMissionDocument';
 const sampleFilePath = path.resolve(__dirname, 'samples/test.pdf');
 
 
-
-
 describe('Document upload test', () => {
   const originalEnv = process.env;
   beforeEach(() => {
     process.env = {
       ...originalEnv,
-      INFORMATIEOBJECTTYPE: 'https://mockinfoobject'
+      INFORMATIEOBJECTTYPE: 'https://mockinfoobject',
     };
   });
   afterEach(() => {
