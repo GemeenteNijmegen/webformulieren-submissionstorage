@@ -107,7 +107,7 @@ describeIntegration('Dynamodb migration test', () => {
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
     const command = getItemCommand(tableName, 'PERSON#testshouldupdate', 'TDL12.348');
     const results = await dynamoDBClient.send(command);
-    
+
     expect(results).toHaveProperty('Item.migrated20241106');
     expect(results).toHaveProperty('Item.userType');
   });
@@ -117,16 +117,16 @@ describeIntegration('Dynamodb migration test', () => {
     const personCommand = getItemCommand(tableName, 'PERSON#testshouldupdate', 'TDL12.348');
     const personResults = await dynamoDBClient.send(personCommand);
     expect(personResults?.Item?.userType?.S).toBe('person');
-    
+
     const orgCommand = getItemCommand(tableName, 'ORG#test', 'TDL12.346');
     const orgResults = await dynamoDBClient.send(orgCommand);
-    
+
     expect(orgResults).toHaveProperty('Item.migrated20241106');
     expect(orgResults?.Item?.userType?.S).toBe('organisation');
 
     const anonCommand = getItemCommand(tableName, 'ANONYMOUS#test', 'TDL12.347');
     const anonResults = await dynamoDBClient.send(anonCommand);
-    
+
     expect(anonResults).toHaveProperty('Item.migrated20241106');
     expect(anonResults?.Item?.userType?.S).toBe('anonymous');
   });
@@ -135,7 +135,7 @@ describeIntegration('Dynamodb migration test', () => {
   test('correct item wont update', async() => {
     const consoleSpy = jest.spyOn(console, 'info');
     await new Migration(dynamoDBClient, tableName, storage).run(50, false);
-      expect(consoleSpy).not.toHaveBeenCalledWith('TDL12.345');
+    expect(consoleSpy).not.toHaveBeenCalledWith('TDL12.345');
   });
 
   // test('dryrun does not actually update', async() => {
@@ -183,8 +183,8 @@ function storeItem(tableName: string, pk: string, sk: string, additionalInfo?: a
 // Be able to fill up the db with enough data to have the scan be paginated (1MB per page)
 async function prefillDatabase(dynamoDBClient: DynamoDBClient, tableName: string) {
   await dynamoDBClient.send(storeItem(tableName, 'PERSON#shouldntupdate', 'TDL12.345', {
-      userType: { S: 'person' }
-    }
+    userType: { S: 'person' },
+  },
   ));
   await dynamoDBClient.send(storeItem(tableName, 'ORG#test', 'TDL12.346'));
   await dynamoDBClient.send(storeItem(tableName, 'ANONYMOUS#test', 'TDL12.347'));

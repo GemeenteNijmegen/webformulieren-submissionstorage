@@ -76,16 +76,16 @@ export class Migration {
         const command = new ScanCommand({
           TableName: this.tableName,
           ExclusiveStartKey: this.lastKey,
-          FilterExpression: `NOT attribute_exists(#userType) AND (begins_with(#pk, :PERSON) OR begins_with(#pk, :ORG) OR begins_with(#pk, :ANONYMOUS))`,
-          ExpressionAttributeNames: { 
+          FilterExpression: 'NOT attribute_exists(#userType) AND (begins_with(#pk, :PERSON) OR begins_with(#pk, :ORG) OR begins_with(#pk, :ANONYMOUS))',
+          ExpressionAttributeNames: {
             '#userType': 'userType',
             '#pk': 'pk',
           },
           ExpressionAttributeValues: {
             ':PERSON': { S: 'PERSON' },
             ':ORG': { S: 'ORG' },
-            ':ANONYMOUS': { S: 'ANONYMOUS' }
-          }
+            ':ANONYMOUS': { S: 'ANONYMOUS' },
+          },
         });
         this.info('Starting scan');
         const result = await this.client.send(command);
@@ -172,16 +172,16 @@ export class Migration {
     for (const item of items) {
       try {
         let userType;
-        if(item.pk.S.includes('PERSON#')) {
+        if (item.pk.S.includes('PERSON#')) {
           userType = 'person';
-        } else if(item.pk.S.includes('ORG#')) {
+        } else if (item.pk.S.includes('ORG#')) {
           userType = 'organisation';
-        } else if(item.pk.S.includes('ANONYMOUS')) {
+        } else if (item.pk.S.includes('ANONYMOUS')) {
           userType = 'anonymous';
         } else {
           throw Error(`unexpected pk found, not one of org, person, anonymous: ${item.pk.S}`);
         }
-       
+
         const updateCommand = new UpdateItemCommand({
           Key: {
             pk: { S: item.pk.S },
@@ -194,7 +194,7 @@ export class Migration {
           },
           ExpressionAttributeValues: {
             ':migrated20241106': { BOOL: true },
-            ':userType': { S: userType }
+            ':userType': { S: userType },
           },
           UpdateExpression: 'SET #migrated20241106 = :migrated20241106, #userType = :userType',
           ReturnValues: 'ALL_NEW',
