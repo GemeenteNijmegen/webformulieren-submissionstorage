@@ -85,4 +85,5 @@ export abstract class Statics {
   static readonly ssmRxMissionZgwInformatieObjectType = '/rxmission/zgw/informatieobjecttype';
   static readonly ssmRxMissionZgwRoltype = '/rxmission/zgw/roltype';
 
+  static readonly ssmSubmittedFormoverviewFormnames = `/${this.projectName}/submitted-formoverview-formnames`;
 }

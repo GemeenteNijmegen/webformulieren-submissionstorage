@@ -15,6 +15,12 @@ export class ParameterStack extends Stack {
     this.zgwParameters();
     this.rxMissionZgwParameters();
 
+    new StringParameter(this, 'ssm-submitted-formoverview-formnames-list', {
+      parameterName: Statics.ssmSubmittedFormoverviewFormnames,
+      stringValue: '-',
+      description: 'Comma separated list with formnames to be retrieved for the overview of submitted forms. To check if all submitted forms were processed in the backend.',
+    });
+
   }
 
 

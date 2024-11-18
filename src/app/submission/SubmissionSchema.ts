@@ -26,6 +26,7 @@ export const SubmissionSchema = z.object({
     timestamp: z.array(z.number()),
   }).passthrough(),
 });
+export type Submission = z.infer<typeof SubmissionSchema>;
 
 export const SubmissionPaymentSchema = z.object({
   appId: z.string(),

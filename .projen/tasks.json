@@ -62,6 +62,9 @@
           "spawn": "bundle:app/formOverview/listFormOverviews/listFormOverviews.lambda"
         },
         {
+          "spawn": "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda"
+        },
+        {
           "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
         },
         {
@@ -168,6 +171,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/listFormOverviews/listFormOverviews.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda": {
+      "name": "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda",
+      "description": "Create a JavaScript bundle from src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/submittedFormOverview/submittedFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda:watch": {
+      "name": "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/submittedFormOverview/submittedFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -368,6 +389,9 @@
     "eslint": {
       "name": "eslint",
       "description": "Runs eslint against the codebase",
+      "env": {
+        "ESLINT_USE_FLAT_CONFIG": "false"
+      },
       "steps": [
         {
           "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern $@ src test build-tools .projenrc.js",
@@ -520,13 +544,13 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/node,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,sns-validator,zod"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --no-deprecated --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/node,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/client-ssm,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @testcontainers/localstack @types/jest @types/jsonwebtoken @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock commit-and-tag-version esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-eventbridge @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv jose jsonwebtoken sns-validator zod"
+          "exec": "yarn upgrade @aws-sdk/client-secrets-manager @gemeentenijmegen/projen-project-type @stylistic/eslint-plugin @testcontainers/localstack @types/jest @types/jsonwebtoken @types/node @types/sns-validator @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk aws-sdk-client-mock commit-and-tag-version esbuild eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit projen testcontainers ts-jest ts-node typescript @aws-sdk/client-dynamodb @aws-sdk/client-eventbridge @aws-sdk/client-s3 @aws-sdk/client-ssm @aws-sdk/s3-request-presigner @gemeentenijmegen/apigateway-http @gemeentenijmegen/aws-constructs @gemeentenijmegen/dnssec-record @gemeentenijmegen/utils @types/aws-lambda aws-cdk-lib axios cdk-remote-stack constructs dotenv jose jsonwebtoken sns-validator zod"
         },
         {
           "exec": "npx projen"

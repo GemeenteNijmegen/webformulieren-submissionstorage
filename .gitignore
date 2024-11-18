@@ -64,6 +64,7 @@ junit.xml
 !/src/app/formOverview/getFormCount/getFormCountExpired-function.ts
 !/src/app/formOverview/getFormOverview/getFormOverview-function.ts
 !/src/app/formOverview/listFormOverviews/listFormOverviews-function.ts
+!/src/app/formOverview/submittedFormOverview/submittedFormOverview-function.ts
 !/src/app/listSubmissions/listSubmissions-function.ts
 !/src/app/submission/submission-function.ts
 !/src/app/zgw/rxMissionZgwHandler/rxmission-zgw-function.ts

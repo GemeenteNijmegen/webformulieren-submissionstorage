@@ -23,6 +23,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@aws-sdk/client-s3',
     '@aws-sdk/client-eventbridge',
     '@aws-sdk/client-dynamodb',
+    '@aws-sdk/client-ssm',
     '@aws-sdk/s3-request-presigner',
     'axios',
     'dotenv',
