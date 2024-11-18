@@ -1,9 +1,11 @@
 import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
-import { Database, DynamoDBDatabase } from '../../submission/Database';
-import { SubmissionSchema } from '../../submission/SubmissionSchema';
+import { Database, DynamoDBDatabase, SubmissionData } from '../../submission/Database';
+import { Submission, SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
+import { RXMissionZaak } from './RxMissionZaak';
 import { RxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
-import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
+import { ZgwClient } from '../zgwClient/ZgwClient';
+import 'dotenv/config';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -56,31 +58,6 @@ export class RxMissionZgwHandler {
       throw Error(`Could not find submission ${key}`);
     }
 
-    // Collect information for creating the role
-    const email = SubmissionUtils.findEmail(parsedSubmission);
-    const telefoon = SubmissionUtils.findTelefoon(parsedSubmission);
-    const name = parsedSubmission.data.naamIngelogdeGebruiker;
-    const hasContactDetails = !!email || !!telefoon;
-    if (!hasContactDetails || !name) {
-      console.log('No contact information found in submission. Notifications cannot be send.');
-    }
-
-    // Handle idempotency by checking if the zaak already exists
-    try {
-      const existingZaak = await this.zgwClient.getZaak(key);
-      if (existingZaak) {
-        console.log('Zaak exists, skipping');
-        return;
-      }
-    } catch (error) {
-      // If zaak not found is thrown that's a good thing we can continue
-      // Otherwise log the error and stop processing
-      if (!(error instanceof ZaakNotFoundError)) {
-        console.error(error);
-        return;
-      }
-    }
-
     // Create zaak
     // Gebruikt database data die ook uit parsedSubmission kan komen
     // Zaaktype meegeven
@@ -90,30 +67,44 @@ export class RxMissionZgwHandler {
     // TODO: vanaf dit stuk moet het per formulier anders worden gedaan afhankelijk van de config.
     // Deze zal steeds specifieker worden als we later bepaalde mappings toe gaan voegen.
     // Ander zaaktype en eventueel ook verschillende rollen en zaakeigenschappen per type formulier
-
-    const zaak = await this.zgwClient.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
+    const zaak = new RXMissionZaak(this.zgwClient);
+    const zgwZaak = await zaak.create(parsedSubmission, submission);
 
     // Geen rol toevoegen indien geen bsn of kvk
     // Nog checken bij RxMission of ze uberhaupt rollen hebben zonder bsn/kvk
-    if (parsedSubmission.bsn) {
-      await this.zgwClient.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, telefoon, name);
-    } else if (parsedSubmission.kvknummer) {
-      await this.zgwClient.addKvkRoleToZaak(zaak.url, submission.userId, email, telefoon, name);
-    } else {
-      console.warn('No BSN or KVK found so a rol will not be created.');
+    if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, weghalen
+      await this.addRole(parsedSubmission, zgwZaak, submission);
     }
 
     // Check if the zaak has attachments
     // TODO: checken in parsedsubmission of in S3
     if (!submission.attachments) {
-      throw Error('No attachments found');
+      throw Error('No attachments found'); //TODO: geen attachments is ook prima?
     }
 
     // Upload attachments
     // Nog checken bij RxMission of hier beperkingen aan zitten. Kunnen grote docs zijn met bouwzaken
-    await this.uploadAttachment(key, zaak.url, `${key}.pdf`);
-    const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, 'attachments/' + attachment));
+    await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
+    const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
     await Promise.all(uploads);
+  }
+
+  private async addRole(parsedSubmission: Submission, zgwZaak: any, submission: SubmissionData) {
+    // Collect information for creating the role
+    const email = SubmissionUtils.findEmail(parsedSubmission);
+    const telefoon = SubmissionUtils.findTelefoon(parsedSubmission);
+    const name = parsedSubmission.data.naamIngelogdeGebruiker;
+    const hasContactDetails = !!email || !!telefoon;
+    if (!hasContactDetails || !name) {
+      console.log('No contact information found in submission. Notifications cannot be send.');
+    }
+    if (parsedSubmission.bsn) {
+      await this.zgwClient.addBsnRoleToZaak(zgwZaak.url, new Bsn(submission.userId), email, telefoon, name);
+    } else if (parsedSubmission.kvknummer) {
+      await this.zgwClient.addKvkRoleToZaak(zgwZaak.url, submission.userId, email, telefoon, name);
+    } else {
+      console.warn('No BSN or KVK found so a rol will not be created.');
+    }
   }
 
   async submissionData(key: string) {

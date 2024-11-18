@@ -89,13 +89,13 @@ export class ZgwClient {
   // Optioneel zaaktype toevoegen
   // Andere velden optioneel maken en duidelijke interfaces maken
   async createZaak(identificatie: string, formulier: string) {
-
+    console.log('CREATEZAAK');
     const zaakRequest = {
       identificatie: identificatie,
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       zaaktype: this.options.zaaktype,
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
-      startdatum: this.datestemp(),
+      startdatum: this.datestamp(),
       omschrijving: formulier,
       toelichting: `Formulier: "${formulier}" met kenmerk ${identificatie}.`,
     };
@@ -104,7 +104,7 @@ export class ZgwClient {
     const statusRequest = {
       zaak: zaak.url,
       statustype: this.options.zaakstatus,
-      datumStatusGezet: this.datestemp(),
+      datumStatusGezet: this.datestamp(),
       statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
     };
     await this.callZaakApi('POST', 'statussen', statusRequest);
@@ -121,7 +121,7 @@ export class ZgwClient {
   async addDocumentToZaak(zaak: string, documentName: string, documentBase64: string) {
     const documentRequest = {
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
-      creatiedatum: this.datestemp(),
+      creatiedatum: this.datestamp(),
       titel: documentName,
       auteur: this.options.name,
       taal: 'dut',
@@ -134,6 +134,16 @@ export class ZgwClient {
     const documentZaakRequest = {
       informatieobject: document.url,
       zaak: zaak,
+    };
+    await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
+  }
+
+  async relateDocumentToZaak(zaakUrl: string, informatieObjectUrl: string, fileName: string) {
+    const documentZaakRequest = {
+      informatieobject: informatieObjectUrl,
+      zaak: zaakUrl,
+      titel: fileName,
+      omschrijving: 'TEST Devops',
     };
     await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
   }
@@ -224,11 +234,35 @@ export class ZgwClient {
     return json;
   }
 
-  private async callDocumentenApi(method: string, path: string, data?: any) {
+  async callBestandsdelenApi(method: string, url: string, data: FormData) {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
-    const url = this.joinUrl(this.options.documentenApiUrl, path);
+    const response = await fetch(url, {
+      method: method,
+      body: data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.debug(response);
+    const json = await response.json() as any;
+    console.debug(json);
+    if (response.status < 200 || response.status > 300) {
+      throw Error('Not a 2xx response');
+    }
+    return json;
+  }
+
+  async callDocumentenApi(method: string, pathOrUrl: string, data?: any) {
+    this.checkConfiguration();
+    const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
+
+    let url = pathOrUrl;
+    if (!pathOrUrl.startsWith('https://')) {
+      url = this.joinUrl(this.options.documentenApiUrl, pathOrUrl);
+    }
+
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(data),
@@ -238,6 +272,9 @@ export class ZgwClient {
       },
     });
     console.debug(response);
+    if (response.status == 204) {
+      return;
+    }
     const json = await response.json() as any;
     console.debug(json);
     if (response.status < 200 || response.status > 300) {
@@ -253,7 +290,7 @@ export class ZgwClient {
     }
   }
 
-  private datestemp() {
+  private datestamp() {
     return new Date().toISOString().substring(0, 'yyyy-mm-dd'.length);
   }
 
