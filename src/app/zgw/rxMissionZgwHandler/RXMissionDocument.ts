@@ -7,6 +7,13 @@ interface RXMissionDocumentConfig {
   informatieObjectType: string;
 }
 
+/**
+ * Create and upload documents
+ * 
+ * This is ZGW-standard, using the 'bestandsdelen' functionality. Some documentation
+ * from Roxit: https://github.com/OneGround/About/blob/main/exampledocumentupload.md
+ */
+
 export class RXMissionDocument {
   private zgwClient: ZgwClient;
   private informatieObjectType: string;

@@ -77,7 +77,7 @@ export class Migration {
         const command = new ScanCommand({
           TableName: this.tableName,
           ExclusiveStartKey: this.lastKey,
-          FilterExpression: 'NOT attribute_exists(userType)',
+          FilterExpression: 'NOT attribute_exists(userType) AND NOT attribute_exists(migrated20241106)',
         });
         this.info('Starting scan');
         const result = await this.client.send(command);
