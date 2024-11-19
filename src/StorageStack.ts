@@ -117,6 +117,15 @@ export class StorageStack extends Stack {
     });
     table.grantReadWriteData(migration20241106);
     bucket.grantRead(migration20241106);
+
+    const migration20241118 = new Migration20241106FixKvkFunction(this, 'migration-20241118', {
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+      memorySize: 2048,
+      timeout: Duration.minutes(15),
+    });
+    table.grantReadWriteData(migration20241118);
   }
 
   private key() {
