@@ -32,6 +32,7 @@
 /src/app/zgw/zgwForwardingHandler/zgw-function.ts linguist-generated
 /src/migrations/migration-2024-02-06-enrich-table-function.ts linguist-generated
 /src/migrations/migration-2024-11-06-fix-kvk-function.ts linguist-generated
+/src/migrations/migration-2024-11-18-add-userType-function.ts linguist-generated
 /tsconfig.dev.json linguist-generated
 /tsconfig.json linguist-generated
 /yarn.lock linguist-generated
