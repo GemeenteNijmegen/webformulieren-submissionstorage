@@ -110,7 +110,7 @@ export class RXMissionDocument {
       inhoud: null,
       bestandsomvang: fileSize,
       informatieobjecttype,
-      ...this.informatieObjectProperties
+      ...this.informatieObjectProperties,
     };
     this.informatieObject = await this.zgwClient.callDocumentenApi('POST', 'enkelvoudiginformatieobjecten', doc);
     console.debug('create informatieobject', this.informatieObject);
