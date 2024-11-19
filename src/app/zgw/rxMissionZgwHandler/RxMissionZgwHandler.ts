@@ -125,7 +125,7 @@ export class RxMissionZgwHandler {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
     const bytes = await inhoud?.Body?.transformToByteArray();
-    if(!bytes) {
+    if (!bytes) {
       throw Error('error converting file');
     }
     const blob = new Blob([bytes]);
@@ -136,7 +136,7 @@ export class RxMissionZgwHandler {
       zgwClient: this.zgwClient,
       contents: blob,
     });
-    return await document.addToZaak(zaak);
+    return document.addToZaak(zaak);
   }
 
 }
