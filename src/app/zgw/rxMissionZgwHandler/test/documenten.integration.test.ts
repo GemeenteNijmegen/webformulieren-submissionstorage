@@ -30,6 +30,7 @@ describe('Document upload test', () => {
       informatieObjectType: env.INFORMATIEOBJECTTYPE,
       fileName: 'testfile',
       filePath: sampleFilePath,
+      identificatie: 'TEST1',
     });
     await document.addToZaak('https://zaak-test/zaak');
     console.debug(spyOnFetch.mock.calls);
@@ -50,6 +51,7 @@ describeIntegration('Live document upload test', () => {
         informatieObjectType: env.INFORMATIEOBJECTTYPE,
         fileName: 'testfile',
         filePath: sampleFilePath,
+        identificatie: 'TEST1',
       });
       await document.addToZaak('https://zaken.preprod-rx-services.nl/api/v1/zaken/bf8e1c72-b6be-403b-bfb7-406c8408ab91');
     } catch (error) {
