@@ -81,6 +81,9 @@
         },
         {
           "spawn": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda"
+        },
+        {
+          "spawn": "bundle:migrations/migration-2024-11-18-add-userType.lambda"
         }
       ]
     },
@@ -297,6 +300,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+        }
+      ]
+    },
+    "bundle:migrations/migration-2024-11-18-add-userType.lambda": {
+      "name": "bundle:migrations/migration-2024-11-18-add-userType.lambda",
+      "description": "Create a JavaScript bundle from src/migrations/migration-2024-11-18-add-userType.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-18-add-userType.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-18-add-userType.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+        }
+      ]
+    },
+    "bundle:migrations/migration-2024-11-18-add-userType.lambda:watch": {
+      "name": "bundle:migrations/migration-2024-11-18-add-userType.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-11-18-add-userType.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-18-add-userType.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-18-add-userType.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },

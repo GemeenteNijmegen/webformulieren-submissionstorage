@@ -28,6 +28,8 @@
     "bundle:migrations/migration-2024-02-06-enrich-table.lambda:watch": "npx projen bundle:migrations/migration-2024-02-06-enrich-table.lambda:watch",
     "bundle:migrations/migration-2024-11-06-fix-kvk.lambda": "npx projen bundle:migrations/migration-2024-11-06-fix-kvk.lambda",
     "bundle:migrations/migration-2024-11-06-fix-kvk.lambda:watch": "npx projen bundle:migrations/migration-2024-11-06-fix-kvk.lambda:watch",
+    "bundle:migrations/migration-2024-11-18-add-userType.lambda": "npx projen bundle:migrations/migration-2024-11-18-add-userType.lambda",
+    "bundle:migrations/migration-2024-11-18-add-userType.lambda:watch": "npx projen bundle:migrations/migration-2024-11-18-add-userType.lambda:watch",
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
     "default": "npx projen default",
