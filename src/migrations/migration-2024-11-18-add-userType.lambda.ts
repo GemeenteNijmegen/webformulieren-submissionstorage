@@ -1,5 +1,4 @@
 import { AttributeValue, DynamoDBClient, ScanCommand, ScanCommandOutput, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import { S3Storage, Storage } from '@gemeentenijmegen/utils';
 
 /**
  * This is a one-time use function to migrate the dynamoDB table used for storing submissions. The following changes need to be performed:
@@ -29,13 +28,12 @@ export async function handler(event: any) {
   const dryrun = event?.runlive === 'true' ? false: true; // Only update when the event object contains runlive: 'true'
   const batchSize = event?.batchSize ?? 50; // Only update when the event object contains runlive: 'true'
   console.info('dry run', dryrun);
-  if (!process.env.BUCKET_NAME || !process.env.TABLE_NAME) {
-    throw Error('No table name or bucket provided');
+  if (!process.env.TABLE_NAME) {
+    throw Error('No table provided');
   }
   try {
     const client = new DynamoDBClient();
-    const storage = new S3Storage(process.env.BUCKET_NAME);
-    const migration = new Migration(client, process.env.TABLE_NAME, storage);
+    const migration = new Migration(client, process.env.TABLE_NAME);
     await migration.run(batchSize, dryrun);
   } catch (error: any) {
     console.error(error);
@@ -47,16 +45,14 @@ export class Migration {
   private lastKey?: Record<string, AttributeValue>;
   private client: DynamoDBClient;
   private tableName: string;
-  private storage: Storage;
   private _errors: string = '';
   private _info: string = '';
   private _success: string = '';
   private _failed: string = '';
 
-  constructor(client: DynamoDBClient, tableName: string, storage: Storage) {
+  constructor(client: DynamoDBClient, tableName: string) {
     this.client = client;
     this.tableName = tableName;
-    this.storage = storage;
   }
 
   /**
@@ -129,37 +125,6 @@ export class Migration {
       this.error(`Mismatch in total and processed items count, processed ${processedItems} of ${totalItems}`);
     }
   }
-
-  /**
-   * Batch get form submission objects from S3
-   *
-   * Gets the JSON from the submission and return it as an array keyed by reference
-   * @param keys array of s3 object keys
-   * @returns array of submission JSON's, keyed by reference
-   */
-  async getSubmissionObjectsFromBucket(keys: string[]) {
-    this.info('Retrieving submissions from S3');
-    const objects = await this.storage.getBatch(keys);
-    const submissions: any = {};
-    for (const object of objects) {
-      try {
-        if (object.Body) {
-          const bodyString = await object.Body.transformToString();
-          const objectJson = JSON.parse(bodyString);
-          const submission = JSON.parse(objectJson.Message);
-          //Add the sns message timestamp in, we might need it
-          submission.snsTimeStamp = objectJson.Timestamp;
-          submissions[submission.reference] = submission;
-          this.info(`- ${submission.reference}`);
-        }
-      } catch (error: any) {
-        this.error(error);
-      }
-    }
-    this.info(`Retrieved ${Object.keys(submissions).length} form submissions from S3`);
-    return submissions;
-  }
-
 
   /**
    * Actually update items in dynamodb

@@ -5,6 +5,7 @@ import { ZgwClient } from '../zgwClient/ZgwClient';
 interface RXMissionDocumentConfig {
   zgwClient: ZgwClient;
   informatieObjectType: string;
+  informatieObjectProperties?: any;
 }
 
 /**
@@ -18,6 +19,7 @@ export class RXMissionDocument {
   private zgwClient: ZgwClient;
   private informatieObjectType: string;
   private informatieObject: any;
+  private informatieObjectProperties?: any;
   private lock?: string;
   private fileName: string;
   private fileBuffer: Buffer;
@@ -25,6 +27,7 @@ export class RXMissionDocument {
   constructor(filePath: string, fileName: string, config: RXMissionDocumentConfig) {
     this.zgwClient = config.zgwClient;
     this.informatieObjectType = config.informatieObjectType;
+    this.informatieObjectProperties = config.informatieObjectProperties;
     this.fileName = fileName;
     this.fileBuffer = this.getFile(filePath);
   }
@@ -107,6 +110,7 @@ export class RXMissionDocument {
       inhoud: null,
       bestandsomvang: fileSize,
       informatieobjecttype,
+      ...this.informatieObjectProperties
     };
     this.informatieObject = await this.zgwClient.callDocumentenApi('POST', 'enkelvoudiginformatieobjecten', doc);
     console.debug('create informatieobject', this.informatieObject);
