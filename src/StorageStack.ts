@@ -8,8 +8,8 @@ import { Construct } from 'constructs';
 import { Configurable } from './Configuration';
 import { Migration20240206EnrichTableFunction } from './migrations/migration-2024-02-06-enrich-table-function';
 import { Migration20241106FixKvkFunction } from './migrations/migration-2024-11-06-fix-kvk-function';
-import { Statics } from './statics';
 import { Migration20241118AddUserTypeFunction } from './migrations/migration-2024-11-18-add-userType-function';
+import { Statics } from './statics';
 
 interface StorageStackProps extends StackProps, Configurable {};
 
