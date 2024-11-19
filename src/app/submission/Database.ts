@@ -171,7 +171,6 @@ export class DynamoDBDatabase implements Database {
     console.debug(`Storing object to table ${this.table} with primary key USER#${hashedId}`);
     const sk = `${submission.key}`;
     let item: any = dynamoDBItem(pk, sk, submission.userType, submission);
-    console.debug(JSON.stringify(item, null, 2));
     const command = new PutItemCommand({
       TableName: this.table,
       Item: item,
