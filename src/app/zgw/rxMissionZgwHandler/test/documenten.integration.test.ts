@@ -30,52 +30,6 @@ describe('Document upload test', () => {
     console.debug(spyOnFetch.mock.calls);
     expect(spyOnFetch.mock.calls[0][0]).toBe('https://documenten-api/enkelvoudiginformatieobjecten');
 
-    // const fileBuffer = getFile('samples/test.pdf');
-    // if (fileBuffer) {
-    //   // eerst document creeëren, dan pas uploaden
-    //   const doc = {
-    //     identificatie: 'TESTDOC1',
-    //     bronorganisatie: '001479179',
-    //     creatiedatum: '2024-08-27',
-    //     titel: 'test Devops Nijmegen',
-    //     vertrouwelijkheidaanduiding: 'openbaar',
-    //     auteur: 'Devops Nijmegen',
-    //     status: '',
-    //     formaat: 'application/pdf',
-    //     taal: 'nld',
-    //     bestandsnaam: 'test.pdf',
-    //     inhoud: null,
-    //     bestandsomvang: fileBuffer.byteLength,
-    //     informatieobjecttype: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
-    //   };
-
-    //   const informatieObject = await zgwClient.callDocumentenApi('POST', 'enkelvoudiginformatieobjecten', doc);
-    //   console.debug('informatieobject', informatieObject);
-    //   const bestandsDeelUrl = informatieObject?.bestandsdelen?.[0]?.url;
-    //   const lock = informatieObject?.lock;
-
-    //   if (bestandsDeelUrl && lock) {
-    //     const data = new FormData();
-    //     data.append('inhoud', new Blob([fileBuffer]));
-    //     data.append('lock', lock);
-    //     const result = await zgwClient.callBestandsdelenApi('put', bestandsDeelUrl, data);
-    //     console.debug('bestandsdeel', result);
-    //     // if (result.url) {
-    //   //TODO Gaat mis op url: https://documenten.preprod-rx-services.nl/api/v1/https://documenten.preprod-rx-services.nl/api/v1/enkelvoudiginformatieobjecten/{uuid}}/unlock
-    //   const unlockResult = await zgwClient.callDocumentenApi('POST', `${informatieObject.url}/unlock`, {
-    //     lock: lock,
-    //   });
-    //   console.debug('unlock', unlockResult);
-    //   const relateResult = await zgwClient.callZaakApi('POST', 'zaakinformatieobjecten', {
-    //     informatieobject: informatieObject.url,
-    //     zaak: 'https://zaken.preprod-rx-services.nl/api/v1/zaken/7a89ea95-a167-415f-80d8-6b9bb0c61da7',
-    //     titel: 'test.pdf',
-    //     beschrijving: 'test DEVOPS nijmegen',
-    //   },
-    //   );
-    //   console.debug(relateResult);
-    // }
-  // }
   });
 });
 

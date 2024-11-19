@@ -27,7 +27,7 @@ export class MockDatabase implements Database {
     const pk = hashString(submission.userId);
     const sk = `${submission.key}`;
     console.debug(`would store object to table ${this.table} with primary key ${pk} and contents`, submission);
-    let item: any = dynamoDBItem(pk, sk, submission);
+    let item: any = dynamoDBItem(pk, sk, submission.userType, submission);
     console.debug('DynamoDB insert Item', JSON.stringify(item, null, 2));
 
     return true;

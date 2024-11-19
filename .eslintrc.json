@@ -159,7 +159,8 @@
           "src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
           "src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
           "src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
-          "src/migrations/migration-2024-11-06-fix-kvk.lambda.ts"
+          "src/migrations/migration-2024-11-06-fix-kvk.lambda.ts",
+          "src/migrations/migration-2024-11-18-add-userType.lambda.ts"
         ],
         "optionalDependencies": false,
         "peerDependencies": true

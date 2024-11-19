@@ -170,7 +170,7 @@ export class DynamoDBDatabase implements Database {
     }
     console.debug(`Storing object to table ${this.table} with primary key USER#${hashedId}`);
     const sk = `${submission.key}`;
-    let item: any = dynamoDBItem(pk, sk, submission);
+    let item: any = dynamoDBItem(pk, sk, submission.userType, submission);
     console.debug(JSON.stringify(item, null, 2));
     const command = new PutItemCommand({
       TableName: this.table,
@@ -262,10 +262,11 @@ export class DynamoDBDatabase implements Database {
   }
 }
 
-export function dynamoDBItem(pk: string, sk: string, submission: SubmissionData) {
+export function dynamoDBItem(pk: string, sk: string, userType: 'person' | 'organisation' | 'anonymous', submission: SubmissionData) {
   let item: any = {
     pk: { S: pk },
     sk: { S: sk },
+    userType: { S: userType },
     pdfKey: { S: submission.pdf },
   };
   if (submission.dateSubmitted) {
