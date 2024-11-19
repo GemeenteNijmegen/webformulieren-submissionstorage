@@ -4,7 +4,7 @@ import { ZgwClient } from '../zgwClient/ZgwClient';
 
 interface RXMissionDocumentConfig {
   zgwClient: ZgwClient;
-  identificatie: string; 
+  identificatie: string;
   fileName: string;
   filePath?: string;
   contents?: Blob;
@@ -37,7 +37,7 @@ export class RXMissionDocument {
     this.identificatie = config.identificatie;
     if (config.filePath) {
       this.contents = new Blob([this.getFile(config.filePath)]);
-    } else if(config.contents) {
+    } else if (config.contents) {
       this.contents = config.contents;
     } else {
       throw Error('You must provide either a file path or a content Blob to RXMissionDocument');
