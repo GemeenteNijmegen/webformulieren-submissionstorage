@@ -1,5 +1,4 @@
 import { CreateTableCommand, DeleteTableCommand, DynamoDBClient, GetItemCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
-import { S3Storage } from '@gemeentenijmegen/utils';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait } from 'testcontainers';
 import { describeIntegration } from '../../app/test-utils/describeIntegration';
@@ -20,7 +19,6 @@ describeIntegration('Dynamodb migration test', () => {
   });
 
   const tableName = 'submissions-local';
-  const storage = new S3Storage('dummybucket');
 
   beforeAll(async() => {
     if (!process.env.DEBUG) {
@@ -88,12 +86,12 @@ describeIntegration('Dynamodb migration test', () => {
   });
 
   test('can create migration', async() => {
-    expect(new Migration(dynamoDBClient, tableName, storage)).toBeTruthy();
+    expect(new Migration(dynamoDBClient, tableName)).toBeTruthy();
   });
 
   test('can perform update', async() => {
     await prefillDatabase(dynamoDBClient, tableName);
-    const migration = new Migration(dynamoDBClient, tableName, storage);
+    const migration = new Migration(dynamoDBClient, tableName);
     const result = await migration.run(50, false);
     expect(result).toBeTruthy();
   }, 240000);
@@ -104,7 +102,7 @@ describeIntegration('Dynamodb migration test', () => {
     expect(preMigrationResults).not.toHaveProperty('Item.migrated20241106');
     expect(preMigrationResults).not.toHaveProperty('Item.userType');
 
-    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
+    await new Migration(dynamoDBClient, tableName).run(50, false);
     const command = getItemCommand(tableName, 'PERSON#testshouldupdate', 'TDL12.348');
     const results = await dynamoDBClient.send(command);
 
@@ -113,7 +111,7 @@ describeIntegration('Dynamodb migration test', () => {
   });
 
   test('can get new attributes for updated items (org, person) after update', async() => {
-    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
+    await new Migration(dynamoDBClient, tableName).run(50, false);
     const personCommand = getItemCommand(tableName, 'PERSON#testshouldupdate', 'TDL12.348');
     const personResults = await dynamoDBClient.send(personCommand);
     expect(personResults?.Item?.userType?.S).toBe('person');
@@ -134,23 +132,23 @@ describeIntegration('Dynamodb migration test', () => {
 
   test('correct item wont update', async() => {
     const consoleSpy = jest.spyOn(console, 'info');
-    await new Migration(dynamoDBClient, tableName, storage).run(50, false);
+    await new Migration(dynamoDBClient, tableName).run(50, false);
     expect(consoleSpy).not.toHaveBeenCalledWith('TDL12.345');
   });
 
   // test('dryrun does not actually update', async() => {
-  //   await new Migration(dynamoDBClient, tableName, storage).run(50, true);
+  //   await new Migration(dynamoDBClient, tableName).run(50, true);
   //   const command = getItemCommand(tableName, 'TDL17.957');
   //   expect(await dynamoDBClient.send(command)).not.toHaveProperty('Item.migrated20241106');
   // });
 
   // test('Running migration twice should result in same table', async() => {
   //   const consoleSpy = jest.spyOn(console, 'info');
-  //   await new Migration(dynamoDBClient, tableName, storage).run(50, false);
+  //   await new Migration(dynamoDBClient, tableName).run(50, false);
   //   expect(consoleSpy).toHaveBeenCalledWith('Updating 3 items in dynamoDB');
   //   const command = getItemCommand(tableName, 'TDL17.957');
   //   expect(await dynamoDBClient.send(command)).toHaveProperty('Item.migrated20241106');
-  //   await new Migration(dynamoDBClient, tableName, storage).run(50, false);
+  //   await new Migration(dynamoDBClient, tableName).run(50, false);
   //   expect(consoleSpy).toHaveBeenCalledWith('Processed 0 items');
   //   const secondCommand = getItemCommand(tableName, 'TDL17.957');
   //   expect(await dynamoDBClient.send(secondCommand)).toHaveProperty('Item.migrated20241106');
