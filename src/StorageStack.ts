@@ -9,6 +9,7 @@ import { Configurable } from './Configuration';
 import { Migration20240206EnrichTableFunction } from './migrations/migration-2024-02-06-enrich-table-function';
 import { Migration20241106FixKvkFunction } from './migrations/migration-2024-11-06-fix-kvk-function';
 import { Statics } from './statics';
+import { Migration20241118AddUserTypeFunction } from './migrations/migration-2024-11-18-add-userType-function';
 
 interface StorageStackProps extends StackProps, Configurable {};
 
@@ -117,6 +118,15 @@ export class StorageStack extends Stack {
     });
     table.grantReadWriteData(migration20241106);
     bucket.grantRead(migration20241106);
+
+    const migration20241118 = new Migration20241118AddUserTypeFunction(this, 'migration-20241118', {
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+      memorySize: 2048,
+      timeout: Duration.minutes(15),
+    });
+    table.grantReadWriteData(migration20241118);
   }
 
   private key() {
