@@ -6,6 +6,7 @@ import { RXMissionZaak } from './RxMissionZaak';
 import { RxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
 import { ZgwClient } from '../zgwClient/ZgwClient';
 import 'dotenv/config';
+import { RXMissionDocument } from './RXMissionDocument';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -24,10 +25,12 @@ export class RxMissionZgwHandler {
   private database: Database;
   private zgwClient: ZgwClient;
   private rxmConfig: RxMissionZgwConfiguration;
+  private informatieObjectType: string;
 
   constructor(rxMissionZgwConfiguration: RxMissionZgwConfiguration) {
     this.rxmConfig = rxMissionZgwConfiguration;
     const env = environmentVariables(envKeys);
+    this.informatieObjectType = env.INFORMATIEOBJECTTYPE;
     this.storage = new S3Storage(env.BUCKET_NAME);
     this.database = new DynamoDBDatabase(env.TABLE_NAME);
 
@@ -72,7 +75,7 @@ export class RxMissionZgwHandler {
 
     // Geen rol toevoegen indien geen bsn of kvk
     // Nog checken bij RxMission of ze uberhaupt rollen hebben zonder bsn/kvk
-    if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, weghalen
+    if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
       await this.addRole(parsedSubmission, zgwZaak, submission);
     }
 
@@ -121,8 +124,19 @@ export class RxMissionZgwHandler {
   async uploadAttachment(key: string, zaak: string, attachment: string) {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
-    const base64 = await inhoud?.Body?.transformToString('base64');
-    return this.zgwClient.addDocumentToZaak(zaak, attachment, base64 ?? '');
+    const bytes = await inhoud?.Body?.transformToByteArray();
+    if(!bytes) {
+      throw Error('error converting file');
+    }
+    const blob = new Blob([bytes]);
+    const document = new RXMissionDocument({
+      identificatie: `${key}-${attachment}`,
+      fileName: attachment,
+      informatieObjectType: this.informatieObjectType,
+      zgwClient: this.zgwClient,
+      contents: blob,
+    });
+    return await document.addToZaak(zaak);
   }
 
 }

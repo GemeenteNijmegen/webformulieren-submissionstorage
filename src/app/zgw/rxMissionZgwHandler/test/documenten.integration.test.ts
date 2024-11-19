@@ -25,11 +25,15 @@ describe('Document upload test', () => {
     const zgwClient = zgwTestClient();
     setFetchMockResponse({});
     const spyOnFetch = jest.spyOn(global, 'fetch');
-    const document = new RXMissionDocument(sampleFilePath, 'testfile', { zgwClient: zgwClient, informatieObjectType: env.INFORMATIEOBJECTTYPE });
+    const document = new RXMissionDocument({
+      zgwClient: zgwClient,
+      informatieObjectType: env.INFORMATIEOBJECTTYPE,
+      fileName: 'testfile',
+      filePath: sampleFilePath,
+    });
     await document.addToZaak('https://zaak-test/zaak');
     console.debug(spyOnFetch.mock.calls);
     expect(spyOnFetch.mock.calls[0][0]).toBe('https://documenten-api/enkelvoudiginformatieobjecten');
-
   });
 });
 
@@ -41,7 +45,12 @@ describeIntegration('Live document upload test', () => {
     const zgwClient = liveTestZgwClient();
     const spyOnFetch = jest.spyOn(global, 'fetch');
     try {
-      const document = new RXMissionDocument(sampleFilePath, 'testfile', { zgwClient: zgwClient, informatieObjectType: env.INFORMATIEOBJECTTYPE });
+      const document = new RXMissionDocument({
+        zgwClient: zgwClient,
+        informatieObjectType: env.INFORMATIEOBJECTTYPE,
+        fileName: 'testfile',
+        filePath: sampleFilePath,
+      });
       await document.addToZaak('https://zaken.preprod-rx-services.nl/api/v1/zaken/bf8e1c72-b6be-403b-bfb7-406c8408ab91');
     } catch (error) {
       console.error(error);
