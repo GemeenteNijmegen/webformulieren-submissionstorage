@@ -31,13 +31,28 @@ export interface SubmissionZaakProperties {
   formName?: string;
   /**
    * RxMission Zaaktype
-   * For example: NMG-00002Omzetvergunning
    */
   zaakType?: string;
   /**
-   * Option to set specific settings for a submission - zaak combination
-   * Such as
+   * RXMission productentype, as URL
+   * For example: `https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7`
    */
+  productType?: string;
+  
+  /**
+   * InformatieObjectType for document.
+   */
+  informatieObjectType?: string;
+
+  /**
+   * Statustype for initial status for zaak
+   */
+  statusType?: string;
+
+  /**
+   * Role type for initiator-role
+   */
+  aanvragerRolType?: string;
 }
 
 
@@ -82,6 +97,11 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
       },
       {
         appId: 'TDL',
+        zaakType: `https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707`,
+        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
+        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
+        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/1f616878-dc79-4b14-bd3e-08dcd0bf97b7',
       },
     ],
   },
