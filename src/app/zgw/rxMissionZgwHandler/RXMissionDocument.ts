@@ -4,6 +4,10 @@ import { ZgwClient } from '../zgwClient/ZgwClient';
 
 interface RXMissionDocumentConfig {
   zgwClient: ZgwClient;
+  identificatie: string;
+  fileName: string;
+  filePath?: string;
+  contents?: Blob;
   informatieObjectType: string;
   informatieObjectProperties?: any;
 }
@@ -22,14 +26,22 @@ export class RXMissionDocument {
   private informatieObjectProperties?: any;
   private lock?: string;
   private fileName: string;
-  private fileBuffer: Buffer;
+  private contents: Blob;
+  private identificatie: string;
 
-  constructor(filePath: string, fileName: string, config: RXMissionDocumentConfig) {
+  constructor(config: RXMissionDocumentConfig) {
     this.zgwClient = config.zgwClient;
     this.informatieObjectType = config.informatieObjectType;
     this.informatieObjectProperties = config.informatieObjectProperties;
-    this.fileName = fileName;
-    this.fileBuffer = this.getFile(filePath);
+    this.fileName = config.fileName;
+    this.identificatie = config.identificatie;
+    if (config.filePath) {
+      this.contents = new Blob([this.getFile(config.filePath)]);
+    } else if (config.contents) {
+      this.contents = config.contents;
+    } else {
+      throw Error('You must provide either a file path or a content Blob to RXMissionDocument');
+    }
   }
 
   /**
@@ -46,7 +58,7 @@ export class RXMissionDocument {
    */
   public async addToZaak(zaakUrl: string) {
     try {
-      await this.createInformatieObject(this.informatieObjectType, this.fileBuffer.byteLength);
+      await this.createInformatieObject(this.informatieObjectType, this.contents.size);
     } catch (error) {
       console.error('Could not create informatieobject, stopping');
       throw (error);
@@ -77,7 +89,7 @@ export class RXMissionDocument {
 
   private async uploadFile(bestandsDeelUrl: any) {
     const data = new FormData();
-    data.append('inhoud', new Blob([this.fileBuffer]));
+    data.append('inhoud', this.contents);
     data.append('lock', this.lock);
     const result = await this.zgwClient.callBestandsdelenApi('PUT', bestandsDeelUrl, data);
     console.debug('put file', result);
@@ -97,7 +109,7 @@ export class RXMissionDocument {
 
   private async createInformatieObject(informatieobjecttype: string, fileSize: number) {
     const doc = {
-      identificatie: 'DEVOPS-TESTDOC', //Combi moet uniek zijn met bronorganisatie
+      identificatie: this.identificatie, //Combi moet uniek zijn met bronorganisatie
       bronorganisatie: '001479179', //Combi moet uniek zijn met identificatie
       creatiedatum: '2024-08-27',
       titel: 'test Devops Nijmegen',
