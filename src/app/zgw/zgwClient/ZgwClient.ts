@@ -118,14 +118,22 @@ export class ZgwClient {
       toelichting: `Formulierinzending: "${formulier}" met kenmerk ${identificatie}.`,
     };
     const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
-
-    const statusRequest = {
-      zaak: zaak.url,
-      statustype: this.options.zaakstatus,
-      datumStatusGezet: this.datestamp(),
-      statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
-    };
-    await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
+    if(zaak.url) {
+      const statusRequest = {
+        zaak: zaak.url,
+        statustype: this.options.zaakstatus,
+        datumStatusGezet: this.datestamp(),
+        statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
+      };
+      const result = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
+      if(!result.url) {
+        // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
+        console.warn(`Creating status for zaak with identificatie ${identificatie} failed. Expected object with url.`);
+      }
+    } else {
+      // If the zaak result doesn't return a URL, assume something unrecoverable happened, and throw.
+      throw Error(`Creating zaak with identificatie ${identificatie} failed. Expected object with url.`);
+    }
 
     return zaak;
   }
@@ -163,7 +171,7 @@ export class ZgwClient {
       titel: fileName,
       omschrijving: 'TEST Devops',
     };
-    await this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
+    return await this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
@@ -260,7 +268,7 @@ export class ZgwClient {
     });
     console.debug(response);
     if (response.status == 204) {
-      return;
+      return { statusCode: 204 };
     }
     const json = await response.json() as any;
     console.debug(json);
