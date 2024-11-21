@@ -70,7 +70,6 @@ export class RxMissionZgwHandler {
     // TODO: vanaf dit stuk moet het per formulier anders worden gedaan afhankelijk van de config.
     // Deze zal steeds specifieker worden als we later bepaalde mappings toe gaan voegen.
     // Ander zaaktype en eventueel ook verschillende rollen en zaakeigenschappen per type formulier
-    
 
 
     const zaak = new RXMissionZaak(this.zgwClient);

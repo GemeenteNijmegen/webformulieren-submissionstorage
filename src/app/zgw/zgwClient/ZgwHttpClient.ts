@@ -1,5 +1,13 @@
 import * as jwt from 'jsonwebtoken';
 
+export enum HttpMethod {
+  Get = 'GET',
+  Head = 'HEAD',
+  Post = 'POST',
+  Put = 'PUT',
+  Delete = 'DELETE',
+}
+
 interface ZgwHttpClientConfig {
   clientId: string;
   clientSecret: string;
@@ -14,7 +22,7 @@ export class ZgwHttpClient {
     this.clientSecret = config.clientSecret;
   }
 
-  async request(method: 'POST'|'GET'|'PUT', url: string, data?: any, headers?: Record<string, string>) {
+  async request(method: HttpMethod, url: string, data?: any, headers?: Record<string, string>) {
     const token = this.createToken();
     const body = data ?? undefined;
 

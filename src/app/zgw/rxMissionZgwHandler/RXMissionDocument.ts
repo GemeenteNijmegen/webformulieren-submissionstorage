@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import { ZgwClient } from '../zgwClient/ZgwClient';
+import { HttpMethod } from '../zgwClient/ZgwHttpClient';
 
 interface RXMissionDocumentConfig {
   zgwClient: ZgwClient;
@@ -91,7 +92,7 @@ export class RXMissionDocument {
     const data = new FormData();
     data.append('inhoud', this.contents);
     data.append('lock', this.lock);
-    const result = await this.zgwClient.callBestandsdelenApi('PUT', bestandsDeelUrl, data);
+    const result = await this.zgwClient.callBestandsdelenApi(HttpMethod.Put, bestandsDeelUrl, data);
     console.debug('put file', result);
     return result;
   }
