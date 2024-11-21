@@ -1,5 +1,6 @@
 import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
+import { ZgwHttpClient } from './ZgwHttpClient';
 
 interface ZgwClientOptions {
   /**
@@ -60,20 +61,37 @@ export class ZgwClient {
 
   private clientId?: string;
   private clientSecret?: string;
+  private zgwHttpClient?: ZgwHttpClient;
   private readonly options: ZgwClientOptions;
 
   constructor(options: ZgwClientOptions) {
     this.options = options;
     this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
+
+    //If constructor was provided all info, create http client now.
+    if (this.clientId && this.clientSecret) {
+      this.createZgwHttpClient();
+    }
   }
 
   async init() {
-    if (this.clientId && this.clientSecret) {
+    if (this.clientId && this.clientSecret && this.zgwHttpClient) {
       return;
     }
     this.clientId = process.env.ZGW_CLIENT_ID;
     this.clientSecret = await AWS.getSecret(process.env.ZGW_CLIENT_SECRET_ARN!);
+    this.createZgwHttpClient();
+  }
+
+  private createZgwHttpClient() {
+    if (!this.clientId || !this.clientSecret) {
+      throw Error('clientID & secret are required before calling createZgwHttpClient');
+    }
+    this.zgwHttpClient = new ZgwHttpClient({
+      clientId: this.clientId,
+      clientSecret: this.clientSecret,
+    });
   }
 
   async getZaak(identificatie: string) {
@@ -206,32 +224,16 @@ export class ZgwClient {
     return token;
   }
 
-  private async callZaakApi(method: string, pathOrUrl: string, data?: any) {
+  private async callZaakApi(method: 'GET'|'PUT'|'POST', pathOrUrl: string, data?: any) {
     this.checkConfiguration();
-    const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
     let url = pathOrUrl;
     if (!pathOrUrl.startsWith('https://')) {
       url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
     }
-
-    const response = await fetch(url, {
-      method: method,
-      body: JSON.stringify(data),
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-type': 'application/json',
-        'Content-Crs': 'EPSG:4326',
-        'Accept-Crs': 'EPSG:4326',
-      },
-    });
-    console.debug(response);
-    const json = await response.json() as any;
-    console.debug(json);
-    if (response.status < 200 || response.status > 300) {
-      throw Error('Not a 2xx response');
-    }
-    return json;
+    const json = (data) ? JSON.stringify(data) : null;
+    console.debug('client', this.zgwHttpClient);
+    return this.zgwHttpClient?.request(method, url, json);
   }
 
   async callBestandsdelenApi(method: string, url: string, data: FormData) {
