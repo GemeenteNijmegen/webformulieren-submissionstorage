@@ -73,12 +73,12 @@ export class RxMissionZgwHandler {
 
     const zaak = new RXMissionZaak(this.zgwClient);
     const zgwZaak = await zaak.create(parsedSubmission, submission);
-    
+
     // Geen rol toevoegen indien geen bsn of kvk
     // Nog checken bij RxMission of ze uberhaupt rollen hebben zonder bsn/kvk
     if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
       // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
-      if(zgwZaak.rollen.length == 0) {
+      if (zgwZaak.rollen.length == 0) {
         await this.addRole(parsedSubmission, zgwZaak, submission);
       }
     }
@@ -92,10 +92,10 @@ export class RxMissionZgwHandler {
     // Upload attachments
     // Nog checken bij RxMission of hier beperkingen aan zitten. Kunnen grote docs zijn met bouwzaken
 
-    // We may have returned an existing zaak, in which some documents have been created. 
+    // We may have returned an existing zaak, in which some documents have been created.
     // Only start adding docs if the zaakinformatieobjecten count is different from attachments + pdf
     // TODO: check which attachments have already been added before adding all attachments again.
-    if(zgwZaak.zaakinformatieobjecten.length < (submission.attachments.length + 1)) {
+    if (zgwZaak.zaakinformatieobjecten.length < (submission.attachments.length + 1)) {
       await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
       const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
       await Promise.all(uploads);

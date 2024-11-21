@@ -99,7 +99,7 @@ export class RXMissionDocument {
 
   private async relateToZaak(zaakUrl: string) {
     const result = await this.zgwClient.relateDocumentToZaak(zaakUrl, this.informatieObject.url, this.fileName);
-    if(!result.url) {
+    if (!result.url) {
       throw Error(`Unable to relate informatieobject to zaak, zaakUrl: ${zaakUrl}, informatieObject: ${this.informatieObject}`);
     }
   }
@@ -135,7 +135,7 @@ export class RXMissionDocument {
     const result = await this.zgwClient.callDocumentenApi('POST', `${this.informatieObject.url}/unlock`, {
       lock: this.lock,
     });
-    if(result?.statusCode != 204) {
+    if (result?.statusCode != 204) {
       throw Error(`unlock expected a http 204 status code for ${this.informatieObject.url}`);
     }
   }

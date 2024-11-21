@@ -36,7 +36,7 @@ describe('ZGW Client', () => {
   });
   describe('createZaak', () => {
     test('original ZGWForwardHandler expected calls', async () => {
-      const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse() as any as Response);
+      const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
       console.debug(spyOnFetch);
       await client.createZaak('R01.0001', 'mockFormulierNaam');
       console.debug(spyOnFetch.mock.calls);
@@ -62,7 +62,7 @@ describe('ZGW Client', () => {
       });
     });
     test('original ZGWForwardHandler expected request content', async () => {
-      const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse() as any as Response);
+      const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
       await client.createZaak('R02.0002', 'mockFormulierNaam');
       const createZaakRequest = spyOnFetch.mock.calls[0];
       console.debug(createZaakRequest);
