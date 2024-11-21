@@ -11,8 +11,8 @@ if (process.env.DEBUG !== 'true') {
 /**
  * Get specific config
  */
-const env = environmentVariables(['BRANCH_NAME']);
-const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH_NAME!);
+const env = environmentVariables(['BRANCH']);
+const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH!);
 
 export async function handler(event: EventBridgeEvent<'New Form Processed', {Reference: string; UserId: string; UserType: 'person' | 'organisation'; Key: string}>) {
   console.log('RxMission Event Detected and ready for processing', event);
