@@ -70,12 +70,12 @@ export class SubmissionHandler {
     // eventually the goal is to only send hashed string in the events instead of identifiers like bsn and kvk
     const eventDetails: ZgwForwardEventDetail = {
       Reference: submission.key ?? '',
-      UserId: submission.userId(),
+      userId: submission.userId(),
       pk: submission.getHashedUserId(),
       sk: submission.key ?? '',
-      UserType: submission.getUserType(),
-      Key: submission.key ?? ''
-    }
+      userType: submission.getUserType(),
+      Key: submission.key ?? '',
+    };
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {

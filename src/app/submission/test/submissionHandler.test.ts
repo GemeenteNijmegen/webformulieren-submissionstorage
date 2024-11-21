@@ -68,10 +68,10 @@ describe('Submission', () => {
           DetailType: 'New Form Processed',
           Detail: JSON.stringify({
             Reference: 'TDL17.957',
-            UserId: '900026236',
+            userId: '900026236',
             pk: 'PERSON#n1oy6f+PijuPsy/rXsBGkdKsaaj/WFSBP2sp/7ngmdU=',
             sk: 'TDL17.957',
-            UserType: 'person',
+            userType: 'person',
             Key: 'TDL17.957',
           }),
         },

@@ -18,6 +18,6 @@ export async function handler(event: ZgwForwardProcessedFormEvent) {
   console.log('RxMission Event Detected and ready for processing', event);
   // parse event with zod
   const rxMissionZgwHandler = new RxMissionZgwHandler(rxMissionZgwConfig);
-  await rxMissionZgwHandler.sendSubmissionToRxMission(event.detail.Key, event.detail.UserId, event.detail.UserType);
+  await rxMissionZgwHandler.sendSubmissionToRxMission(event.detail.Key, event.detail.userId, event.detail.userType);
 
 }

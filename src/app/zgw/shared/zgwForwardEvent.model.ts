@@ -4,10 +4,10 @@ import { HashedUserId } from '../../submission/hash';
 
 export interface ZgwForwardEventDetail {
   Reference: string;
-  UserId: string;
+  userId: string;
   pk: HashedUserId;
   sk: string;
-  UserType: UserType;
+  userType: UserType;
   Key: string;
 }
 

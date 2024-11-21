@@ -31,7 +31,7 @@ import { ZgwForwardEventDetail, ZgwForwardProcessedFormEvent } from '../../../sh
 interface MockSubmissionInfo {
   filename: string;
   formName: string;
-  userType: 'person' | 'organisation';
+  userType: UserType;
   description: string;
 }
 
@@ -123,8 +123,8 @@ export class MockRxMissionSubmission {
   public getSubmissionParameters(): { key: string; userId: string; userType: UserType } {
     return {
       key: this.detail.Key,
-      userId: this.detail.UserId,
-      userType: this.detail.UserType,
+      userId: this.detail.userId,
+      userType: this.detail.userType,
     };
   }
 
@@ -133,9 +133,9 @@ export class MockRxMissionSubmission {
    */
   public async mockedDatabaseGetSubmission(): Promise<SubmissionData | false> {
     // Extract the mock data details
-    const mockUserId = this.detail.UserId;
+    const mockUserId = this.detail.userId;
     const mockKey = this.detail.Key;
-    const mockUserType = this.detail.UserType;
+    const mockUserType = this.detail.userType;
 
 
     // Extract necessary fields from the mock data
@@ -164,18 +164,18 @@ export class MockRxMissionSubmission {
   // details van event dat ingeschoten wordt met deze submission
   private createDetail(): ZgwForwardEventDetail {
     const Reference = this.messageData.reference ?? '';
-    const UserId = this.messageData.bsn || this.messageData.brpData?.Persoon?.BSN?.BSN || '';
-    const UserType = this.userType; // Gebruik het userType uit submissionInfo
+    const userId = this.messageData.bsn || this.messageData.brpData?.Persoon?.BSN?.BSN || '';
+    const userType = this.userType; // Gebruik het userType uit submissionInfo
     const Key = this.messageData.reference ?? '';
-    const pk = getHashedUserId(UserId, UserType);
+    const pk = getHashedUserId(userId, userType);
     const sk = Key;
 
     return {
       Reference,
-      UserId,
+      userId: userId,
       pk,
       sk,
-      UserType,
+      userType: userType,
       Key,
     };
   }
