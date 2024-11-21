@@ -4,9 +4,6 @@
  * processed and sent to RxMission in their own specific way
  */
 
-// TODO: kijken of dit wel de juiste plek is. Misschien is de algemene config toch duidelijker.
-// Vermoeden dat er veel meer specifieke properties bij komen, vooral als we gaan mappen.
-// Optioneel om een default config te hebben die aangevuld kan worden met branch config.
 export interface RxMissionZgwConfiguration {
   /**
    * The branch name this configuration is used for
@@ -104,25 +101,25 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
     branchName: 'development',
     submissionZaakProperties: [
       {
+        // Als er een aparte eigenaar opgevoerd wordt, dan komt er een tweede betrokkene bij. De eigenaar die als niet originele aanvrager opgevoerd wordt is een "belanghebbende".
         appId: 'R01',
         formName: 'kamerverhuurvergunningaanvragen',
-        //Aanvraag Beschikking Behandelen
-        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
         aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
-        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/1f616878-dc79-4b14-bd3e-08dcd0bf97b7',
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/5152a5d9-b915-4679-18dd-08dcce4a3fa1', // NMG-00002 Omzetvergunning
 
       },
       {
+        // Periode van de activiteit is van belang. Het verhuren tot wanneer is belangrijk.
         appId: 'R02',
         formName: 'vergunningaanvragentijdelijkverhurenwoning',
-        //Aanvraag Beschikking Behandelen
-        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
         aanvragerRolType: '',
         statusType: '',
         informatieObjectType: '',
-        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/1f616878-dc79-4b14-bd3e-08dcd0bf97b7',
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/06141a44-80d7-4bf7-18de-08dcce4a3fa1', // NMG-00003 Vergunning tijdelijk verhuren
       },
       {
         appId: 'R03',
@@ -135,9 +132,18 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
       {
         appId: 'R05',
         formName: 'bouwmaterialenopopenbaarterreinmeldenofvergunningaanvragen',
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7' //NMG-00001 Bouwobjectenvergunning 
+      },
+      {
+        appId: 'R06',
+        formName: 'contactformulier',
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7' //NMG-00001 Bouwobjectenvergunning 
       },
       {
         appId: 'TDL',
+        formName: 'test',
         zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
         aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',

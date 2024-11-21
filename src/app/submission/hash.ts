@@ -1,8 +1,6 @@
 import crypto from 'crypto';
 import { UserType } from '../shared/User';
 
-// CREATE PK from
-
 /**
  * Helper function for creating a
  * cryptographically secure hash from a string.
