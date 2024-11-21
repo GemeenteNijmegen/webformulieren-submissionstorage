@@ -118,7 +118,7 @@ export class ZgwClient {
       toelichting: `Formulierinzending: "${formulier}" met kenmerk ${identificatie}.`,
     };
     const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
-    if(zaak.url) {
+    if (zaak.url) {
       const statusRequest = {
         zaak: zaak.url,
         statustype: this.options.zaakstatus,
@@ -126,7 +126,7 @@ export class ZgwClient {
         statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
       };
       const result = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
-      if(!result.url) {
+      if (!result.url) {
         // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
         console.warn(`Creating status for zaak with identificatie ${identificatie} failed. Expected object with url.`);
       }
@@ -171,7 +171,7 @@ export class ZgwClient {
       titel: fileName,
       omschrijving: 'TEST Devops',
     };
-    return await this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
+    return this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {

@@ -38,7 +38,7 @@ export interface SubmissionZaakProperties {
    * For example: `https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7`
    */
   productType?: string;
-  
+
   /**
    * InformatieObjectType for document.
    */
@@ -88,12 +88,12 @@ export function getAppIdsByBranchName(branchName: string): string[] {
 export function rxMissionConfigurationForForm(branchName: string, appId: string, formName?: string) {
   const configuration = getRxMissionZgwConfiguration(branchName);
   let result;
-  if(formName) {
+  if (formName) {
     result = configuration.submissionZaakProperties.filter(props => props.formName?.toLowerCase() == formName.toLowerCase());
   } else {
     result = configuration.submissionZaakProperties.filter(props => props.appId.toLowerCase() == appId.toLowerCase());
   }
-  if(result.length != 1) { 
+  if (result.length != 1) {
     throw Error('Could not retrieve single config for zaak');
   }
   return result;
@@ -107,18 +107,18 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         appId: 'R01',
         formName: 'kamerverhuurvergunningaanvragen',
         //Aanvraag Beschikking Behandelen
-        zaakType: `https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707`,
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
         aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/1f616878-dc79-4b14-bd3e-08dcd0bf97b7',
-    
+
       },
       {
         appId: 'R02',
         formName: 'vergunningaanvragentijdelijkverhurenwoning',
         //Aanvraag Beschikking Behandelen
-        zaakType: `https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707`,
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
         aanvragerRolType: '',
         statusType: '',
         informatieObjectType: '',
@@ -138,7 +138,7 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
       },
       {
         appId: 'TDL',
-        zaakType: `https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707`,
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
         aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',

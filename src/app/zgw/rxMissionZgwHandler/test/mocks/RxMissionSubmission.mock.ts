@@ -1,7 +1,9 @@
-import { RxMissionEventDetail, RxMissionProcessedFormEvent } from '../../rxmission-zgw.lambda';
 import * as fs from 'fs';
 import * as path from 'path';
+import { UserType } from '../../../../shared/User';
 import { SubmissionData } from '../../../../submission/Database';
+import { getHashedUserId } from '../../../../submission/hash';
+import { ZgwForwardEventDetail, ZgwForwardProcessedFormEvent } from '../../../shared/zgwForwardEvent.model';
 
 // Voorbeeld testgebruik
 
@@ -69,10 +71,10 @@ export const MockSubmissions: { [key: string]: MockSubmissionInfo } = {
 export class MockRxMissionSubmission {
   public jsonData: any;
   public messageData: any;
-  public detail: RxMissionEventDetail;
-  public event: RxMissionProcessedFormEvent;
+  public detail: ZgwForwardEventDetail;
+  public event: ZgwForwardProcessedFormEvent;
   public formName: string;
-  public userType: 'person' | 'organisation';
+  public userType: UserType;
   public description: string;
 
   // De constructor accepteert een key van MockSubmissions
@@ -107,18 +109,18 @@ export class MockRxMissionSubmission {
     return this.messageData;
   }
 
-  public getEventDetail(): RxMissionEventDetail {
+  public getEventDetail(): ZgwForwardEventDetail {
     return this.detail;
   }
 
-  public getEvent(): RxMissionProcessedFormEvent {
+  public getEvent(): ZgwForwardProcessedFormEvent {
     return this.event;
   }
 
   /**
    * Gebruik om gemakkelijk RxMissionZgwHandler aan te roepen met params gebaseerd op de json
    */
-  public getSubmissionParameters(): { key: string; userId: string; userType: 'person' | 'organisation' } {
+  public getSubmissionParameters(): { key: string; userId: string; userType: UserType } {
     return {
       key: this.detail.Key,
       userId: this.detail.UserId,
@@ -134,55 +136,59 @@ export class MockRxMissionSubmission {
     const mockUserId = this.detail.UserId;
     const mockKey = this.detail.Key;
     const mockUserType = this.detail.UserType;
-  
 
-      // Extract necessary fields from the mock data
-      const pdfReference = this.messageData?.pdf?.reference ?? '';
-      const dateSubmitted = this.jsonData.Timestamp ?? '';
-      const formName = this.messageData.formTypeId ?? 'onbekend';
-      const formTitle = this.messageData.formTypeId ?? 'Onbekende aanvraag';
-      const attachments =
+
+    // Extract necessary fields from the mock data
+    const pdfReference = this.messageData?.pdf?.reference ?? '';
+    const dateSubmitted = this.jsonData.Timestamp ?? '';
+    const formName = this.messageData.formTypeId ?? 'onbekend';
+    const formTitle = this.messageData.formTypeId ?? 'Onbekende aanvraag';
+    const attachments =
         this.messageData.data?.toevoegen?.map((attachment: any) => attachment.reference) ?? [];
-  
-      // Construct the SubmissionData object
-      const submissionData: SubmissionData = {
-        userId: mockUserId,
-        userType: mockUserType,
-        key: mockKey,
-        pdf: pdfReference,
-        dateSubmitted: dateSubmitted,
-        formName: formName,
-        formTitle: formTitle,
-        attachments: attachments,
-      };
-  
-      return submissionData;
+
+    // Construct the SubmissionData object
+    const submissionData: SubmissionData = {
+      userId: mockUserId,
+      userType: mockUserType,
+      key: mockKey,
+      pdf: pdfReference,
+      dateSubmitted: dateSubmitted,
+      formName: formName,
+      formTitle: formTitle,
+      attachments: attachments,
+    };
+
+    return submissionData;
   }
 
   // details van event dat ingeschoten wordt met deze submission
-    private createDetail(): RxMissionEventDetail {
-      const Reference = this.messageData.reference ?? '';
-      const UserId = this.messageData.bsn || this.messageData.brpData?.Persoon?.BSN?.BSN || '';
-      const UserType = this.userType; // Gebruik het userType uit submissionInfo
-      const Key = this.messageData.reference ?? '';
-  
-      return {
-        Reference,
-        UserId,
-        UserType,
-        Key,
-      };
-    }
-  
-    // Event gebruikt in de lambda handler
-    private createEvent(): RxMissionProcessedFormEvent {
-      const event: RxMissionProcessedFormEvent = {
-        id: this.jsonData.MessageId || 'mock-id',
-        time: this.jsonData.Timestamp || new Date().toISOString(),
-        detail: this.detail,
-        'detail-type': 'New Form Processed',
-      } as any as RxMissionProcessedFormEvent;
-  
-      return event;
-    }
+  private createDetail(): ZgwForwardEventDetail {
+    const Reference = this.messageData.reference ?? '';
+    const UserId = this.messageData.bsn || this.messageData.brpData?.Persoon?.BSN?.BSN || '';
+    const UserType = this.userType; // Gebruik het userType uit submissionInfo
+    const Key = this.messageData.reference ?? '';
+    const pk = getHashedUserId(UserId, UserType);
+    const sk = Key;
+
+    return {
+      Reference,
+      UserId,
+      pk,
+      sk,
+      UserType,
+      Key,
+    };
+  }
+
+  // Event gebruikt in de lambda handler
+  private createEvent(): ZgwForwardProcessedFormEvent {
+    const event = {
+      'id': this.jsonData.MessageId || 'mock-id',
+      'time': this.jsonData.Timestamp || new Date().toISOString(),
+      'detail': this.detail,
+      'detail-type': 'New Form Processed',
+    } as any as ZgwForwardProcessedFormEvent;
+
+    return event;
+  }
 }

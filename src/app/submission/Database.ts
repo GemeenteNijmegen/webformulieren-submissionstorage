@@ -1,11 +1,12 @@
 import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand, QueryCommandInput, QueryCommandOutput, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { z } from 'zod';
 import { FormNameIndexQueryBuilder } from './FormNameIndexQueryBuilder';
-import { hashString } from './hash';
+import { getHashedUserId, hashString } from './hash';
+import { UserType } from '../shared/User';
 
 export interface SubmissionData {
   userId: string;
-  userType: 'organisation' | 'person' | 'anonymous';
+  userType: UserType;
   key: string;
   pdf: string;
   attachments?: string[];
@@ -51,7 +52,7 @@ export interface ListSubmissionParameters {
 
 export interface GetSubmissionParameters {
   userId: string;
-  userType: 'organisation' | 'person';
+  userType: UserType;
   key: string;
 }
 export interface GetSubmissionsByFormNameParameters {
@@ -159,16 +160,8 @@ export class DynamoDBDatabase implements Database {
   }
 
   async storeSubmission(submission: SubmissionData): Promise<boolean> {
-    const hashedId = hashString(submission.userId);
-    let pk;
-    if (submission.userType == 'person') {
-      pk = `PERSON#${hashedId}`;
-    } else if (submission.userType == 'organisation') {
-      pk = `ORG#${hashedId}`;
-    } else {
-      pk = 'ANONYMOUS';
-    }
-    console.debug(`Storing object to table ${this.table} with primary key USER#${hashedId}`);
+    const pk = getHashedUserId(submission.userId, submission.userType);
+    console.debug(`Storing object to table ${this.table} with primary key ${pk}`);
     const sk = `${submission.key}`;
     let item: any = dynamoDBItem(pk, sk, submission.userType, submission);
     const command = new PutItemCommand({

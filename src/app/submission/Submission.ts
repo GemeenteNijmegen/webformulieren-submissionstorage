@@ -3,9 +3,11 @@ import { z } from 'zod';
 import { Database } from './Database';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
+import { getHashedUserId, HashedUserId } from './hash';
 import { s3Object } from './s3Object';
 import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
 import { dateArrayToDate } from '../../utils/dateArrayToDate';
+import { UserType } from '../shared/User';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
@@ -155,7 +157,7 @@ export class Submission {
    *
    * @returns bsn or kvk or 'anonymous'
    */
-  private userId() {
+  public userId() {
     if (this.bsn) {
       return this.bsn;
     } else if (this.kvk) {
@@ -176,7 +178,7 @@ export class Submission {
    *
    * @returns bsn or kvk or 'anonymous'
    */
-  public getUserType() {
+  public getUserType(): UserType {
     if (this.bsn) {
       return 'person';
     } else if (this.kvk) {
@@ -184,6 +186,10 @@ export class Submission {
     } else {
       return 'anonymous';
     }
+  }
+
+  getHashedUserId(): HashedUserId {
+    return getHashedUserId(this.userId(), this.getUserType());
   }
 
   /**
