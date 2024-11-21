@@ -85,6 +85,20 @@ export function getAppIdsByBranchName(branchName: string): string[] {
   return configuration.submissionZaakProperties.map(property => property.appId);
 }
 
+export function rxMissionConfigurationForForm(branchName: string, appId: string, formName?: string) {
+  const configuration = getRxMissionZgwConfiguration(branchName);
+  let result;
+  if(formName) {
+    result = configuration.submissionZaakProperties.filter(props => props.formName?.toLowerCase() == formName.toLowerCase());
+  } else {
+    result = configuration.submissionZaakProperties.filter(props => props.appId.toLowerCase() == appId.toLowerCase());
+  }
+  if(result.length != 1) { 
+    throw Error('Could not retrieve single config for zaak');
+  }
+  return result;
+}
+
 const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = {
   development: {
     branchName: 'development',
