@@ -116,14 +116,7 @@ export class DynamoDBDatabase implements Database {
   }
 
   async getSubmission(parameters: GetSubmissionParameters): Promise<SubmissionData|false> {
-    const hashedId = hashString(parameters.userId);
-    let prefix;
-    if (parameters.userType == 'person') {
-      prefix = 'PERSON';
-    } else if (parameters.userType == 'organisation') {
-      prefix = 'ORG';
-    }
-    const pk = `${prefix}#${hashedId}`;
+    const pk = getHashedUserId(parameters.userId, parameters.userType);
     const command = new GetItemCommand({
       TableName: this.table,
       Key: {
