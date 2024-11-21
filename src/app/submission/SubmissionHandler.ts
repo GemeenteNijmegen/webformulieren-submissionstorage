@@ -3,6 +3,7 @@ import { S3Storage, Storage, AWS } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
 import { Submission } from './Submission';
+import { ZgwForwardEventDetail } from '../zgw/shared/zgwForwardEvent.model';
 
 
 export class SubmissionHandler {
@@ -65,22 +66,22 @@ export class SubmissionHandler {
   }
 
   async sendEvent(submission: Submission) {
-    //TODO: maak hash van submission met exported function op andere plek en geeft PK en SK mee.
-    // Voor nu userid laten staan, backwards compatible
-
+    // pk and sk have been added, but are unused for now
+    // eventually the goal is to only send hashed string in the events instead of identifiers like bsn and kvk
+    const eventDetails: ZgwForwardEventDetail = {
+      Reference: submission.key ?? '',
+      UserId: submission.userId(),
+      pk: submission.getHashedUserId(),
+      sk: submission.key ?? '',
+      UserType: submission.getUserType(),
+      Key: submission.key ?? ''
+    }
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
           Source: 'Submissionstorage',
           DetailType: 'New Form Processed',
-          Detail: JSON.stringify({
-            Reference: submission.key,
-            UserId: submission.userId(),
-            pk: submission.getHashedUserId(),
-            sk: submission.key,
-            UserType: submission.getUserType(),
-            Key: submission.key,
-          }),
+          Detail: JSON.stringify(eventDetails),
         },
       ],
     }));
