@@ -14,8 +14,8 @@ export class RXMissionZaak {
     try {
       const existingZaak = await this.zgwClient.getZaak(submission.reference);
       if (existingZaak) {
-        console.log('Zaak exists, skipping');
-        return;
+        console.log(`Zaak with reference ${submission.reference} already exists, skipping`);
+        return existingZaak;
       }
     } catch (error) {
       // If zaak not found is thrown that's a good thing we can continue

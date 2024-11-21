@@ -1,7 +1,7 @@
 import { environmentVariables } from '@gemeentenijmegen/utils';
-import { EventBridgeEvent } from 'aws-lambda';
 import { getRxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from './RxMissionZgwHandler';
+import { ZgwForwardProcessedFormEvent } from '../shared/zgwForwardEvent.model';
 
 if (process.env.DEBUG !== 'true') {
   console.debug = () => {};
@@ -11,13 +11,13 @@ if (process.env.DEBUG !== 'true') {
 /**
  * Get specific config
  */
-const env = environmentVariables(['BRANCH_NAME']);
-const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH_NAME!);
+const env = environmentVariables(['BRANCH']);
+const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH!);
 
-export async function handler(event: EventBridgeEvent<'New Form Processed', {Reference: string; UserId: string; UserType: 'person' | 'organisation'; Key: string}>) {
+export async function handler(event: ZgwForwardProcessedFormEvent) {
   console.log('RxMission Event Detected and ready for processing', event);
   // parse event with zod
   const rxMissionZgwHandler = new RxMissionZgwHandler(rxMissionZgwConfig);
-  await rxMissionZgwHandler.sendSubmissionToRxMission(event.detail.Key, event.detail.UserId, event.detail.UserType);
+  await rxMissionZgwHandler.sendSubmissionToRxMission(event.detail.Key, event.detail.userId, event.detail.userType);
 
 }

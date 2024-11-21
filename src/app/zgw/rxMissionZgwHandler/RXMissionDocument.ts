@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import { ZgwClient } from '../zgwClient/ZgwClient';
+import { HttpMethod } from '../zgwClient/ZgwHttpClient';
 
 interface RXMissionDocumentConfig {
   zgwClient: ZgwClient;
@@ -91,14 +92,16 @@ export class RXMissionDocument {
     const data = new FormData();
     data.append('inhoud', this.contents);
     data.append('lock', this.lock);
-    const result = await this.zgwClient.callBestandsdelenApi('PUT', bestandsDeelUrl, data);
+    const result = await this.zgwClient.callBestandsdelenApi(HttpMethod.Put, bestandsDeelUrl, data);
     console.debug('put file', result);
     return result;
   }
 
   private async relateToZaak(zaakUrl: string) {
     const result = await this.zgwClient.relateDocumentToZaak(zaakUrl, this.informatieObject.url, this.fileName);
-    console.debug('relate to zaak', result);
+    if (!result.url) {
+      throw Error(`Unable to relate informatieobject to zaak, zaakUrl: ${zaakUrl}, informatieObject: ${this.informatieObject}`);
+    }
   }
 
   private getFile(filePath: string): Buffer {
@@ -132,6 +135,8 @@ export class RXMissionDocument {
     const result = await this.zgwClient.callDocumentenApi('POST', `${this.informatieObject.url}/unlock`, {
       lock: this.lock,
     });
-    console.debug('unlock', result);
+    if (result?.statusCode != 204) {
+      throw Error(`unlock expected a http 204 status code for ${this.informatieObject.url}`);
+    }
   }
 }
