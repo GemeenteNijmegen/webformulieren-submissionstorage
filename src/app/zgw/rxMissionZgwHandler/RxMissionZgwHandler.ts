@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { RXMissionDocument } from './RXMissionDocument';
 import { RXMissionZaak } from './RxMissionZaak';
 import { getSubmissionPropsFromAppIdOrFormName, RxMissionZgwConfiguration, SubmissionZaakProperties } from './RxMissionZgwConfiguration';
-import { UserType } from '../../shared/User';
+import { UserType } from '../../shared/UserType';
 import { Database, DynamoDBDatabase, SubmissionData } from '../../submission/Database';
 import { Submission, SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
@@ -32,7 +32,7 @@ export class RxMissionZgwHandler {
   constructor(rxMissionZgwConfiguration: RxMissionZgwConfiguration) {
     this.rxmConfig = rxMissionZgwConfiguration;
     //TODO: nu standaard TDL, omzetten naar appid
-    this.submissionZaakProperties = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfiguration, { appId: 'TDL' });
+    this.submissionZaakProperties = getSubmissionPropsFromAppIdOrFormName(this.rxmConfig, { appId: 'TDL' });
     const env = environmentVariables(envKeys);
     this.informatieObjectType = env.INFORMATIEOBJECTTYPE;
     this.storage = new S3Storage(env.BUCKET_NAME);
@@ -55,29 +55,19 @@ export class RxMissionZgwHandler {
 
     // Get submission
     const submission = await this.database.getSubmission({ key, userId, userType });
-    const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
-    if (process.env.DEBUG==='true') {
-      console.debug('Submission', parsedSubmission);
-    }
-
     if (!submission) {
       throw Error(`Could not find submission ${key}`);
     }
 
-    // Create zaak
-    // Gebruikt database data die ook uit parsedSubmission kan komen
-    // Zaaktype meegeven
-    console.debug('RxMissionZGWConfig. Which can be used to retrieve zaaktype from appId');
-    console.dir(this.rxmConfig, { depth: null, colors: true, compact: false, showHidden: true });
+    const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
+    const submissionAttachments: string[] = submission.attachments ?? [];
+    if (process.env.DEBUG==='true') {
+      console.debug('Submission', parsedSubmission, 'Attachments', submissionAttachments.length);
+    }
 
-    // TODO: vanaf dit stuk moet het per formulier anders worden gedaan afhankelijk van de config.
-    // Deze zal steeds specifieker worden als we later bepaalde mappings toe gaan voegen.
-    // Ander zaaktype en eventueel ook verschillende rollen en zaakeigenschappen per type formulier
-
-
-    const zaak = new RXMissionZaak(this.zgwClient);
-    const zgwZaak = await zaak.create(parsedSubmission, submission);
-
+    const zaak = new RXMissionZaak(this.zgwClient, this.submissionZaakProperties);
+    const zgwZaak = await zaak.create(parsedSubmission);
+    console.log('ZGWZAAK: ', zgwZaak);
     if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
       // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
       if (zgwZaak.rollen.length == 0) {
@@ -85,18 +75,12 @@ export class RxMissionZgwHandler {
       }
     }
 
-    // Check if the zaak has attachments
-    // TODO: checken in parsedsubmission of in S3
-    if (!submission.attachments) {
-      throw Error('No attachments found'); //TODO: geen attachments is ook prima?
-    }
-
     // We may have returned an existing zaak, in which some documents have been created.
     // Only start adding docs if the zaakinformatieobjecten count is different from attachments + pdf
     // TODO: check which attachments have already been added before adding all attachments again.
-    if (zgwZaak.zaakinformatieobjecten.length < (submission.attachments.length + 1)) {
+    if (zgwZaak.zaakinformatieobjecten.length < (submissionAttachments.length + 1)) {
       await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
-      const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
+      const uploads = submissionAttachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
       await Promise.all(uploads);
     }
   }

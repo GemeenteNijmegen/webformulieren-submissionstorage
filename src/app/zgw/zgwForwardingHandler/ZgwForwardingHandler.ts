@@ -92,7 +92,7 @@ export class ZgwForwarderHandler {
     }
 
     // Create zaak
-    const zaak: ZakenApiZaakResponse = await this.zgw.createZaak({identificatie: key, formulier:submission.formTitle ?? 'Onbekend formulier'});
+    const zaak: ZakenApiZaakResponse = await this.zgw.createZaak({ identificatie: key, formulier: submission.formTitle ?? 'Onbekend formulier' });
     // Set status for zaak
     if (zaak.url) {
       await this.zgw.addZaakStatus({ zaakUrl: zaak.url });

@@ -38,7 +38,7 @@ describe('ZGW Client', () => {
     test('original ZGWForwardHandler expected calls', async () => {
       const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
       console.debug(spyOnFetch);
-      await client.createZaak({identificatie:'R01.0001', formulier:'mockFormulierNaam01'});
+      await client.createZaak({ identificatie: 'R01.0001', formulier: 'mockFormulierNaam01' });
       console.debug(spyOnFetch.mock.calls);
       expect(spyOnFetch).toHaveBeenNthCalledWith(1, 'https://zaken-api/zaken', {
         method: 'POST',
@@ -53,7 +53,7 @@ describe('ZGW Client', () => {
     });
     test('original ZGWForwardHandler expected request content', async () => {
       const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
-      await client.createZaak({identificatie:'R02.0002', formulier:'mockFormulierNaam'});
+      await client.createZaak({ identificatie: 'R02.0002', formulier: 'mockFormulierNaam' });
       const createZaakRequest = spyOnFetch.mock.calls[0];
       console.debug(createZaakRequest);
       const parsedRequestBody = JSON.parse(createZaakRequest[1]!.body! as any);

@@ -43,10 +43,8 @@ describeIntegration('RX Mission live tests', () => {
     const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties);
 
     const zaakRefNo = '12.345';
-    const submission = getSampleSubmissionDataBaseData(zaakRefNo);
-
     const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.create(parsedSubmission, submission);
+    await zaak.create(parsedSubmission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });
@@ -59,10 +57,8 @@ describeIntegration('RX Mission live tests', () => {
     const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties);
     const zaakRefNo = '12.346';
 
-
-    const submission = getSampleSubmissionDataBaseData(zaakRefNo);
     const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.create(parsedSubmission, submission);
+    await zaak.create(parsedSubmission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });

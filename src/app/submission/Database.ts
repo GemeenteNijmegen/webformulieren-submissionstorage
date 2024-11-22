@@ -2,7 +2,7 @@ import { DynamoDBClient, GetItemCommand, PutItemCommand, QueryCommand, QueryComm
 import { z } from 'zod';
 import { FormNameIndexQueryBuilder } from './FormNameIndexQueryBuilder';
 import { getHashedUserId, hashString } from './hash';
-import { UserType } from '../shared/User';
+import { UserType } from '../shared/UserType';
 
 export interface SubmissionData {
   userId: string;

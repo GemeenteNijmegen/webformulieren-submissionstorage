@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { UserType } from '../../../../shared/User';
+import { UserType } from '../../../../shared/UserType';
 import { SubmissionData } from '../../../../submission/Database';
 import { getHashedUserId } from '../../../../submission/hash';
 import { ZgwForwardEventDetail, ZgwForwardProcessedFormEvent } from '../../../shared/zgwForwardEvent.model';
@@ -85,7 +85,7 @@ export class MockRxMissionSubmission {
     this.userType = submissionInfo.userType;
     this.description = submissionInfo.description;
 
-    const filePath = path.join(__dirname, './mocks', filename);
+    const filePath = path.join(__dirname, filename);
     const jsonString = fs.readFileSync(filePath, 'utf8');
     this.jsonData = JSON.parse(jsonString);
     this.messageData = JSON.parse(this.jsonData.Message);
@@ -103,6 +103,21 @@ export class MockRxMissionSubmission {
 
   public getJsonData(): any {
     return this.jsonData;
+  }
+
+  public getMockStorageSubmission(): any {
+    return { Body: { transformToString: () => { return JSON.stringify(this.jsonData); } } };
+  }
+
+  /**
+   * Mocks a file with bytes containing Hello
+   */
+  public getMockStorageBlob(): any {
+    return {
+      Body: {
+        transformToByteArray: jest.fn().mockResolvedValue(new Uint8Array([72, 101, 108, 108, 111])), // "Hello" in bytes
+      },
+    };
   }
 
   public getMessageData(): any {

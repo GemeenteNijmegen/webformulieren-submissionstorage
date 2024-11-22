@@ -116,7 +116,7 @@ export class ZgwClient {
       startdatum: this.datestamp(),
       // Can be undefined, which auto-creates zaakidentificatie
       identificatie: params.identificatie,
-      zaaktype: params.zaaktype ?? this.options.zaaktype, 
+      zaaktype: params.zaaktype ?? this.options.zaaktype,
       omschrijving: params.formulierKey, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
       toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.identificatie}.`,
     };
