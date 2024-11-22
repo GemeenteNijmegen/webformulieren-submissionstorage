@@ -67,7 +67,7 @@ export class RxMissionZgwHandler {
 
     const zaak = new RXMissionZaak(this.zgwClient, this.submissionZaakProperties);
     const zgwZaak = await zaak.create(parsedSubmission);
-    console.log('ZGWZAAK: ', zgwZaak);
+
     if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
       // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
       if (zgwZaak.rollen.length == 0) {

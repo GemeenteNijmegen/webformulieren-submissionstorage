@@ -119,6 +119,7 @@ export class ZgwClient {
       zaaktype: params.zaaktype ?? this.options.zaaktype,
       omschrijving: params.formulierKey, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
       toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.identificatie}.`,
+      productenOfDiensten: params.productenOfDiensten,
     };
     const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
     if (!zaak.url) {
@@ -322,6 +323,7 @@ export interface CreateZaakParameters {
   zaaktype?: string;
   toelichting?: string;
   omschrijving?: string;
+  productenOfDiensten?: string[];
 }
 
 export interface AddZaakStatusParameters {
