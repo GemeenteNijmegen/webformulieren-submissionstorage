@@ -3,6 +3,7 @@ import { S3Storage, Storage, AWS } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
 import { Submission } from './Submission';
+import { ZgwForwardEventDetail } from '../zgw/shared/zgwForwardEvent.model';
 
 
 export class SubmissionHandler {
@@ -60,23 +61,27 @@ export class SubmissionHandler {
     await submission.parse(message);
     await submission.save();
     await this.sendEvent(submission);
+
+
   }
 
   async sendEvent(submission: Submission) {
-    //TODO: bsn of kvk eruit, dit moet apart gecontroleerd worden in de generieke ZGW forwarder (zodat rxmission het zelf kan bepalen)
-    //TODO: in Detail ook apart appId toevoegen en misschien zelfs formuliernaam als de appID niet. Formuliernaam zou niet nodig moeten zijn als de APPID's uniek genoeg zijn.
-
+    // pk and sk have been added, but are unused for now
+    // eventually the goal is to only send hashed string in the events instead of identifiers like bsn and kvk
+    const eventDetails: ZgwForwardEventDetail = {
+      Reference: submission.key ?? '',
+      userId: submission.userId(),
+      pk: submission.getHashedUserId(),
+      sk: submission.key ?? '',
+      userType: submission.getUserType(),
+      Key: submission.key ?? '',
+    };
     await this.eventsClient.send(new PutEventsCommand({
       Entries: [
         {
           Source: 'Submissionstorage',
           DetailType: 'New Form Processed',
-          Detail: JSON.stringify({
-            Reference: submission.key,
-            UserId: submission.bsn ?? submission.kvk, // Can only be a BSN or KVK? Moeten we uberhaupt bsn of kvk meegeven hier?
-            UserType: submission.getUserType(),
-            Key: submission.key,
-          }),
+          Detail: JSON.stringify(eventDetails),
         },
       ],
     }));

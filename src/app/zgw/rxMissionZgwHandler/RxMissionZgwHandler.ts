@@ -1,12 +1,13 @@
 import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
+import 'dotenv/config';
+import { RXMissionDocument } from './RXMissionDocument';
+import { RXMissionZaak } from './RxMissionZaak';
+import { RxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
+import { UserType } from '../../shared/User';
 import { Database, DynamoDBDatabase, SubmissionData } from '../../submission/Database';
 import { Submission, SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
-import { RXMissionZaak } from './RxMissionZaak';
-import { RxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
 import { ZgwClient } from '../zgwClient/ZgwClient';
-import 'dotenv/config';
-import { RXMissionDocument } from './RXMissionDocument';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -46,11 +47,10 @@ export class RxMissionZgwHandler {
   }
 
 
-  async sendSubmissionToRxMission(key: string, userId: string, userType: 'person' | 'organisation') {
+  async sendSubmissionToRxMission(key: string, userId: string, userType: UserType) {
     await this.zgwClient.init();
 
     // Get submission
-    // TODO: alleen op kunnen halen uit S3 met key en verwerken (parsedsubmission). Checken of dit echt nodig gaat zijn of altijd bsn/kvk aanwezig
     const submission = await this.database.getSubmission({ key, userId, userType });
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
     if (process.env.DEBUG==='true') {
@@ -70,13 +70,18 @@ export class RxMissionZgwHandler {
     // TODO: vanaf dit stuk moet het per formulier anders worden gedaan afhankelijk van de config.
     // Deze zal steeds specifieker worden als we later bepaalde mappings toe gaan voegen.
     // Ander zaaktype en eventueel ook verschillende rollen en zaakeigenschappen per type formulier
+
+
     const zaak = new RXMissionZaak(this.zgwClient);
     const zgwZaak = await zaak.create(parsedSubmission, submission);
 
     // Geen rol toevoegen indien geen bsn of kvk
     // Nog checken bij RxMission of ze uberhaupt rollen hebben zonder bsn/kvk
     if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
-      await this.addRole(parsedSubmission, zgwZaak, submission);
+      // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
+      if (zgwZaak.rollen.length == 0) {
+        await this.addRole(parsedSubmission, zgwZaak, submission);
+      }
     }
 
     // Check if the zaak has attachments
@@ -87,9 +92,15 @@ export class RxMissionZgwHandler {
 
     // Upload attachments
     // Nog checken bij RxMission of hier beperkingen aan zitten. Kunnen grote docs zijn met bouwzaken
-    await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
-    const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
-    await Promise.all(uploads);
+
+    // We may have returned an existing zaak, in which some documents have been created.
+    // Only start adding docs if the zaakinformatieobjecten count is different from attachments + pdf
+    // TODO: check which attachments have already been added before adding all attachments again.
+    if (zgwZaak.zaakinformatieobjecten.length < (submission.attachments.length + 1)) {
+      await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
+      const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
+      await Promise.all(uploads);
+    }
   }
 
   private async addRole(parsedSubmission: Submission, zgwZaak: any, submission: SubmissionData) {

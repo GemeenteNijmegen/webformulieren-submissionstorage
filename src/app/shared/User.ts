@@ -7,8 +7,10 @@ import { Bsn } from '@gemeentenijmegen/utils';
  */
 export interface User {
   identifier: string;
-  type: 'person' | 'organisation';
+  type: UserType;
 }
+
+export type UserType = 'person' | 'organisation' | 'anonymous';
 
 /**
  * Convenience function for creating a user. Returns the correct type based on
@@ -18,7 +20,7 @@ export interface User {
  * @param userId string value of kvk or bsn
  * @param userType person for users with BSN, organisation for those with KVK
  */
-export function userFromIdAndType(userId: string, userType: 'person'|'organisation') {
+export function userFromIdAndType(userId: string, userType: UserType) {
   if (userType == 'organisation') {
     return new Organisation(userId);
   } else {
@@ -32,7 +34,7 @@ export class Person implements User {
   bsn: Bsn;
   identifier: string;
   userName?: string;
-  type: 'person' | 'organisation' = 'person';
+  type: UserType = 'person';
   constructor(bsn: Bsn) {
     this.bsn = bsn;
     this.identifier = bsn.bsn;
@@ -45,7 +47,7 @@ export class Person implements User {
 export class Organisation implements User {
   kvk: string;
   identifier: string;
-  type: 'person' | 'organisation' = 'organisation';
+  type: UserType = 'organisation';
 
   constructor(kvk: string) {
     this.kvk = kvk;

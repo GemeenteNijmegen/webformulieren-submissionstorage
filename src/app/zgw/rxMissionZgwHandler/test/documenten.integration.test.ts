@@ -23,7 +23,10 @@ describe('Document upload test', () => {
   test('Can create document in ZGW store', async() => {
     const env = environmentVariables(['INFORMATIEOBJECTTYPE']);
     const zgwClient = zgwTestClient();
-    setFetchMockResponse({});
+    setFetchMockResponse({
+      url: 'http://someurl',
+      statusCode: 204, //hacky, some requests expect a url, some a statuscode
+    });
     const spyOnFetch = jest.spyOn(global, 'fetch');
     const document = new RXMissionDocument({
       zgwClient: zgwClient,

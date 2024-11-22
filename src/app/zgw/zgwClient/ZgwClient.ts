@@ -1,5 +1,6 @@
 import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
+import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
 
 interface ZgwClientOptions {
   /**
@@ -60,24 +61,41 @@ export class ZgwClient {
 
   private clientId?: string;
   private clientSecret?: string;
+  private zgwHttpClient?: ZgwHttpClient;
   private readonly options: ZgwClientOptions;
 
   constructor(options: ZgwClientOptions) {
     this.options = options;
     this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
+
+    //If constructor was provided all info, create http client now.
+    if (this.clientId && this.clientSecret) {
+      this.createZgwHttpClient();
+    }
   }
 
   async init() {
-    if (this.clientId && this.clientSecret) {
+    if (this.clientId && this.clientSecret && this.zgwHttpClient) {
       return;
     }
     this.clientId = process.env.ZGW_CLIENT_ID;
     this.clientSecret = await AWS.getSecret(process.env.ZGW_CLIENT_SECRET_ARN!);
+    this.createZgwHttpClient();
+  }
+
+  private createZgwHttpClient() {
+    if (!this.clientId || !this.clientSecret) {
+      throw Error('clientID & secret are required before calling createZgwHttpClient');
+    }
+    this.zgwHttpClient = new ZgwHttpClient({
+      clientId: this.clientId,
+      clientSecret: this.clientSecret,
+    });
   }
 
   async getZaak(identificatie: string) {
-    const zaken = await this.callZaakApi('GET', `zaken?identificatie=${identificatie}`);
+    const zaken = await this.callZaakApi(HttpMethod.Get, `zaken?identificatie=${identificatie}`);
     if (!zaken || zaken.count == 0) {
       throw new ZaakNotFoundError();
     } else if (zaken.count > 1) {
@@ -97,24 +115,32 @@ export class ZgwClient {
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       startdatum: this.datestamp(),
       omschrijving: formulier,
-      toelichting: `Formulier: "${formulier}" met kenmerk ${identificatie}.`,
+      toelichting: `Formulierinzending: "${formulier}" met kenmerk ${identificatie}.`,
     };
-    const zaak = await this.callZaakApi('POST', 'zaken', zaakRequest);
-
-    const statusRequest = {
-      zaak: zaak.url,
-      statustype: this.options.zaakstatus,
-      datumStatusGezet: this.datestamp(),
-      statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
-    };
-    await this.callZaakApi('POST', 'statussen', statusRequest);
+    const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
+    if (zaak.url) {
+      const statusRequest = {
+        zaak: zaak.url,
+        statustype: this.options.zaakstatus,
+        datumStatusGezet: this.datestamp(),
+        statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
+      };
+      const result = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
+      if (!result.url) {
+        // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
+        console.warn(`Creating status for zaak with identificatie ${identificatie} failed. Expected object with url.`);
+      }
+    } else {
+      // If the zaak result doesn't return a URL, assume something unrecoverable happened, and throw.
+      throw Error(`Creating zaak with identificatie ${identificatie} failed. Expected object with url.`);
+    }
 
     return zaak;
   }
 
   async addZaakEigenschap(zaak: string, eigenschap: string, waarde: string) {
     const addEigenschap = { zaak, eigenschap, waarde };
-    const response = await this.callZaakApi('POST', zaak + '/zaakeigenschappen', addEigenschap);
+    const response = await this.callZaakApi(HttpMethod.Post, zaak + '/zaakeigenschappen', addEigenschap);
     return response;
   }
 
@@ -135,7 +161,7 @@ export class ZgwClient {
       informatieobject: document.url,
       zaak: zaak,
     };
-    await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
+    await this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
   async relateDocumentToZaak(zaakUrl: string, informatieObjectUrl: string, fileName: string) {
@@ -145,7 +171,7 @@ export class ZgwClient {
       titel: fileName,
       omschrijving: 'TEST Devops',
     };
-    await this.callZaakApi('POST', 'zaakinformatieobjecten', documentZaakRequest);
+    return this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
@@ -188,7 +214,7 @@ export class ZgwClient {
       contactpersoonRol = undefined;
     }
 
-    await this.callZaakApi('POST', 'rollen', {
+    await this.callZaakApi(HttpMethod.Post, 'rollen', {
       ...roleRequest,
       contactpersoonRol,
     });
@@ -206,52 +232,21 @@ export class ZgwClient {
     return token;
   }
 
-  private async callZaakApi(method: string, pathOrUrl: string, data?: any) {
+  private async callZaakApi(method: HttpMethod, pathOrUrl: string, data?: any) {
     this.checkConfiguration();
-    const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
 
     let url = pathOrUrl;
     if (!pathOrUrl.startsWith('https://')) {
       url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
     }
-
-    const response = await fetch(url, {
-      method: method,
-      body: JSON.stringify(data),
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-type': 'application/json',
-        'Content-Crs': 'EPSG:4326',
-        'Accept-Crs': 'EPSG:4326',
-      },
-    });
-    console.debug(response);
-    const json = await response.json() as any;
-    console.debug(json);
-    if (response.status < 200 || response.status > 300) {
-      throw Error('Not a 2xx response');
-    }
-    return json;
+    const json = (data) ? JSON.stringify(data) : null;
+    console.debug('client', this.zgwHttpClient);
+    return this.zgwHttpClient?.request(method, url, json);
   }
 
-  async callBestandsdelenApi(method: string, url: string, data: FormData) {
+  async callBestandsdelenApi(method: HttpMethod, url: string, data: FormData) {
     this.checkConfiguration();
-    const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
-
-    const response = await fetch(url, {
-      method: method,
-      body: data,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.debug(response);
-    const json = await response.json() as any;
-    console.debug(json);
-    if (response.status < 200 || response.status > 300) {
-      throw Error('Not a 2xx response');
-    }
-    return json;
+    return this.zgwHttpClient?.request(method, url, data);
   }
 
   async callDocumentenApi(method: string, pathOrUrl: string, data?: any) {
@@ -273,7 +268,7 @@ export class ZgwClient {
     });
     console.debug(response);
     if (response.status == 204) {
-      return;
+      return { statusCode: 204 };
     }
     const json = await response.json() as any;
     console.debug(json);

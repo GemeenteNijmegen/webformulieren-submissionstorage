@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const EventParametersSchema = z.object({
   userId: z.string(),
-  userType: z.enum(['organisation', 'person']),
+  userType: z.enum(['organisation', 'person']), // Cannot retrieve anonymous submissions due to this restriction
   key: z.string().optional(),
 });
 export type EventParameters = z.infer<typeof EventParametersSchema>;
