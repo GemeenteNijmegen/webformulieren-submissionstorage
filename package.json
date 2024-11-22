@@ -82,9 +82,9 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.696.0",
     "@aws-sdk/client-eventbridge": "^3.696.0",
-    "@aws-sdk/client-s3": "^3.697.0",
-    "@aws-sdk/client-ssm": "^3.696.0",
-    "@aws-sdk/s3-request-presigner": "^3.697.0",
+    "@aws-sdk/client-s3": "^3.698.0",
+    "@aws-sdk/client-ssm": "^3.698.0",
+    "@aws-sdk/s3-request-presigner": "^3.698.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.17",
     "@gemeentenijmegen/aws-constructs": "^0.0.23",
     "@gemeentenijmegen/dnssec-record": "^0.0.22",
