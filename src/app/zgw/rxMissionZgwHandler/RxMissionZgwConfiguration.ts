@@ -52,8 +52,6 @@ export interface SubmissionZaakProperties {
   aanvragerRolType?: string;
 }
 
-
-//TODO: consider rewriting with a default config part
 /**
  *
  * @param branchName
@@ -82,19 +80,50 @@ export function getAppIdsByBranchName(branchName: string): string[] {
   return configuration.submissionZaakProperties.map(property => property.appId);
 }
 
-export function rxMissionConfigurationForForm(branchName: string, appId: string, formName?: string) {
-  const configuration = getRxMissionZgwConfiguration(branchName);
-  let result;
-  if (formName) {
-    result = configuration.submissionZaakProperties.filter(props => props.formName?.toLowerCase() == formName.toLowerCase());
-  } else {
-    result = configuration.submissionZaakProperties.filter(props => props.appId.toLowerCase() == appId.toLowerCase());
-  }
-  if (result.length != 1) {
-    throw Error('Could not retrieve single config for zaak');
-  }
-  return result;
+/**
+ * Haalt SubmissionZaakProperties op basis van branchName en appId of formName.
+ * @param branchName Naam van de branch.
+ * @param appIdOrFormName Parameters object met appId of formName.
+ * @returns De overeenkomstige SubmissionZaakProperties.
+ * @throws Error als er niet precies één match is of als beide parameters zijn doorgegeven.
+ */
+export function rxMissionConfigurationForForm(
+  branchName: string,
+  appIdOrFormName: { appId?: string; formName?: string },
+): SubmissionZaakProperties {
+  const config = getRxMissionZgwConfiguration(branchName);
+  return getSubmissionPropsFromAppIdOrFormName(config, appIdOrFormName);
 }
+
+
+/**
+ * Implementatie van de functie die zowel appId als formName accepteert.
+ * @param config Configuratie object. Kan opgehaald worden met getRxMissionZgwConfiguration(branchName: string)
+ * @param appIdOrFormName Parameters object met appId of formName.
+ * @returns De overeenkomstige SubmissionZaakProperties.
+ * @throws Error als er niet precies één match is of als beide parameters zijn doorgegeven.
+ */
+export function getSubmissionPropsFromAppIdOrFormName(
+  config: RxMissionZgwConfiguration,
+  appIdOrFormName: { appId?: string; formName?: string },
+): SubmissionZaakProperties {
+  const { appId, formName } = appIdOrFormName;
+
+  if ((appId && formName) || (!appId && !formName)) {
+    throw new Error('You must provide either appId or formName, but not both.');
+  }
+  const key = formName ? 'formName' : 'appId';
+  const value = (formName || appId)!.toLowerCase();
+
+  const match = config.submissionZaakProperties.find(
+    (props) => props[key]?.toLowerCase() === value,
+  );
+  if (!match) {
+    throw new Error('Could not retrieve single config for zaak');
+  }
+  return match;
+}
+
 
 const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = {
   development: {
@@ -133,13 +162,13 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         appId: 'R05',
         formName: 'bouwmaterialenopopenbaarterreinmeldenofvergunningaanvragen',
         zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
-        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7' //NMG-00001 Bouwobjectenvergunning 
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7', //NMG-00001 Bouwobjectenvergunning
       },
       {
         appId: 'R06',
         formName: 'contactformulier',
         zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
-        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7' //NMG-00001 Bouwobjectenvergunning 
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7', //NMG-00001 Bouwobjectenvergunning
       },
       {
         appId: 'TDL',

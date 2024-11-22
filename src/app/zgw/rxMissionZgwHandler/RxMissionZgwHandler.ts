@@ -2,7 +2,7 @@ import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import 'dotenv/config';
 import { RXMissionDocument } from './RXMissionDocument';
 import { RXMissionZaak } from './RxMissionZaak';
-import { RxMissionZgwConfiguration } from './RxMissionZgwConfiguration';
+import { getSubmissionPropsFromAppIdOrFormName, RxMissionZgwConfiguration, SubmissionZaakProperties } from './RxMissionZgwConfiguration';
 import { UserType } from '../../shared/User';
 import { Database, DynamoDBDatabase, SubmissionData } from '../../submission/Database';
 import { Submission, SubmissionSchema } from '../../submission/SubmissionSchema';
@@ -26,10 +26,13 @@ export class RxMissionZgwHandler {
   private database: Database;
   private zgwClient: ZgwClient;
   private rxmConfig: RxMissionZgwConfiguration;
+  private submissionZaakProperties: SubmissionZaakProperties;
   private informatieObjectType: string;
 
   constructor(rxMissionZgwConfiguration: RxMissionZgwConfiguration) {
     this.rxmConfig = rxMissionZgwConfiguration;
+    //TODO: nu standaard TDL, omzetten naar appid
+    this.submissionZaakProperties = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfiguration, { appId: 'TDL' });
     const env = environmentVariables(envKeys);
     this.informatieObjectType = env.INFORMATIEOBJECTTYPE;
     this.storage = new S3Storage(env.BUCKET_NAME);
@@ -75,8 +78,6 @@ export class RxMissionZgwHandler {
     const zaak = new RXMissionZaak(this.zgwClient);
     const zgwZaak = await zaak.create(parsedSubmission, submission);
 
-    // Geen rol toevoegen indien geen bsn of kvk
-    // Nog checken bij RxMission of ze uberhaupt rollen hebben zonder bsn/kvk
     if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
       // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
       if (zgwZaak.rollen.length == 0) {
@@ -89,9 +90,6 @@ export class RxMissionZgwHandler {
     if (!submission.attachments) {
       throw Error('No attachments found'); //TODO: geen attachments is ook prima?
     }
-
-    // Upload attachments
-    // Nog checken bij RxMission of hier beperkingen aan zitten. Kunnen grote docs zijn met bouwzaken
 
     // We may have returned an existing zaak, in which some documents have been created.
     // Only start adding docs if the zaakinformatieobjecten count is different from attachments + pdf

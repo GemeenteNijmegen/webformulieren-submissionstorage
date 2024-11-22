@@ -1,5 +1,7 @@
 import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
+import { ZakenApiStatus } from './model/ZakenApiStatus.model';
+import { ZakenApiZaak, ZakenApiZaakResponse } from './model/ZakenApiZaak.model';
 import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
 
 interface ZgwClientOptions {
@@ -106,9 +108,8 @@ export class ZgwClient {
 
   // Optioneel zaaktype toevoegen
   // Andere velden optioneel maken en duidelijke interfaces maken
-  async createZaak(identificatie: string, formulier: string) {
-    console.log('CREATEZAAK');
-    const zaakRequest = {
+  async createZaak(identificatie: string, formulier: string): Promise<ZakenApiZaakResponse> {
+    const zaakRequest: ZakenApiZaak = {
       identificatie: identificatie,
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       zaaktype: this.options.zaaktype,
@@ -118,24 +119,25 @@ export class ZgwClient {
       toelichting: `Formulierinzending: "${formulier}" met kenmerk ${identificatie}.`,
     };
     const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
-    if (zaak.url) {
-      const statusRequest = {
-        zaak: zaak.url,
-        statustype: this.options.zaakstatus,
-        datumStatusGezet: this.datestamp(),
-        statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
-      };
-      const result = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
-      if (!result.url) {
-        // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
-        console.warn(`Creating status for zaak with identificatie ${identificatie} failed. Expected object with url.`);
-      }
-    } else {
-      // If the zaak result doesn't return a URL, assume something unrecoverable happened, and throw.
+    if (!zaak.url) {
       throw Error(`Creating zaak with identificatie ${identificatie} failed. Expected object with url.`);
     }
-
+    console.log(`Zaak has been created. Identification: ${zaak.identificatie}`);
     return zaak;
+  }
+  async addZaakStatus(params: AddZaakStatusParameters): Promise<ZakenApiStatus> {
+    const statusRequest: ZakenApiStatus = {
+      zaak: params.zaakUrl,
+      statustype: params.statusType ?? this.options.zaakstatus,
+      datumStatusGezet: this.datestamp(),
+      statustoelichting: params.statustoelichting ?? 'Aanvraag ingediend vanuit Webformulieren',
+    };
+    const status = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
+    if (!status.url) {
+      // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
+      console.warn(`Creating status for zaak with zaakurl ${params.zaakUrl} failed. Expected object with url.`);
+    }
+    return status;
   }
 
   async addZaakEigenschap(zaak: string, eigenschap: string, waarde: string) {
@@ -301,3 +303,30 @@ export class ZgwClient {
 
 
 export class ZaakNotFoundError extends Error {}
+
+export interface CreateZaakParameters {
+  /**
+   * Optional.
+   * Zaaknummer will be made by the ZGW application.
+   * Zaaknummer returns as zaak.identificatie
+   */
+  identificatie?: string;
+  formulier?: string;
+  /**
+   * The reference or key of the form submission.
+   * Should be included in the creation to retrieve the original submission if needed.
+   */
+  formulierKey?: string;
+  zaaktype?: string;
+  toelichting?: string;
+  omschrijving?: string;
+}
+
+export interface AddZaakStatusParameters {
+  /**
+   * Zaakurl retrieved from creating the zaak.
+   */
+  zaakUrl: string;
+  statusType?: string;
+  statustoelichting?: string;
+}

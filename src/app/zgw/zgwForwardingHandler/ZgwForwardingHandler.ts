@@ -2,6 +2,7 @@ import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
+import { ZakenApiZaakResponse } from '../zgwClient/model/ZakenApiZaak.model';
 import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
 
 export class ZgwForwarderHandler {
@@ -91,8 +92,11 @@ export class ZgwForwarderHandler {
     }
 
     // Create zaak
-    const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
-
+    const zaak: ZakenApiZaakResponse = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
+    // Set status for zaak
+    if (zaak.url) {
+      await this.zgw.addZaakStatus({ zaakUrl: zaak.url });
+    }
     if (parsedSubmission.bsn) {
       await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, telefoon, name);
     } else if (parsedSubmission.kvknummer) {

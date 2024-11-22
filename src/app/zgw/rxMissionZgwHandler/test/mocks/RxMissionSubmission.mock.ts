@@ -172,10 +172,10 @@ export class MockRxMissionSubmission {
 
     return {
       Reference,
-      userId: userId,
+      userId,
       pk,
       sk,
-      userType: userType,
+      userType,
       Key,
     };
   }

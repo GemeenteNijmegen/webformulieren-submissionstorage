@@ -50,16 +50,6 @@ describe('ZGW Client', () => {
           'Accept-Crs': 'EPSG:4326',
         }),
       });
-      expect(spyOnFetch).toHaveBeenNthCalledWith(2, 'https://zaken-api/statussen', {
-        method: 'POST',
-        body: expect.any(String),
-        headers: expect.objectContaining({
-          'Authorization': expect.stringMatching(/^Bearer\s.+/), // Matches any token prefixed with 'Bearer '
-          'Content-type': 'application/json',
-          'Content-Crs': 'EPSG:4326',
-          'Accept-Crs': 'EPSG:4326',
-        }),
-      });
     });
     test('original ZGWForwardHandler expected request content', async () => {
       const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
@@ -71,6 +61,23 @@ describe('ZGW Client', () => {
 
       expect(parsedRequestBody.identificatie).toBe('R02.0002');
 
+    });
+  });
+  describe('addZaakStatus', () => {
+    test('original ZGWForwardHandler expected calls', async () => {
+      const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
+      await client.addZaakStatus({ zaakUrl: 'https://url', statusType: 'https://statusurl' });
+      console.debug(spyOnFetch.mock.calls);
+      expect(spyOnFetch).toHaveBeenNthCalledWith(1, 'https://zaken-api/statussen', {
+        method: 'POST',
+        body: expect.any(String),
+        headers: expect.objectContaining({
+          'Authorization': expect.stringMatching(/^Bearer\s.+/), // Matches any token prefixed with 'Bearer '
+          'Content-type': 'application/json',
+          'Content-Crs': 'EPSG:4326',
+          'Accept-Crs': 'EPSG:4326',
+        }),
+      });
     });
   });
 });
