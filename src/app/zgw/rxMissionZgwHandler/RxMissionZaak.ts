@@ -31,11 +31,12 @@ export class RXMissionZaak {
       }
     }
 
-    // Create zaak
-    // Gebruikt database data die ook uit parsedSubmission kan komen
-    // Zaaktype meegeven
-    const zaak = await this.zgwClient.createZaak(submission.reference, submissionData.formTitle ?? 'Onbekend formulier'); // TODO expand with useful fields
-
+    const zaak = await this.zgwClient.createZaak({
+      zaaktype: this.submissionZaakProperties.zaakType,
+      formulier: submissionData.formTitle  ?? 'Onbekend formulier',
+      formulierKey: submission.reference, 
+      toelichting: `Webformulier Devops ${submission.reference}`,
+    }); 
 
     // Set zaakstatus
     await this.zgwClient.addZaakStatus({ zaakUrl: zaak.url, statusType: this.submissionZaakProperties.statusType, statustoelichting: 'RxMissionZaak DevOps webformulieren' });

@@ -108,19 +108,21 @@ export class ZgwClient {
 
   // Optioneel zaaktype toevoegen
   // Andere velden optioneel maken en duidelijke interfaces maken
-  async createZaak(identificatie: string, formulier: string): Promise<ZakenApiZaakResponse> {
+  async createZaak(params: CreateZaakParameters): Promise<ZakenApiZaakResponse> {
     const zaakRequest: ZakenApiZaak = {
-      identificatie: identificatie,
+      // Base fields
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
-      zaaktype: this.options.zaaktype,
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       startdatum: this.datestamp(),
-      omschrijving: formulier,
-      toelichting: `Formulierinzending: "${formulier}" met kenmerk ${identificatie}.`,
+      // Can be undefined, which auto-creates zaakidentificatie
+      identificatie: params.identificatie,
+      zaaktype: params.zaaktype ?? this.options.zaaktype, 
+      omschrijving: params.formulierKey, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
+      toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.identificatie}.`,
     };
     const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
     if (!zaak.url) {
-      throw Error(`Creating zaak with identificatie ${identificatie} failed. Expected object with url.`);
+      throw Error(`Creating zaak with identificatie ${params.identificatie} failed. Expected object with url.`);
     }
     console.log(`Zaak has been created. Identification: ${zaak.identificatie}`);
     return zaak;
