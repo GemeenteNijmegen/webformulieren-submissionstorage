@@ -1,25 +1,20 @@
+import fs from 'fs';
+import path from 'path';
 // @ts-ignore: Ignoring unused import
 import { AWS, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import { MockRxMissionSubmission } from './mocks/RxMissionSubmission.mock';
 // @ts-ignore: Ignoring unused import
 import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
-import { getRxMissionZgwConfiguration } from '../RxMissionZgwConfiguration';
+import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch } from '../RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from '../RxMissionZgwHandler';
+import { handler } from '../rxmission-zgw.lambda';
 
+const DEBUG_OUTPUT = false;
+// The ZgwHttpClient still uses process env
 let envMockRxMissionHandler = {
-  CLIENT_ID: 'testclientid',
-  CLIENT_SECRET: 'testclientsecret',
   ZGW_CLIENT_SECRET_ARN: 'testclientsecret',
   ZGW_CLIENT_ID: 'testclientid',
-  BUCKET_NAME: 'testBucket',
-  TABLE_NAME: 'testTable',
-  ZAAKTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
-  ROLTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
-  ZAAKSTATUS: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
-  INFORMATIEOBJECTTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
-  ZAKEN_API_URL: 'https://zaken.preprod-rx-services.nl/api/v1/',
-  DOCUMENTEN_API_URL: 'https://documenten.preprod-rx-services.nl/api/v1/',
 };
 process.env = { ...process.env, ...envMockRxMissionHandler };
 
@@ -56,10 +51,9 @@ jest.mock('@gemeentenijmegen/utils', () => {
         TABLE_NAME: 'testTable',
         ZAAKTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
         ROLTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
-        ZAAKSTATUS: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
-        INFORMATIEOBJECTTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
         ZAKEN_API_URL: 'https://zaken.preprod-rx-services.nl/api/v1/',
         DOCUMENTEN_API_URL: 'https://documenten.preprod-rx-services.nl/api/v1/',
+        BRANCH: 'development',
       },
     ),
   };
@@ -70,26 +64,77 @@ describe('RxMissionZgwHandler', () => {
   test('Kamerverhuur Aanvraag', async () => {
     const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
     mockSubmission.logMockInfo();
-
+    // Get data from database
     mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission);
+    // Get submission json and attachment
     mockS3Get = jest.fn()
       .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
       .mockResolvedValueOnce(mockSubmission.getMockStorageBlob());
+    // All Zgw API calls
     const spyOnFetch = jest.spyOn(global, 'fetch')
-      .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // GetZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [] }) as any as Response) //createZaak
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
-      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //documentenApi
+      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
       .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response); //relateToZaak
 
-
-    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'));
+    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', {appId:mockSubmission.getAppId()}));
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
     await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
-    console.log('ALL CALLS MADE TO MAKE Kamerverhuuraanvraag');
-    console.dir(spyOnFetch.mock.calls, { depth: null, colors: true, compact: false, showHidden: true });
+    
+    // console.log('ALL CALLS MADE TO MAKE Kamerverhuuraanvraag');
+    // console.dir(spyOnFetch.mock.calls, { depth: null, colors: true, compact: true, showHidden: true, showProxy: true });
+    writeOutputToFile('kamerverhuur', spyOnFetch.mock.calls);
+  });
+  test('Bouwmaterialen from lambda event', async () => {
+    const mockSubmission = new MockRxMissionSubmission('Bouwmaterialen');
+    mockSubmission.logMockInfo();
+    // Get data from database
+    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission);
+    // Get submission json and attachment
+    mockS3Get = jest.fn()
+      .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
+      .mockResolvedValueOnce(mockSubmission.getMockStorageBlob());
+    // All Zgw API calls
+    const spyOnFetch = jest.spyOn(global, 'fetch')
+      .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [] }) as any as Response) //createZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
+      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
+      .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response); //relateToZaak
+
+    await handler(mockSubmission.getEvent());
+    writeOutputToFile('bouwmaterialen', spyOnFetch.mock.calls);
   });
 });
 
+
+function writeOutputToFile(name: string, data: any) {
+  if (DEBUG_OUTPUT) {
+    const outputDir = path.resolve(__dirname, 'output');
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    const timestamp = Date.now(); // Epoch in milliseconds
+    const fileName = `${name}_${timestamp}.json`;
+    const filePath = path.join(outputDir, fileName);
+    const formattedData = data.map((item: any) => {
+      if (Array.isArray(item) && item[1]?.body) {
+        try {
+          item[1].body = JSON.parse(item[1].body);
+        } catch (e) {}
+      }
+      return item;
+    });
+
+    const jsonData = JSON.stringify(formattedData, null, 2); // Pretty-printed JSON
+    fs.writeFileSync(filePath, jsonData, 'utf8');
+
+    console.log(`Output written to ${filePath}`);
+  }
+}

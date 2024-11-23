@@ -50,6 +50,10 @@ export interface SubmissionZaakProperties {
    * Role type for initiator-role
    */
   aanvragerRolType?: string;
+  /**
+   * Role type for belanghebbende-role
+   */
+  belanghebbendeRolType?: string;
 }
 
 /**
@@ -87,7 +91,7 @@ export function getAppIdsByBranchName(branchName: string): string[] {
  * @returns De overeenkomstige SubmissionZaakProperties.
  * @throws Error als er niet precies één match is of als beide parameters zijn doorgegeven.
  */
-export function rxMissionConfigurationForForm(
+export function getSubmissionPropsForFormWithBranch(
   branchName: string,
   appIdOrFormName: { appId?: string; formName?: string },
 ): SubmissionZaakProperties {
@@ -134,9 +138,10 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         appId: 'R01',
         formName: 'kamerverhuurvergunningaanvragen',
         zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
-        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
-        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509',
-        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/47d64918-891c-4653-8237-cd5445fc6543',
+        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        belanghebbendeRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/84b198b1-10be-4da4-a645-6a5859b0b55f', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/b222fce5-5ebf-4f6e-83a6-3ded759d2b59', // Aanvraag
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/5152a5d9-b915-4679-18dd-08dcce4a3fa1', // NMG-00002 Omzetvergunning
 
       },
@@ -163,6 +168,10 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         formName: 'bouwmaterialenopopenbaarterreinmeldenofvergunningaanvragen',
         zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7', //NMG-00001 Bouwobjectenvergunning
+        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        belanghebbendeRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/84b198b1-10be-4da4-a645-6a5859b0b55f', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/257a9236-74e5-4eb3-8556-63ea58980509', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/b222fce5-5ebf-4f6e-83a6-3ded759d2b59', // Aanvraag
       },
       {
         appId: 'R06',

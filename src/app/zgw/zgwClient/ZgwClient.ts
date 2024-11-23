@@ -3,6 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import { ZakenApiStatus } from './model/ZakenApiStatus.model';
 import { ZakenApiZaak, ZakenApiZaakResponse } from './model/ZakenApiZaak.model';
 import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
+import { ZakenApiRolRequest, ZakenApiRolResponse } from './model/ZakenApiRol.model';
 
 interface ZgwClientOptions {
   /**
@@ -41,14 +42,14 @@ interface ZgwClientOptions {
   roltype: string;
 
   /**
-   * Zaakstatus url for the zaak to create
+   * Zaakstatus url for the zaak to create if the client always uses the same status
    */
-  zaakstatus: string;
+  zaakstatus?: string;
 
   /**
-   * A informatieobjecttype for documents added to a zaak
+   * A informatieobjecttype for documents added to a zaak if the client always uses the same informatieobject
    */
-  informatieobjecttype: string;
+  informatieobjecttype?: string;
 
   /**
    * RSIN of the organization
@@ -106,8 +107,11 @@ export class ZgwClient {
     return zaken.results[0];
   }
 
-  // Optioneel zaaktype toevoegen
-  // Andere velden optioneel maken en duidelijke interfaces maken
+/**
+ * 
+ * @param params CreateZaakParameters
+ * @returns ZakenApiZaakResponse
+ */
   async createZaak(params: CreateZaakParameters): Promise<ZakenApiZaakResponse> {
     const zaakRequest: ZakenApiZaak = {
       // Base fields
@@ -121,17 +125,17 @@ export class ZgwClient {
       toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.identificatie}.`,
       productenOfDiensten: params.productenOfDiensten,
     };
-    const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
+    const zaak: ZakenApiZaakResponse = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
     if (!zaak.url) {
       throw Error(`Creating zaak with identificatie ${params.identificatie} failed. Expected object with url.`);
     }
-    console.log(`Zaak has been created. Identification: ${zaak.identificatie}`);
+    console.log(`Zaak has been created. Identification: ${zaak.identificatie ?? zaak.url}`);
     return zaak;
   }
   async addZaakStatus(params: AddZaakStatusParameters): Promise<ZakenApiStatus> {
     const statusRequest: ZakenApiStatus = {
       zaak: params.zaakUrl,
-      statustype: params.statusType ?? this.options.zaakstatus,
+      statustype: params.statusType ?? this.options.zaakstatus ?? '',
       datumStatusGezet: this.datestamp(),
       statustoelichting: params.statustoelichting ?? 'Aanvraag ingediend vanuit Webformulieren',
     };
@@ -149,6 +153,16 @@ export class ZgwClient {
     return response;
   }
 
+  /**
+   * Original ZgwForwardHandler
+   * Simple flow to add a document to a zaak.
+   * Add document with DocumentenAPI
+   * Relate to zaak with ZakenAPI
+   * The complex uses locking.
+   * @param zaak
+   * @param documentName
+   * @param documentBase64
+   */
   async addDocumentToZaak(zaak: string, documentName: string, documentBase64: string) {
     const documentRequest = {
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
@@ -169,6 +183,7 @@ export class ZgwClient {
     await this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
+  // RxMission used only right now
   async relateDocumentToZaak(zaakUrl: string, informatieObjectUrl: string, fileName: string) {
     const documentZaakRequest = {
       informatieobject: informatieObjectUrl,
@@ -179,12 +194,19 @@ export class ZgwClient {
     return this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
+  //RxMission new
+  async createRol(request: ZakenApiRolRequest): Promise<ZakenApiRolResponse> {
+    return this.callZaakApi(HttpMethod.Post, 'rollen', request);
+  }
+
+   // Original ZgwForwardHandler
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       inpBsn: bsn.bsn,
     };
     return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
   }
+   // Original ZgwForwardHandler
   async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       annIdentificatie: kvk,
@@ -192,6 +214,7 @@ export class ZgwClient {
     return this.addRoleToZaak(zaak, 'niet_natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
   }
 
+  // Original ZgwForwardHandler
   private async addRoleToZaak(
     zaak: string,
     betrokkeneType: string,
@@ -225,7 +248,7 @@ export class ZgwClient {
     });
   }
 
-
+  // Not needed anymore after using the ZgwHttpClient for all calls
   private createToken(clientId: string, userId: string, secret: string) {
     const token = jwt.sign({
       iss: clientId,
@@ -254,6 +277,7 @@ export class ZgwClient {
     return this.zgwHttpClient?.request(method, url, data);
   }
 
+  //Refactor to use ZgwHttpClient
   async callDocumentenApi(method: string, pathOrUrl: string, data?: any) {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
