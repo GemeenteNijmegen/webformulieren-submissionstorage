@@ -6,9 +6,9 @@ import { MockRxMissionSubmission } from './mocks/RxMissionSubmission.mock';
 // @ts-ignore: Ignoring unused import
 import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
+import { handler } from '../rxmission-zgw.lambda';
 import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch } from '../RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from '../RxMissionZgwHandler';
-import { handler } from '../rxmission-zgw.lambda';
 
 const DEBUG_OUTPUT = false;
 // The ZgwHttpClient still uses process env
@@ -80,10 +80,10 @@ describe('RxMissionZgwHandler', () => {
       .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response); //relateToZaak
 
-    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', {appId:mockSubmission.getAppId()}));
+    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
     await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
-    
+
     // console.log('ALL CALLS MADE TO MAKE Kamerverhuuraanvraag');
     // console.dir(spyOnFetch.mock.calls, { depth: null, colors: true, compact: true, showHidden: true, showProxy: true });
     writeOutputToFile('kamerverhuur', spyOnFetch.mock.calls);

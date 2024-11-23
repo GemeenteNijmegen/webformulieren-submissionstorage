@@ -1,11 +1,11 @@
-import { ZakenApiRolRequest } from "../zgwClient/model/ZakenApiRol.model";
-import { ZgwClient } from "../zgwClient/ZgwClient";
-import { SubmissionZaakProperties } from "./RxMissionZgwConfiguration";
+import { SubmissionZaakProperties } from './RxMissionZgwConfiguration';
+import { ZakenApiRolRequest } from '../zgwClient/model/ZakenApiRol.model';
+import { ZgwClient } from '../zgwClient/ZgwClient';
 
 interface RXMissionRolConfig {
-    zgwClient: ZgwClient;
-    submissionZaakProperties: SubmissionZaakProperties;
-    submission: any;
+  zgwClient: ZgwClient;
+  submissionZaakProperties: SubmissionZaakProperties;
+  submission: any;
 }
 
 /**
@@ -14,24 +14,24 @@ interface RXMissionRolConfig {
  * The types in ZakenApiRol can be used to build the RolRequest
  */
 export class RXMissionRol {
-    private zgwClient: ZgwClient;
-    private submissionZaakProperties: SubmissionZaakProperties;
+  private zgwClient: ZgwClient;
+  private submissionZaakProperties: SubmissionZaakProperties;
 
-    constructor(config: RXMissionRolConfig){
-        this.zgwClient = config.zgwClient;
-        this.submissionZaakProperties = config.submissionZaakProperties;
-    }
+  constructor(config: RXMissionRolConfig) {
+    this.zgwClient = config.zgwClient;
+    this.submissionZaakProperties = config.submissionZaakProperties;
+  }
 
-    public async addRolToZaak(){
-        console.debug(this.submissionZaakProperties);
-        // Build the RolRequest based on submission and submissionZaakProperties
-        // Maybe even add two roles (belanghebbende) if needed
-        this.callCreateRol({} as any as ZakenApiRolRequest);
-    };
+  public async addRolToZaak() {
+    console.debug(this.submissionZaakProperties);
+    // Build the RolRequest based on submission and submissionZaakProperties
+    // Maybe even add two roles (belanghebbende) if needed
+    await this.callCreateRol({} as any as ZakenApiRolRequest);
+  };
 
-    private async callCreateRol(request: ZakenApiRolRequest) {
-        const result = await this.zgwClient.createRol(request);
-        return result;
-    }
+  private async callCreateRol(request: ZakenApiRolRequest) {
+    const result = await this.zgwClient.createRol(request);
+    return result;
+  }
 }
 

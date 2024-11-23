@@ -8,9 +8,9 @@ import { ZgwForwardEventDetail, ZgwForwardProcessedFormEvent } from '../../../sh
 /**
  * MockRxMissionSubmission: A helper class to simulate and manage mock submission data for RxMission integration tests.
  *
- * This class is designed to facilitate testing of RxMission integrations by providing a streamlined way to 
- * access, manipulate, and use mock submission data. It includes methods to generate mock events, database 
- * responses, and other resources that mimic real-world scenarios. This makes it easier to test handlers 
+ * This class is designed to facilitate testing of RxMission integrations by providing a streamlined way to
+ * access, manipulate, and use mock submission data. It includes methods to generate mock events, database
+ * responses, and other resources that mimic real-world scenarios. This makes it easier to test handlers
  * and workflows end-to-end without relying on live data or external dependencies.
  *
  * ### Key Features:
@@ -20,18 +20,18 @@ import { ZgwForwardEventDetail, ZgwForwardProcessedFormEvent } from '../../../sh
  * - Designed to test RxMission handlers and related processes, such as ZgwForward processing.
  *
  * ### Example Usage:
- * 
+ *
  * ```typescript
  * import { MockRxMissionSubmission } from './MockRxMissionSubmission';
- * 
+ *
  * // Unit test for a specific submission type
  * test('Handler processes Kamerverhuur Vergunning correctly', async () => {
  *   // Initialize the mock submission
  *   const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
- * 
+ *
  *   // Log the details of the mock submission
  *   mockSubmission.logMockInfo();
- * 
+ *
  *   // Retrieve parameters for calling the handler
  *   const params = mockSubmission.getSubmissionParameters();
  * });
@@ -131,7 +131,7 @@ export class MockRxMissionSubmission {
   }
 
   public getAppId(): string {
-    return this.detail.Key.substring(0,3);
+    return this.detail.Key.substring(0, 3);
   }
   public getJsonData(): any {
     return this.jsonData;

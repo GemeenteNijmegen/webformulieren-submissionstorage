@@ -1,9 +1,9 @@
 import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
+import { ZakenApiRolRequest, ZakenApiRolResponse } from './model/ZakenApiRol.model';
 import { ZakenApiStatus } from './model/ZakenApiStatus.model';
 import { ZakenApiZaak, ZakenApiZaakResponse } from './model/ZakenApiZaak.model';
 import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
-import { ZakenApiRolRequest, ZakenApiRolResponse } from './model/ZakenApiRol.model';
 
 interface ZgwClientOptions {
   /**
@@ -107,8 +107,8 @@ export class ZgwClient {
     return zaken.results[0];
   }
 
-/**
- * 
+  /**
+ *
  * @param params CreateZaakParameters
  * @returns ZakenApiZaakResponse
  */
@@ -199,14 +199,14 @@ export class ZgwClient {
     return this.callZaakApi(HttpMethod.Post, 'rollen', request);
   }
 
-   // Original ZgwForwardHandler
+  // Original ZgwForwardHandler
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       inpBsn: bsn.bsn,
     };
     return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
   }
-   // Original ZgwForwardHandler
+  // Original ZgwForwardHandler
   async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       annIdentificatie: kvk,

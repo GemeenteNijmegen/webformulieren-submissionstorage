@@ -46,7 +46,7 @@ export class RxMissionZgwHandler {
 
   async sendSubmissionToRxMission(key: string, userId: string, userType: UserType) {
     await this.zgwClient.init();
-    
+
     // Get submission
     const submission = await this.database.getSubmission({ key, userId, userType });
     if (!submission) {
