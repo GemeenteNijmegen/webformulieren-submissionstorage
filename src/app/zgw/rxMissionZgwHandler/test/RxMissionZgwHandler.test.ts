@@ -103,7 +103,7 @@ xdescribe('RxMissionZgwHandler', () => {
     // All Zgw API calls
     const spyOnFetch = jest.spyOn(global, 'fetch')
       .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [], rollen: []  }) as any as Response) //createZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [], rollen: [] }) as any as Response) //createZaak
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
       .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
