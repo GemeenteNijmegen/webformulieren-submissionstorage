@@ -1,4 +1,4 @@
-import { Bsn } from '@gemeentenijmegen/utils';
+ import { Bsn } from '@gemeentenijmegen/utils';
 import { UserType } from './UserType';
 
 /**
@@ -20,6 +20,7 @@ export interface User {
  * @param userType person for users with BSN, organisation for those with KVK
  */
 export function userFromIdAndType(userId: string, userType: UserType) {
+  console.debug(Bsn);
   if (userType == 'organisation') {
     return new Organisation(userId);
   } else {

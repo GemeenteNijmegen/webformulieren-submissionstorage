@@ -1,13 +1,13 @@
 import { environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import 'dotenv/config';
 import { RXMissionDocument } from './RXMissionDocument';
+import { RXMissionRol } from './RxMissionRol';
 import { RXMissionZaak } from './RxMissionZaak';
 import { RxMissionZgwConfiguration, SubmissionZaakProperties } from './RxMissionZgwConfiguration';
 import { UserType } from '../../shared/UserType';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { SubmissionSchema } from '../../submission/SubmissionSchema';
 import { ZgwClient } from '../zgwClient/ZgwClient';
-import { RXMissionRol } from './RxMissionRol';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -64,20 +64,40 @@ export class RxMissionZgwHandler {
     const zgwZaak = await zaak.create(parsedSubmission);
 
     // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
-    if (zgwZaak.rollen.length == 0) {
-      const role = new RXMissionRol({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties })
+    console.debug('zaak no role', zgwZaak);
+    if (zgwZaak?.rollen?.length == 0) {
+      const role = new RXMissionRol({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties });
       await role.addRolToZaak(zgwZaak.url, parsedSubmission, submission);
     }
 
     // We may have returned an existing zaak, in which some documents have been created.
     // Only start adding docs if the zaakinformatieobjecten count is different from attachments + pdf
     // TODO: check which attachments have already been added before adding all attachments again.
+    
     if (zgwZaak.zaakinformatieobjecten.length < (submissionAttachments.length + 1)) {
       await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
       const uploads = submissionAttachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
       await Promise.all(uploads);
     }
   }
+
+  // private async addRole(parsedSubmission: Submission, zgwZaak: any, submission: SubmissionData) {
+  //   // Collect information for creating the role
+  //   const email = SubmissionUtils.findEmail(parsedSubmission);
+  //   const telefoon = SubmissionUtils.findTelefoon(parsedSubmission);
+  //   const name = parsedSubmission.data.naamIngelogdeGebruiker;
+  //   const hasContactDetails = !!email || !!telefoon;
+  //   if (!hasContactDetails || !name) {
+  //     console.log('No contact information found in submission. Notifications cannot be send.');
+  //   }
+  //   if (parsedSubmission.bsn) {
+  //     await this.zgwClient.addBsnRoleToZaak(zgwZaak.url, new Bsn(submission.userId), email, telefoon, name);
+  //   } else if (parsedSubmission.kvknummer) {
+  //     await this.zgwClient.addKvkRoleToZaak(zgwZaak.url, submission.userId, email, telefoon, name);
+  //   } else {
+  //     console.warn('No BSN or KVK found so a rol will not be created.');
+  //   }
+  // }
 
   async submissionData(key: string) {
     const jsonFile = await this.storage.get(`${key}/submission.json`);

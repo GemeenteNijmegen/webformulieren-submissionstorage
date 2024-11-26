@@ -1,8 +1,11 @@
 import { SubmissionZaakProperties } from './RxMissionZgwConfiguration';
-import { ZgwClient } from '../zgwClient/ZgwClient';
-import { SubmissionUtils } from '../SubmissionUtils';
-import { Submission } from '../../submission/SubmissionSchema';
 import { SubmissionData } from '../../submission/Database';
+import { Submission } from '../../submission/SubmissionSchema';
+import { SubmissionUtils } from '../SubmissionUtils';
+import { ZgwClient } from '../zgwClient/ZgwClient';
+import { ZakenApiRolResponse } from '../zgwClient/model/ZakenApiRol.model';
+import { Organisation, Person, User, userFromIdAndType } from '../../shared/User';
+import { UserType } from '../../shared/UserType';
 
 interface RXMissionRolConfig {
   zgwClient: ZgwClient;
@@ -34,16 +37,33 @@ export class RXMissionRol {
     if (!hasContactDetails || !name) {
       console.log('No contact information found in submission. Notifications cannot be send.');
     }
-    let userType: 'natuurlijk_persoon' | 'niet_natuurlijk_persoon';
+    let userType: UserType;
     if (parsedSubmission.bsn) {
-      userType = 'natuurlijk_persoon';
+      userType = 'person';
     } else if (parsedSubmission.kvknummer) {
-      userType = 'niet_natuurlijk_persoon';
+      userType = 'organisation';
     } else {
       console.warn('No BSN or KVK found so a rol will not be created.');
       return;
     }
-    await this.zgwClient.createRol({ zaak, userType, identifier: submission.userId, email, telefoon, name});
+    const user = userFromIdAndType(submission.userId, userType);
+    await this.createRol({ zaak, user, email, telefoon, name });
   };
+
+  private async createRol(config: {
+    zaak: string;
+    user: User;
+    email?: string;
+    telefoon?: string;
+    name?: string;
+  }): Promise<ZakenApiRolResponse> {
+    if (config.user instanceof Person) {
+      return this.zgwClient.addBsnRoleToZaak(config.zaak, config.user.bsn, config.email, config.telefoon, config.name);
+    } else if (config.user instanceof Organisation) {
+      return this.zgwClient.addKvkRoleToZaak(config.zaak, config.user.identifier, config.email, config.telefoon, config.name);
+    } else {
+      throw Error('Unexpectedly didnt get a valid usertype');
+    }
+  }
 }
 

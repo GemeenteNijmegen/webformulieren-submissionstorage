@@ -99,11 +99,12 @@ export class ZgwClient {
 
   async getZaak(identificatie: string) {
     const zaken = await this.callZaakApi(HttpMethod.Get, `zaken?identificatie=${identificatie}`);
-    if (!zaken || zaken.count == 0) {
+    if (!zaken || !zaken.results || zaken.results.length == 0) {
       throw new ZaakNotFoundError();
     } else if (zaken.count > 1) {
       throw Error('Multiple zaken found');
     }
+
     return zaken.results[0];
   }
 
@@ -194,25 +195,6 @@ export class ZgwClient {
     return this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
-  //RxMission new
-  async createRol(config: {
-    zaak: string,
-    userType: 'natuurlijk_persoon' | 'niet_natuurlijk_persoon',
-    identifier: string,
-    email?: string,
-    telefoon?: string,
-    name?: string
-  }): Promise<ZakenApiRolResponse> {
-    if(config.userType == 'natuurlijk_persoon') {
-      const bsn = new Bsn(config.identifier);
-      return this.addBsnRoleToZaak(config.zaak, bsn, config.email, config.telefoon, config.name);
-    } else if(config.userType == 'niet_natuurlijk_persoon') {
-      return this.addKvkRoleToZaak(config.zaak, config.identifier, config.email, config.telefoon, config.name);
-    } else {
-      throw Error('Unexpectedly didnt get a valid usertype');
-    }
-  }
-
   // Original ZgwForwardHandler
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
@@ -256,7 +238,7 @@ export class ZgwClient {
       contactpersoonRol = undefined;
     }
 
-    return await this.callZaakApi(HttpMethod.Post, 'rollen', {
+    return this.callZaakApi(HttpMethod.Post, 'rollen', {
       ...roleRequest,
       contactpersoonRol,
     });

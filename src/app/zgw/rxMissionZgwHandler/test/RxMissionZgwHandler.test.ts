@@ -1,14 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-// @ts-ignore: Ignoring unused import
-import { AWS, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import { MockRxMissionSubmission } from './mocks/RxMissionSubmission.mock';
-// @ts-ignore: Ignoring unused import
-import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
 import { handler } from '../rxmission-zgw.lambda';
 import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch } from '../RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from '../RxMissionZgwHandler';
+import { Bsn } from '@gemeentenijmegen/utils';
 
 const DEBUG_OUTPUT = false;
 // The ZgwHttpClient still uses process env
@@ -73,7 +70,7 @@ describe('RxMissionZgwHandler', () => {
     // All Zgw API calls
     const spyOnFetch = jest.spyOn(global, 'fetch')
       .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [] }) as any as Response) //createZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [], rollen: [] }) as any as Response) //createZaak
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
       .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
@@ -82,6 +79,8 @@ describe('RxMissionZgwHandler', () => {
 
     const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
+    console.debug(userId);
+    return;
     await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
 
     // console.log('ALL CALLS MADE TO MAKE Kamerverhuuraanvraag');
@@ -99,14 +98,19 @@ describe('RxMissionZgwHandler', () => {
       .mockResolvedValueOnce(mockSubmission.getMockStorageBlob());
     // All Zgw API calls
     const spyOnFetch = jest.spyOn(global, 'fetch')
-      .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [] }) as any as Response) //createZaak
+      .mockResolvedValueOnce(getFetchMockResponse({
+        count: 0,
+        next: null,
+        previous: null,
+        results: [],
+      }) as any as Response) // getZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [], rollen: [] }) as any as Response) //createZaak
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
       .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
       .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
       .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response); //relateToZaak
-
+    console.debug(Bsn);
     await handler(mockSubmission.getEvent());
     writeOutputToFile('bouwmaterialen', spyOnFetch.mock.calls);
   });
