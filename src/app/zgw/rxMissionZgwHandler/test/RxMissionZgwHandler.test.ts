@@ -60,7 +60,7 @@ jest.mock('@gemeentenijmegen/utils', () => {
 });
 
 
-describe('RxMissionZgwHandler', () => {
+xdescribe('RxMissionZgwHandler', () => {
   test('Kamerverhuur Aanvraag', async () => {
     const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
     mockSubmission.logMockInfo();

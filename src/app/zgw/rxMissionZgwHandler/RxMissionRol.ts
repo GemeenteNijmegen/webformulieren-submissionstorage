@@ -1,8 +1,8 @@
 import { SubmissionZaakProperties } from './RxMissionZgwConfiguration';
-import { ZgwClient } from '../zgwClient/ZgwClient';
-import { SubmissionUtils } from '../SubmissionUtils';
-import { Submission } from '../../submission/SubmissionSchema';
 import { SubmissionData } from '../../submission/Database';
+import { Submission } from '../../submission/SubmissionSchema';
+import { SubmissionUtils } from '../SubmissionUtils';
+import { ZgwClient } from '../zgwClient/ZgwClient';
 
 interface RXMissionRolConfig {
   zgwClient: ZgwClient;
@@ -43,7 +43,7 @@ export class RXMissionRol {
       console.warn('No BSN or KVK found so a rol will not be created.');
       return;
     }
-    await this.zgwClient.createRol({ zaak, userType, identifier: submission.userId, email, telefoon, name});
+    await this.zgwClient.createRol({ zaak, userType, identifier: submission.userId, email, telefoon, name });
   };
 }
 
