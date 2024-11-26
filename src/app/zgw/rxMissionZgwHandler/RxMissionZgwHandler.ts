@@ -122,7 +122,6 @@ export class RxMissionZgwHandler {
     }
     const blob = new Blob([bytes]);
     const document = new RXMissionDocument({
-      identificatie: `${key}-${attachment}`,
       fileName: attachment,
       informatieObjectType: this.submissionZaakProperties.informatieObjectType ?? '',
       zgwClient: this.zgwClient,
