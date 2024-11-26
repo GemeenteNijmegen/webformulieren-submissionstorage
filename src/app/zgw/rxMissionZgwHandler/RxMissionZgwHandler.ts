@@ -8,6 +8,8 @@ import { Database, DynamoDBDatabase, SubmissionData } from '../../submission/Dat
 import { Submission, SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
 import { ZgwClient } from '../zgwClient/ZgwClient';
+import { RXMissionRol } from './RxMissionRol';
+import { parse } from 'path';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -63,15 +65,11 @@ export class RxMissionZgwHandler {
     const zaak = new RXMissionZaak(this.zgwClient, this.submissionZaakProperties);
     const zgwZaak = await zaak.create(parsedSubmission);
 
-    if (process.env.ADDROLE) { //TODO: ff uit kunnen zetten van rol, later conditie weghalen
-      // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
-      if (zgwZaak.rollen.length == 0) {
-        // Originele ZgwForwardHandler opzet die vervangen moet worden
-        await this.addRole(parsedSubmission, zgwZaak, submission);
-
-        // const rol = new RXMissionRol({zgwClient: this.zgwClient, submissionZaakpropeties: this.submissionZaakProperties});
-        // await rol.addRolToZaak()
-      }
+    // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
+    if (zgwZaak.rollen.length == 0) {
+      // Originele ZgwForwardHandler opzet die vervangen moet worden
+      const role = new RXMissionRol({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties })
+      await role.addRolToZaak(zgwZaak.url, parsedSubmission, submission);
     }
 
     // We may have returned an existing zaak, in which some documents have been created.

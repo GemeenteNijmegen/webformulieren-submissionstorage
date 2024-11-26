@@ -4,6 +4,7 @@ import { ZakenApiRolRequest, ZakenApiRolResponse } from './model/ZakenApiRol.mod
 import { ZakenApiStatus } from './model/ZakenApiStatus.model';
 import { ZakenApiZaak, ZakenApiZaakResponse } from './model/ZakenApiZaak.model';
 import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
+import { DataIdentifier } from 'aws-cdk-lib/aws-logs';
 
 interface ZgwClientOptions {
   /**
@@ -195,8 +196,22 @@ export class ZgwClient {
   }
 
   //RxMission new
-  async createRol(request: ZakenApiRolRequest): Promise<ZakenApiRolResponse> {
-    return this.callZaakApi(HttpMethod.Post, 'rollen', request);
+  async createRol(config: {
+    zaak: string,
+    userType: 'natuurlijk_persoon' | 'niet_natuurlijk_persoon',
+    identifier: string,
+    email?: string,
+    telefoon?: string,
+    name?: string
+  }): Promise<ZakenApiRolResponse> {
+    if(config.userType == 'natuurlijk_persoon') {
+      const bsn = new Bsn(config.identifier);
+      return this.addBsnRoleToZaak(config.zaak, bsn, config.email, config.telefoon, config.name);
+    } else if(config.userType == 'niet_natuurlijk_persoon') {
+      return this.addKvkRoleToZaak(config.zaak, config.identifier, config.email, config.telefoon, config.name);
+    } else {
+      throw Error('Unexpectedly didnt get a valid usertype');
+    }
   }
 
   // Original ZgwForwardHandler
@@ -222,7 +237,7 @@ export class ZgwClient {
     email?: string,
     telefoon?: string,
     name?: string,
-  ) {
+  ): Promise<ZakenApiRolResponse> {
     const roleRequest = {
       zaak,
       betrokkeneType: betrokkeneType,
@@ -242,7 +257,7 @@ export class ZgwClient {
       contactpersoonRol = undefined;
     }
 
-    await this.callZaakApi(HttpMethod.Post, 'rollen', {
+    return await this.callZaakApi(HttpMethod.Post, 'rollen', {
       ...roleRequest,
       contactpersoonRol,
     });
