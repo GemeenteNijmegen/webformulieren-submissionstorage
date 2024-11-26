@@ -283,7 +283,6 @@ export class ZgwClient {
       url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
     }
     const json = (data) ? JSON.stringify(data) : null;
-    console.debug('client', this.zgwHttpClient);
     return this.zgwHttpClient?.request(method, url, json);
   }
 

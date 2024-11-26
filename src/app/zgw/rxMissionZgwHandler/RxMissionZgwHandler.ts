@@ -67,7 +67,6 @@ export class RxMissionZgwHandler {
 
     // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
     if (zgwZaak.rollen.length == 0) {
-      // Originele ZgwForwardHandler opzet die vervangen moet worden
       const role = new RXMissionRol({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties })
       await role.addRolToZaak(zgwZaak.url, parsedSubmission, submission);
     }

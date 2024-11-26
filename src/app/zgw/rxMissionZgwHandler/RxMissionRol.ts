@@ -1,5 +1,4 @@
 import { SubmissionZaakProperties } from './RxMissionZgwConfiguration';
-import { ZakenApiRolRequest } from '../zgwClient/model/ZakenApiRol.model';
 import { ZgwClient } from '../zgwClient/ZgwClient';
 import { SubmissionUtils } from '../SubmissionUtils';
 import { Submission } from '../../submission/SubmissionSchema';
