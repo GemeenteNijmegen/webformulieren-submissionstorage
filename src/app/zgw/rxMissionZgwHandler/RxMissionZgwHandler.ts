@@ -49,10 +49,10 @@ export class RxMissionZgwHandler {
 
     // Get submission
     const submission = await this.database.getSubmission({ key, userId, userType });
+
     if (!submission) {
       throw Error(`Could not find submission ${key}`);
     }
-
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
     console.log('parsedsubmission: ', parsedSubmission.appId);
     const submissionAttachments: string[] = submission.attachments ?? [];
@@ -93,6 +93,7 @@ export class RxMissionZgwHandler {
   async uploadAttachment(key: string, zaak: string, attachment: string) {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
+    console.log('Inhoud Document: ', inhoud);
     const bytes = await inhoud?.Body?.transformToByteArray();
     if (!bytes) {
       throw Error('error converting file');

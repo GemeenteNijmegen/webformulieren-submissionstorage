@@ -30,10 +30,11 @@ jest.mock('../../../submission/Database', () => {
 });
 
 let mockS3Get = jest.fn().mockResolvedValue({});
+
 jest.mock('@gemeentenijmegen/utils', () => {
   const actualModule = jest.requireActual('@gemeentenijmegen/utils');
   return {
-    Bsn: actualModule.Bsn,
+    ...actualModule,
     S3Storage: jest.fn(() => {
       return {
         get: mockS3Get,
@@ -62,26 +63,36 @@ jest.mock('@gemeentenijmegen/utils', () => {
 });
 
 
-xdescribe('RxMissionZgwHandler', () => {
+describe('RxMissionZgwHandler', () => {
   test('Kamerverhuur Aanvraag', async () => {
     const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
     mockSubmission.logMockInfo();
     // Get data from database
-    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission);
+    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
     // Get submission json and attachment
     mockS3Get = jest.fn()
       .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
+      .mockResolvedValueOnce(mockSubmission.getMockStorageBlob())
       .mockResolvedValueOnce(mockSubmission.getMockStorageBlob());
-    // All Zgw API calls
+
     const spyOnFetch = jest.spyOn(global, 'fetch')
-      .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [], rollen: [] }) as any as Response) //createZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
-      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
+      .mockResolvedValueOnce(getFetchMockResponse({
+        count: 0,
+        next: null,
+        previous: null,
+        results: [],
+      }) as any as Response) // getZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl', zaakinformatieobjecten: [], rollen: [] }) as any as Response) //createZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //addZaakStatus
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //createRol
+      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'https://someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //uploadfile
       .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //relateToZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response); //createRol
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //relateToZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'https://someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //uploadfile
+      .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response); //relateToZaak
 
     const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
@@ -91,25 +102,36 @@ xdescribe('RxMissionZgwHandler', () => {
     // console.dir(spyOnFetch.mock.calls, { depth: null, colors: true, compact: true, showHidden: true, showProxy: true });
     writeOutputToFile('kamerverhuur', spyOnFetch.mock.calls);
   });
-  xtest('Bouwmaterialen from lambda event', async () => {
+  test('Bouwmaterialen from lambda event', async () => {
     const mockSubmission = new MockRxMissionSubmission('Bouwmaterialen');
     mockSubmission.logMockInfo();
     // Get data from database
-    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission);
+    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
     // Get submission json and attachment
     mockS3Get = jest.fn()
       .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
+      .mockResolvedValueOnce(mockSubmission.getMockStorageBlob())
       .mockResolvedValueOnce(mockSubmission.getMockStorageBlob());
     // All Zgw API calls
+
     const spyOnFetch = jest.spyOn(global, 'fetch')
-      .mockResolvedValueOnce(getFetchMockResponse({ results: [] }) as any as Response) // getZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl', zaakinformatieobjecten: [], rollen: []  }) as any as Response) //createZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //addZaakStatus
-      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //uploadfile
+      .mockResolvedValueOnce(getFetchMockResponse({
+        count: 0,
+        next: null,
+        previous: null,
+        results: [],
+      }) as any as Response) // getZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl', zaakinformatieobjecten: [], rollen: [] }) as any as Response) //createZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //addZaakStatus
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //createRol
+      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'https://someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //uploadfile
       .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response) //relateToZaak
-      .mockResolvedValueOnce(getFetchMockResponse({ url: 'someurl' }) as any as Response); //createRol
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //relateToZaak
+      .mockResolvedValueOnce(getFetchMockResponse({ bestandsdelen: [{ url: 'https://someurl' }], lock: 'bla' }) as any as Response) //createInformatieObject
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response) //uploadfile
+      .mockResolvedValueOnce(getFetchMockResponse({ statusCode: 204 }) as any as Response) //unlock
+      .mockResolvedValueOnce(getFetchMockResponse({ url: 'https://someurl' }) as any as Response); //relateToZaak
 
     await handler(mockSubmission.getEvent());
     writeOutputToFile('bouwmaterialen', spyOnFetch.mock.calls);

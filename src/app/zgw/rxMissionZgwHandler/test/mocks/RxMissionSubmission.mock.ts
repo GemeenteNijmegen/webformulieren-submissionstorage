@@ -179,7 +179,7 @@ export class MockRxMissionSubmission {
   /**
    * Gebruik om een mockresponse van de database te geven gebaseerd op de json
    */
-  public async mockedDatabaseGetSubmission(): Promise<SubmissionData | false> {
+  public mockedDatabaseGetSubmission(): SubmissionData {
     // Extract the mock data details
     const mockUserId = this.detail.userId;
     const mockKey = this.detail.Key;
@@ -191,8 +191,7 @@ export class MockRxMissionSubmission {
     const dateSubmitted = this.jsonData.Timestamp ?? '';
     const formName = this.messageData.formTypeId ?? 'onbekend';
     const formTitle = this.messageData.formTypeId ?? 'Onbekende aanvraag';
-    const attachments =
-        this.messageData.data?.toevoegen?.map((attachment: any) => attachment.reference) ?? [];
+    const attachments: string[] = this.messageData.data?.toevoegen?.map((attachment: any) => attachment.reference) ?? [];
 
     // Construct the SubmissionData object
     const submissionData: SubmissionData = {
