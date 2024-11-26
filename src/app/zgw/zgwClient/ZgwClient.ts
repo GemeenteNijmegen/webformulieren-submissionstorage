@@ -1,10 +1,9 @@
 import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
-import { ZakenApiRolRequest, ZakenApiRolResponse } from './model/ZakenApiRol.model';
+import { ZakenApiRolResponse } from './model/ZakenApiRol.model';
 import { ZakenApiStatus } from './model/ZakenApiStatus.model';
 import { ZakenApiZaak, ZakenApiZaakResponse } from './model/ZakenApiZaak.model';
 import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
-import { DataIdentifier } from 'aws-cdk-lib/aws-logs';
 
 interface ZgwClientOptions {
   /**
