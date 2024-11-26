@@ -114,14 +114,14 @@ export class RXMissionDocument {
     const doc = {
       identificatie: this.identificatie, //Combi moet uniek zijn met bronorganisatie
       bronorganisatie: '001479179', //Combi moet uniek zijn met identificatie
-      creatiedatum: '2024-08-27',
-      titel: 'test Devops Nijmegen',
+      creatiedatum: new Date().toISOString().substring(0, 'YYYY-MM-DD'.length),
+      titel: this.fileName,
       vertrouwelijkheidaanduiding: 'openbaar',
       auteur: 'Devops Nijmegen',
       status: '',
       formaat: 'application/pdf',
       taal: 'nld',
-      bestandsnaam: 'test2.pdf',
+      bestandsnaam: this.fileName,
       inhoud: null,
       bestandsomvang: fileSize,
       informatieobjecttype,
