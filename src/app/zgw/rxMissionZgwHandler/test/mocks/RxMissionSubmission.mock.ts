@@ -127,6 +127,7 @@ export class MockRxMissionSubmission {
     console.log(`Mock Submission Selected:
     - Form Name   : ${this.formName}
     - User Type   : ${this.userType}
+    - User Id   : ${this.detail.userId}
     - Description : ${this.description}`);
   }
 
