@@ -51,12 +51,12 @@ export class SubmissionZgwForwarder extends Construct {
 
   /**
    * Add a dynamoDB table for storing mapping between submission reference and zaakUrl
-   * 
+   *
    * Not all ZGW-registration stores allow setting zaakID or adding a reference to the zaak. Because
-   * creating a zaak is a multistage process, and lambda's may be invoked multiple times, we need to 
+   * creating a zaak is a multistage process, and lambda's may be invoked multiple times, we need to
    * store a mappping between zaakUrl and reference, so subsequent invocations can verify if the zaak has
    * been (partially) created or not.
-   *  
+   *
    * @param key encryption key for table
    * @returns Table
    */
@@ -117,7 +117,7 @@ export class SubmissionZgwForwarder extends Construct {
  * Create lambda function to process submissions for application RxMission
  * @param bucket S3 bucket containing submission information
  * @param submissionsTable Table containing submission information
- * @param mappingTable Table for storing submission reference to zaakUrl mappings. 
+ * @param mappingTable Table for storing submission reference to zaakUrl mappings.
  * Necessary for idempotency.
  * @returns
  */
