@@ -6,11 +6,13 @@ import * as snsSample from '../../../submission/test/samples/sns.sample.json';
 import { describeIntegration } from '../../../test-utils/describeIntegration';
 import { ZgwClient } from '../../zgwClient/ZgwClient';
 import { RXMissionZaak } from '../RxMissionZaak';
+import { SubmissionZaakReference } from '../SubmissionZaakReference';
 
 describeIntegration('RX Mission live tests', () => {
   test('Can create zaak object', async() => {
     const zgwClient = testZgwClient();
-    const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties);
+    const zaakReference = new SubmissionZaakReference('test');
+    const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties, zaakReference);
 
     const submission = getSampleSubmissionDataBaseData('12.345');
     const parsedSubmission = SubmissionSchema.passthrough().parse(JSON.parse(snsSample.Records[0].Sns.Message));
@@ -40,11 +42,13 @@ describeIntegration('RX Mission live tests', () => {
       json: () => Promise.resolve({}),
     } as any as Response);
 
-    const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties);
+    const zaakReference = new SubmissionZaakReference('test');
+    const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties, zaakReference);
 
     const zaakRefNo = '12.345';
     const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.create(parsedSubmission);
+    const submission = getSampleSubmissionDataBaseData('12.345');
+    await zaak.create(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });
@@ -52,13 +56,15 @@ describeIntegration('RX Mission live tests', () => {
 
   test('Can create zaak in ZGW store', async() => {
     const zgwClient = testZgwClient();
+    const zaakReference = new SubmissionZaakReference('test');
     const spyOnFetch = jest.spyOn(global, 'fetch');
 
-    const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties);
+    const zaak = new RXMissionZaak(zgwClient, mockTDLSubmissionZaakProperties, zaakReference);
     const zaakRefNo = '12.346';
 
     const parsedSubmission = getSampleSubmission(zaakRefNo);
-    await zaak.create(parsedSubmission);
+    const submission = getSampleSubmissionDataBaseData('12.345');
+    await zaak.create(parsedSubmission, submission);
     console.log('Fetch call 1', spyOnFetch.mock.calls[0]);
     console.log('Fetch call 2', spyOnFetch.mock.calls[1]);
   });

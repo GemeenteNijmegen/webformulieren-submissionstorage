@@ -4,6 +4,7 @@ import { RXMissionDocument } from './RXMissionDocument';
 import { RXMissionRol } from './RxMissionRol';
 import { RXMissionZaak } from './RxMissionZaak';
 import { RxMissionZgwConfiguration, SubmissionZaakProperties } from './RxMissionZgwConfiguration';
+import { SubmissionZaakReference } from './SubmissionZaakReference';
 import { UserType } from '../../shared/UserType';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { SubmissionSchema } from '../../submission/SubmissionSchema';
@@ -12,6 +13,7 @@ import { ZgwClient } from '../zgwClient/ZgwClient';
 const envKeys = [
   'BUCKET_NAME',
   'TABLE_NAME',
+  'ZAAKREFERENCE_TABLE_NAME',
   'ZAAKTYPE',
   'ROLTYPE',
   'ZAKEN_API_URL',
@@ -25,6 +27,7 @@ export class RxMissionZgwHandler {
   private zgwClient: ZgwClient;
   // private rxmConfig: RxMissionZgwConfiguration;
   private submissionZaakProperties: SubmissionZaakProperties;
+  private zaakReference: SubmissionZaakReference;
 
   constructor(_rxMissionZgwConfiguration: RxMissionZgwConfiguration, submissionZaakProperties: SubmissionZaakProperties) {
     // Nog bepalen of we deze wel nodig gaan hebben, misschien wel als er wat generieke branch config toegevoegd wordt
@@ -33,6 +36,7 @@ export class RxMissionZgwHandler {
     const env = environmentVariables(envKeys);
     this.storage = new S3Storage(env.BUCKET_NAME);
     this.database = new DynamoDBDatabase(env.TABLE_NAME);
+    this.zaakReference = new SubmissionZaakReference(env.ZAAKREFERENCE_TABLE_NAME);
 
     this.zgwClient = new ZgwClient({
       zaaktype: env.ZAAKTYPE, // Moet eruit
@@ -60,7 +64,7 @@ export class RxMissionZgwHandler {
       console.debug('Submission', parsedSubmission, 'Attachments', submissionAttachments.length);
     }
 
-    const zaak = new RXMissionZaak(this.zgwClient, this.submissionZaakProperties);
+    const zaak = new RXMissionZaak(this.zgwClient, this.submissionZaakProperties, this.zaakReference);
     const zgwZaak = await zaak.create(parsedSubmission, submission);
 
     // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.

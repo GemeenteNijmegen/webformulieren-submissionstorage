@@ -1,17 +1,19 @@
 import { SubmissionZaakProperties } from './RxMissionZgwConfiguration';
+import { SubmissionZaakReference } from './SubmissionZaakReference';
+import { SubmissionData } from '../../submission/Database';
 import { Submission } from '../../submission/SubmissionSchema';
 import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
-import { SubmissionData } from '../../submission/Database';
 
 export class RXMissionZaak {
   private zgwClient: ZgwClient;
   private submissionZaakProperties: SubmissionZaakProperties;
+  private zaakReference: SubmissionZaakReference;
 
-  constructor(zgwClient: ZgwClient, submissionZaakProperties: SubmissionZaakProperties) {
+  constructor(zgwClient: ZgwClient, submissionZaakProperties: SubmissionZaakProperties, zaakReference: SubmissionZaakReference) {
     this.zgwClient = zgwClient;
     this.submissionZaakProperties = submissionZaakProperties;
+    this.zaakReference = zaakReference;
     console.dir(this.submissionZaakProperties, { depth: null, colors: true, compact: false, showHidden: true });
-
   }
 
   async create(submission: Submission, submissionData: SubmissionData) {
@@ -21,10 +23,10 @@ export class RXMissionZaak {
     // Zie Readme voor uiteenzetting probleem
 
     try {
-      const existingZaak = await this.zgwClient.getZaak(submission.reference);
-      if (existingZaak) {
-        console.log(`Zaak with reference ${submission.reference} already exists, skipping`);
-        return existingZaak;
+      const zaakMapping = await this.zaakReference.get(submission.reference);
+      if (zaakMapping) {
+        console.log('Zaak already mapped, returning existing zaak', zaakMapping);
+        return await this.zgwClient.getZaakByUrl(zaakMapping.zaakUrl);
       }
     } catch (error) {
       // If zaak not found is thrown that's a good thing we can continue
@@ -42,6 +44,7 @@ export class RXMissionZaak {
       toelichting: `Webformulierinzending ${submission.reference}`,
       productenOfDiensten: [this.submissionZaakProperties.productType ?? ''],
     });
+    this.zaakReference.set(submission.reference, zaak.url);
 
     // Set zaakstatus
     await this.zgwClient.addZaakStatus({ zaakUrl: zaak.url, statusType: this.submissionZaakProperties.statusType, statustoelichting: 'RxMissionZaak DevOps webformulieren' });

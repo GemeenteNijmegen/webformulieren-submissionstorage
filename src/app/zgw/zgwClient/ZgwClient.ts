@@ -107,6 +107,11 @@ export class ZgwClient {
     return zaken.results[0];
   }
 
+  async getZaakByUrl(zaakUrl: string) {
+    const zaak = await this.callZaakApi(HttpMethod.Get, zaakUrl);
+    return zaak;
+  }
+
   /**
  *
  * @param params CreateZaakParameters
