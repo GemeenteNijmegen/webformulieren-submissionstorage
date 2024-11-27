@@ -1,6 +1,7 @@
 import { SubmissionZaakProperties } from './RxMissionZgwConfiguration';
 import { Submission } from '../../submission/SubmissionSchema';
 import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
+import { SubmissionData } from '../../submission/Database';
 
 export class RXMissionZaak {
   private zgwClient: ZgwClient;
@@ -13,7 +14,7 @@ export class RXMissionZaak {
 
   }
 
-  async create(submission: Submission) {
+  async create(submission: Submission, submissionData: SubmissionData) {
     // Handle idempotency by checking if the zaak already exists
     // Deze vlieger gaat niet op als er geen FormulierReference gebruikt wordt
     // Als het zaaknummer in RxMission aangemaakt wordt, dan weten we de id hier nog niet
@@ -36,9 +37,9 @@ export class RXMissionZaak {
 
     const zaak = await this.zgwClient.createZaak({
       zaaktype: this.submissionZaakProperties.zaakType,
-      formulier: this.submissionZaakProperties.formName ?? 'Onbekend formulier',
+      formulier: submissionData.formTitle ?? 'Onbekend formulier',
       formulierKey: submission.reference,
-      toelichting: `Webformulier Devops ${submission.reference}`,
+      toelichting: `Webformulierinzending ${submission.reference}`,
       productenOfDiensten: [this.submissionZaakProperties.productType ?? ''],
     });
 

@@ -121,8 +121,8 @@ export class ZgwClient {
       // Can be undefined, which auto-creates zaakidentificatie
       identificatie: params.identificatie,
       zaaktype: params.zaaktype ?? this.options.zaaktype,
-      omschrijving: params.formulierKey, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
-      toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.identificatie}.`,
+      omschrijving: params.formulier, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
+      toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.formulierKey}.`,
       productenOfDiensten: params.productenOfDiensten,
     };
     const zaak: ZakenApiZaakResponse = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
