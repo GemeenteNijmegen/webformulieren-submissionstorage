@@ -44,7 +44,7 @@ export class RXMissionZaak {
       toelichting: `Webformulierinzending ${submission.reference}`,
       productenOfDiensten: [this.submissionZaakProperties.productType ?? ''],
     });
-    this.zaakReference.set(submission.reference, zaak.url);
+    await this.zaakReference.set(submission.reference, zaak.url);
 
     // Set zaakstatus
     await this.zgwClient.addZaakStatus({ zaakUrl: zaak.url, statusType: this.submissionZaakProperties.statusType, statustoelichting: 'RxMissionZaak DevOps webformulieren' });
