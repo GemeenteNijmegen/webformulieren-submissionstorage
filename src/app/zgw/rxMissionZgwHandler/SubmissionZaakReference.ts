@@ -50,7 +50,7 @@ export class SubmissionZaakReference {
         console.debug(`Found mapping for ${submissionKey}, ${item.zaakUrl.S}`);
         return {
           submissionKey: item.pk.S,
-          zaakUrl: item.zaakUrl.S,
+          zaak: item.zaakUrl.S,
         };
 
       }
@@ -73,5 +73,5 @@ const DynamoDBStringSchema = z.object({
 });
 const DynamoDBItemSchema = z.object({
   pk: DynamoDBStringSchema,
-  zaakUrl: DynamoDBStringSchema,
+  zaak: DynamoDBStringSchema,
 }).passthrough();
