@@ -26,7 +26,7 @@ export class RXMissionZaak {
       const zaakMapping = await this.zaakReference.get(submission.reference);
       if (zaakMapping) {
         console.log('Zaak already mapped, returning existing zaak', zaakMapping);
-        return await this.zgwClient.getZaakByUrl(zaakMapping.zaakUrl);
+        return await this.zgwClient.getZaakByUrl(zaakMapping.zaak);
       }
     } catch (error) {
       // If zaak not found is thrown that's a good thing we can continue

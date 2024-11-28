@@ -31,7 +31,7 @@ export class SubmissionZaakReference {
     }
   }
 
-  async get(submissionKey: string): Promise<{ submissionKey: string; zaakUrl: string }|false> {
+  async get(submissionKey: string): Promise<{ submissionKey: string; zaak: string }|false> {
     console.debug(`Retrieving mapping for ${submissionKey}`);
     const command = new GetItemCommand({
       TableName: this.table,
@@ -47,10 +47,10 @@ export class SubmissionZaakReference {
       console.debug('Get item result', result);
       if (result?.Item) {
         const item = DynamoDBItemSchema.parse(result.Item);
-        console.debug(`Found mapping for ${submissionKey}, ${item.zaakUrl.S}`);
+        console.debug(`Found mapping for ${submissionKey}, ${item.zaak.S}`);
         return {
           submissionKey: item.pk.S,
-          zaak: item.zaakUrl.S,
+          zaak: item.zaak.S,
         };
 
       }
