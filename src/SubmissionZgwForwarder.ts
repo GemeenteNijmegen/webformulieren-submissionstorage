@@ -64,7 +64,6 @@ export class SubmissionZgwForwarder extends Construct {
     return new Table(this, 'zgw-submission-mapping', {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
-      timeToLiveAttribute: 'expires_at',
       encryption: TableEncryption.CUSTOMER_MANAGED,
       encryptionKey: key,
     });

@@ -25,7 +25,7 @@ export class SubmissionZaakReference {
     });
     try {
       await this.client.send(command);
-    } catch(error) {
+    } catch (error) {
       console.error('put failed', error);
       throw error;
     }
@@ -43,7 +43,7 @@ export class SubmissionZaakReference {
     });
     try {
       const result = await this.client.send(command);
-    
+
       console.debug('Get item result', result);
       if (result?.Item) {
         const item = DynamoDBItemSchema.parse(result.Item);
@@ -54,7 +54,7 @@ export class SubmissionZaakReference {
         };
 
       }
-    } catch(error) {
+    } catch (error) {
       console.error('get failed', error);
       throw error;
     }
