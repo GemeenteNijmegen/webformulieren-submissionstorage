@@ -5,7 +5,7 @@ import { HttpMethod } from '../zgwClient/ZgwHttpClient';
 
 interface RXMissionDocumentConfig {
   zgwClient: ZgwClient;
-  identificatie: string;
+  identificatie?: string;
   fileName: string;
   filePath?: string;
   contents?: Blob;
@@ -28,14 +28,14 @@ export class RXMissionDocument {
   private lock?: string;
   private fileName: string;
   private contents: Blob;
-  private identificatie: string;
+  private identificatie?: string;
 
   constructor(config: RXMissionDocumentConfig) {
     this.zgwClient = config.zgwClient;
     this.informatieObjectType = config.informatieObjectType;
     this.informatieObjectProperties = config.informatieObjectProperties;
-    this.fileName = config.fileName;
     this.identificatie = config.identificatie;
+    this.fileName = config.fileName;
     if (config.filePath) {
       this.contents = new Blob([this.getFile(config.filePath)]);
     } else if (config.contents) {
@@ -114,14 +114,14 @@ export class RXMissionDocument {
     const doc = {
       identificatie: this.identificatie, //Combi moet uniek zijn met bronorganisatie
       bronorganisatie: '001479179', //Combi moet uniek zijn met identificatie
-      creatiedatum: '2024-08-27',
-      titel: 'test Devops Nijmegen',
+      creatiedatum: new Date().toISOString().substring(0, 'YYYY-MM-DD'.length),
+      titel: this.fileName,
       vertrouwelijkheidaanduiding: 'openbaar',
       auteur: 'Devops Nijmegen',
       status: '',
       formaat: 'application/pdf',
       taal: 'nld',
-      bestandsnaam: 'test2.pdf',
+      bestandsnaam: this.fileName,
       inhoud: null,
       bestandsomvang: fileSize,
       informatieobjecttype,

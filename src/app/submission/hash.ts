@@ -1,7 +1,5 @@
 import crypto from 'crypto';
-import { UserType } from '../shared/User';
-
-// CREATE PK from
+import { UserType } from '../shared/UserType';
 
 /**
  * Helper function for creating a

@@ -1,8 +1,8 @@
 import { Duration } from 'aws-cdk-lib';
-import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, ITable, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { Key } from 'aws-cdk-lib/aws-kms';
+import { IKey, Key } from 'aws-cdk-lib/aws-kms';
 import { Function } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
@@ -40,11 +40,34 @@ export class SubmissionZgwForwarder extends Construct {
     }
     // Feature flag to send all relevant submissions to RxMission application
     if (this.props.configuration.enableRxMissionZwgHandler) {
-      const rxMissionZgwLambda = this.createRxMissionZgwHandlerLambda(storageBucket, table);
+
+      const zaakIdentifierMappingTable = this.zaakIdentifierMappingTable(key);
+
+      const rxMissionZgwLambda = this.createRxMissionZgwHandlerLambda(storageBucket, table, zaakIdentifierMappingTable);
       this.addRxMissionEventSubscription(rxMissionZgwLambda);
     }
   }
 
+
+  /**
+   * Add a dynamoDB table for storing mapping between submission reference and zaakUrl
+   *
+   * Not all ZGW-registration stores allow setting zaakID or adding a reference to the zaak. Because
+   * creating a zaak is a multistage process, and lambda's may be invoked multiple times, we need to
+   * store a mappping between zaakUrl and reference, so subsequent invocations can verify if the zaak has
+   * been (partially) created or not.
+   *
+   * @param key encryption key for table
+   * @returns Table
+   */
+  private zaakIdentifierMappingTable(key: IKey) {
+    return new Table(this, 'zgw-submission-mapping', {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      encryption: TableEncryption.CUSTOMER_MANAGED,
+      encryptionKey: key,
+    });
+  }
 
   // TODO: eerst aparte lambda RxMission en dan samenvoegen
 
@@ -91,18 +114,21 @@ export class SubmissionZgwForwarder extends Construct {
 
   /**
  * Create lambda function to process submissions for application RxMission
- * @param bucket
- * @param table
+ * @param bucket S3 bucket containing submission information
+ * @param submissionsTable Table containing submission information
+ * @param mappingTable Table for storing submission reference to zaakUrl mappings.
+ * Necessary for idempotency.
  * @returns
  */
-  private createRxMissionZgwHandlerLambda(bucket: IBucket, table: ITable) {
+  private createRxMissionZgwHandlerLambda(bucket: IBucket, submissionsTable: ITable, mappingTable: ITable) {
     const clientsecret = Secret.fromSecretNameV2(this, 'client-secret-rxm', Statics.ssmRxMissionZgwClientSecret);
 
     const rxmZgwLambda = new RxmissionZgwFunction(this, 'rxm-function', {
       logRetention: RetentionDays.SIX_MONTHS,
       environment: {
         BUCKET_NAME: bucket.bucketName,
-        TABLE_NAME: table.tableName,
+        TABLE_NAME: submissionsTable.tableName,
+        ZAAKREFERENCE_TABLE_NAME: mappingTable.tableName,
         ZGW_CLIENT_ID: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwClientId),
         ZGW_CLIENT_SECRET_ARN: clientsecret.secretArn,
         ZAAKTYPE: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwZaaktype),
@@ -114,11 +140,13 @@ export class SubmissionZgwForwarder extends Construct {
         DEBUG: this.props.configuration.debug ? 'true' : 'false',
         BRANCH: this.props.configuration.branchName,
       },
-      timeout: Duration.minutes(5),
+      timeout: Duration.seconds(30),
+      memorySize: 1024,
     });
     bucket.grantRead(rxmZgwLambda);
     clientsecret.grantRead(rxmZgwLambda);
-    table.grantReadData(rxmZgwLambda);
+    submissionsTable.grantReadData(rxmZgwLambda);
+    mappingTable.grantReadWriteData(rxmZgwLambda);
 
     return rxmZgwLambda;
   }

@@ -1,5 +1,8 @@
 import { AWS, Bsn } from '@gemeentenijmegen/utils';
 import * as jwt from 'jsonwebtoken';
+import { ZakenApiRolResponse } from './model/ZakenApiRol.model';
+import { ZakenApiStatus } from './model/ZakenApiStatus.model';
+import { ZakenApiZaak, ZakenApiZaakResponse } from './model/ZakenApiZaak.model';
 import { HttpMethod, ZgwHttpClient } from './ZgwHttpClient';
 
 interface ZgwClientOptions {
@@ -39,14 +42,14 @@ interface ZgwClientOptions {
   roltype: string;
 
   /**
-   * Zaakstatus url for the zaak to create
+   * Zaakstatus url for the zaak to create if the client always uses the same status
    */
-  zaakstatus: string;
+  zaakstatus?: string;
 
   /**
-   * A informatieobjecttype for documents added to a zaak
+   * A informatieobjecttype for documents added to a zaak if the client always uses the same informatieobject
    */
-  informatieobjecttype: string;
+  informatieobjecttype?: string;
 
   /**
    * RSIN of the organization
@@ -104,38 +107,49 @@ export class ZgwClient {
     return zaken.results[0];
   }
 
-  // Optioneel zaaktype toevoegen
-  // Andere velden optioneel maken en duidelijke interfaces maken
-  async createZaak(identificatie: string, formulier: string) {
-    console.log('CREATEZAAK');
-    const zaakRequest = {
-      identificatie: identificatie,
+  async getZaakByUrl(zaakUrl: string) {
+    const zaak = await this.callZaakApi(HttpMethod.Get, zaakUrl);
+    return zaak;
+  }
+
+  /**
+ *
+ * @param params CreateZaakParameters
+ * @returns ZakenApiZaakResponse
+ */
+  async createZaak(params: CreateZaakParameters): Promise<ZakenApiZaakResponse> {
+    const zaakRequest: ZakenApiZaak = {
+      // Base fields
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
-      zaaktype: this.options.zaaktype,
       verantwoordelijkeOrganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
       startdatum: this.datestamp(),
-      omschrijving: formulier,
-      toelichting: `Formulierinzending: "${formulier}" met kenmerk ${identificatie}.`,
+      // Can be undefined, which auto-creates zaakidentificatie
+      identificatie: params.identificatie,
+      zaaktype: params.zaaktype ?? this.options.zaaktype,
+      omschrijving: params.formulier, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
+      toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.formulierKey}.`,
+      productenOfDiensten: params.productenOfDiensten,
     };
-    const zaak = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
-    if (zaak.url) {
-      const statusRequest = {
-        zaak: zaak.url,
-        statustype: this.options.zaakstatus,
-        datumStatusGezet: this.datestamp(),
-        statustoelichting: 'Aanvraag ingediend vanuit Webformulieren',
-      };
-      const result = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
-      if (!result.url) {
-        // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
-        console.warn(`Creating status for zaak with identificatie ${identificatie} failed. Expected object with url.`);
-      }
-    } else {
-      // If the zaak result doesn't return a URL, assume something unrecoverable happened, and throw.
-      throw Error(`Creating zaak with identificatie ${identificatie} failed. Expected object with url.`);
+    const zaak: ZakenApiZaakResponse = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
+    if (!zaak.url) {
+      throw Error(`Creating zaak with identificatie ${params.identificatie} failed. Expected object with url.`);
     }
-
+    console.log(`Zaak has been created. Identification: ${zaak.identificatie ?? zaak.url}`);
     return zaak;
+  }
+  async addZaakStatus(params: AddZaakStatusParameters): Promise<ZakenApiStatus> {
+    const statusRequest: ZakenApiStatus = {
+      zaak: params.zaakUrl,
+      statustype: params.statusType ?? this.options.zaakstatus ?? '',
+      datumStatusGezet: this.datestamp(),
+      statustoelichting: params.statustoelichting ?? 'Aanvraag ingediend vanuit Webformulieren',
+    };
+    const status = await this.callZaakApi(HttpMethod.Post, 'statussen', statusRequest);
+    if (!status.url) {
+      // Don't throw if creating a status fails, while annoying, this failure mode shouldn't cancel the process.
+      console.warn(`Creating status for zaak with zaakurl ${params.zaakUrl} failed. Expected object with url.`);
+    }
+    return status;
   }
 
   async addZaakEigenschap(zaak: string, eigenschap: string, waarde: string) {
@@ -144,6 +158,16 @@ export class ZgwClient {
     return response;
   }
 
+  /**
+   * Original ZgwForwardHandler
+   * Simple flow to add a document to a zaak.
+   * Add document with DocumentenAPI
+   * Relate to zaak with ZakenAPI
+   * The complex uses locking.
+   * @param zaak
+   * @param documentName
+   * @param documentBase64
+   */
   async addDocumentToZaak(zaak: string, documentName: string, documentBase64: string) {
     const documentRequest = {
       bronorganisatie: this.options.rsin ?? ZgwClient.GN_RSIN,
@@ -164,6 +188,7 @@ export class ZgwClient {
     await this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
+  // RxMission used only right now
   async relateDocumentToZaak(zaakUrl: string, informatieObjectUrl: string, fileName: string) {
     const documentZaakRequest = {
       informatieobject: informatieObjectUrl,
@@ -174,12 +199,33 @@ export class ZgwClient {
     return this.callZaakApi(HttpMethod.Post, 'zaakinformatieobjecten', documentZaakRequest);
   }
 
+  //RxMission new
+  async createRol(config: {
+    zaak: string;
+    userType: 'natuurlijk_persoon' | 'niet_natuurlijk_persoon';
+    identifier: string;
+    email?: string;
+    telefoon?: string;
+    name?: string;
+  }): Promise<ZakenApiRolResponse> {
+    if (config.userType == 'natuurlijk_persoon') {
+      const bsn = new Bsn(config.identifier);
+      return this.addBsnRoleToZaak(config.zaak, bsn, config.email, config.telefoon, config.name);
+    } else if (config.userType == 'niet_natuurlijk_persoon') {
+      return this.addKvkRoleToZaak(config.zaak, config.identifier, config.email, config.telefoon, config.name);
+    } else {
+      throw Error('Unexpectedly didnt get a valid usertype');
+    }
+  }
+
+  // Original ZgwForwardHandler
   async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       inpBsn: bsn.bsn,
     };
     return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
   }
+  // Original ZgwForwardHandler
   async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
     const betrokkeneIdentificatie = {
       annIdentificatie: kvk,
@@ -187,6 +233,7 @@ export class ZgwClient {
     return this.addRoleToZaak(zaak, 'niet_natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
   }
 
+  // Original ZgwForwardHandler
   private async addRoleToZaak(
     zaak: string,
     betrokkeneType: string,
@@ -194,7 +241,7 @@ export class ZgwClient {
     email?: string,
     telefoon?: string,
     name?: string,
-  ) {
+  ): Promise<ZakenApiRolResponse> {
     const roleRequest = {
       zaak,
       betrokkeneType: betrokkeneType,
@@ -214,13 +261,13 @@ export class ZgwClient {
       contactpersoonRol = undefined;
     }
 
-    await this.callZaakApi(HttpMethod.Post, 'rollen', {
+    return this.callZaakApi(HttpMethod.Post, 'rollen', {
       ...roleRequest,
       contactpersoonRol,
     });
   }
 
-
+  // Not needed anymore after using the ZgwHttpClient for all calls
   private createToken(clientId: string, userId: string, secret: string) {
     const token = jwt.sign({
       iss: clientId,
@@ -240,7 +287,6 @@ export class ZgwClient {
       url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
     }
     const json = (data) ? JSON.stringify(data) : null;
-    console.debug('client', this.zgwHttpClient);
     return this.zgwHttpClient?.request(method, url, json);
   }
 
@@ -249,6 +295,7 @@ export class ZgwClient {
     return this.zgwHttpClient?.request(method, url, data);
   }
 
+  //Refactor to use ZgwHttpClient
   async callDocumentenApi(method: string, pathOrUrl: string, data?: any) {
     this.checkConfiguration();
     const token = this.createToken(this.clientId!, this.options.name, this.clientSecret!);
@@ -301,3 +348,31 @@ export class ZgwClient {
 
 
 export class ZaakNotFoundError extends Error {}
+
+export interface CreateZaakParameters {
+  /**
+   * Optional.
+   * Zaaknummer will be made by the ZGW application.
+   * Zaaknummer returns as zaak.identificatie
+   */
+  identificatie?: string;
+  formulier?: string;
+  /**
+   * The reference or key of the form submission.
+   * Should be included in the creation to retrieve the original submission if needed.
+   */
+  formulierKey?: string;
+  zaaktype?: string;
+  toelichting?: string;
+  omschrijving?: string;
+  productenOfDiensten?: string[];
+}
+
+export interface AddZaakStatusParameters {
+  /**
+   * Zaakurl retrieved from creating the zaak.
+   */
+  zaakUrl: string;
+  statusType?: string;
+  statustoelichting?: string;
+}

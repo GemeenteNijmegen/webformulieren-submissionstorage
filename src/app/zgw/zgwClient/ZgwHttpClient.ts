@@ -43,6 +43,7 @@ export class ZgwHttpClient {
       const json = await response.json() as any;
 
       if (response.status < 200 || response.status >= 300) {
+        console.error(`Error of type ${json.type}: ${json.title}, `, json);
         throw Error('Not a 2xx response');
       }
       return json;
