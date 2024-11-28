@@ -44,7 +44,7 @@ export class SubmissionZaakReference {
         submissionKey: item.pk.S,
         zaakUrl: item.zaakUrl.S,
       };
-      
+
     }
     console.debug(`Did not find mapping for ${submissionKey}`);
     return false;
