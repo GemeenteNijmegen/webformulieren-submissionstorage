@@ -64,7 +64,7 @@ export class SubmissionZgwForwarder extends Construct {
     return new Table(this, 'zgw-submission-mapping', {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
-      timeToLiveAttribute: 'ttl',
+      timeToLiveAttribute: 'expires_at',
       encryption: TableEncryption.CUSTOMER_MANAGED,
       encryptionKey: key,
     });
@@ -141,7 +141,8 @@ export class SubmissionZgwForwarder extends Construct {
         DEBUG: this.props.configuration.debug ? 'true' : 'false',
         BRANCH: this.props.configuration.branchName,
       },
-      timeout: Duration.minutes(5),
+      timeout: Duration.seconds(30),
+      memorySize: 1024,
     });
     bucket.grantRead(rxmZgwLambda);
     clientsecret.grantRead(rxmZgwLambda);

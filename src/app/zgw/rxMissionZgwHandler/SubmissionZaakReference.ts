@@ -18,12 +18,17 @@ export class SubmissionZaakReference {
       Item: {
         pk: { S: submissionKey },
         zaak: { S: zaakUrl },
-        ttl: {
+        expires_at: {
           N: expire_at.toString(),
         },
       },
     });
-    await this.client.send(command);
+    try {
+      await this.client.send(command);
+    } catch(error) {
+      console.error('put failed', error);
+      throw error;
+    }
   }
 
   async get(submissionKey: string): Promise<{ submissionKey: string; zaakUrl: string }|false> {
@@ -36,15 +41,22 @@ export class SubmissionZaakReference {
         },
       },
     });
-    const result = await this.client.send(command);
-    if (result?.Item) {
-      const item = DynamoDBItemSchema.parse(result.Item);
-      console.debug(`Found mapping for ${submissionKey}, ${item.zaakUrl.S}`);
-      return {
-        submissionKey: item.pk.S,
-        zaakUrl: item.zaakUrl.S,
-      };
+    try {
+      const result = await this.client.send(command);
+    
+      console.debug('Get item result', result);
+      if (result?.Item) {
+        const item = DynamoDBItemSchema.parse(result.Item);
+        console.debug(`Found mapping for ${submissionKey}, ${item.zaakUrl.S}`);
+        return {
+          submissionKey: item.pk.S,
+          zaakUrl: item.zaakUrl.S,
+        };
 
+      }
+    } catch(error) {
+      console.error('get failed', error);
+      throw error;
     }
     console.debug(`Did not find mapping for ${submissionKey}`);
     return false;
