@@ -20,7 +20,7 @@ describe('Submission to Zaak references', () => {
       return {
         Item: {
           pk: { S: 'TDL12.345' },
-          zaakUrl: { S: 'https://example.com' },
+          zaak: { S: 'https://example.com' },
         },
       };
     });
