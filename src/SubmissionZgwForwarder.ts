@@ -129,7 +129,7 @@ export class SubmissionZgwForwarder extends Construct {
       environment: {
         BUCKET_NAME: bucket.bucketName,
         TABLE_NAME: submissionsTable.tableName,
-        MAPPING_TABLE_NAME: mappingTable.tableName,
+        ZAAKREFERENCE_TABLE_NAME: mappingTable.tableName,
         ZGW_CLIENT_ID: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwClientId),
         ZGW_CLIENT_SECRET_ARN: clientsecret.secretArn,
         ZAAKTYPE: StringParameter.valueForStringParameter(this, Statics.ssmRxMissionZgwZaaktype),
