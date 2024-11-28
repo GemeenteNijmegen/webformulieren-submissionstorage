@@ -66,9 +66,11 @@ export class RxMissionZgwHandler {
 
     const zaak = new RXMissionZaak(this.zgwClient, this.submissionZaakProperties, this.zaakReference);
     const zgwZaak = await zaak.create(parsedSubmission, submission);
+    console.debug('created zaak');
 
     // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
     if (zgwZaak.rollen.length == 0) {
+      console.debug('creating roles');
       const role = new RXMissionRol({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties });
       await role.addRolToZaak(zgwZaak.url, parsedSubmission, submission);
     }
@@ -77,6 +79,7 @@ export class RxMissionZgwHandler {
     // Only start adding docs if the zaakinformatieobjecten count is different from attachments + pdf
     // TODO: check which attachments have already been added before adding all attachments again.
     if (zgwZaak.zaakinformatieobjecten.length < (submissionAttachments.length + 1)) {
+      console.debug('creating documents');
       await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
       const uploads = submissionAttachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
       await Promise.all(uploads);

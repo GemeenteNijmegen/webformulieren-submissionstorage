@@ -11,6 +11,7 @@ export class SubmissionZaakReference {
   }
 
   async set(submissionKey: string, zaakUrl: string) {
+    console.debug(`Adding mapping to DB for ${submissionKey} and ${zaakUrl}`);
     const expire_at = this.timestamp(Duration.days(90));
     const command = new PutItemCommand({
       TableName: this.table,
@@ -26,6 +27,7 @@ export class SubmissionZaakReference {
   }
 
   async get(submissionKey: string): Promise<{ submissionKey: string; zaakUrl: string }|false> {
+    console.debug(`Retrieving mapping for ${submissionKey}`);
     const command = new GetItemCommand({
       TableName: this.table,
       Key: {
@@ -37,11 +39,14 @@ export class SubmissionZaakReference {
     const result = await this.client.send(command);
     if (result?.Item) {
       const item = DynamoDBItemSchema.parse(result.Item);
+      console.debug(`Found mapping for ${submissionKey}, ${item.zaakUrl.S}`);
       return {
         submissionKey: item.pk.S,
         zaakUrl: item.zaakUrl.S,
       };
+      
     }
+    console.debug(`Did not find mapping for ${submissionKey}`);
     return false;
   }
 

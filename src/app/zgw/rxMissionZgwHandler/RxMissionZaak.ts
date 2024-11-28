@@ -37,6 +37,7 @@ export class RXMissionZaak {
       }
     }
 
+    console.log('Creating new zaak');
     const zaak = await this.zgwClient.createZaak({
       zaaktype: this.submissionZaakProperties.zaakType,
       formulier: submissionData.formTitle ?? 'Onbekend formulier',
