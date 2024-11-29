@@ -214,6 +214,7 @@ const fetchMockMatchers = [
     method: ['POST'],
     urlPathMatch: '/enkelvoudiginformatieobjecten',
     response: {
+      url: 'https://somebasedomain.nl/enkelvoudiginformatieobjecturl',
       bestandsdelen: [{ url: 'https://somebasedomain.nl/bestandsdeelurl' }],
       lock: 'bla',
     }, // createInformatieObject
