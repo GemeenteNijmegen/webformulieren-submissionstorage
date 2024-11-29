@@ -9,19 +9,36 @@ import { MockRxMissionSubmission } from './mocks/RxMissionSubmission.mock';
 // @ts-ignore: Ignoring unused import
 import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
-import { handler } from '../rxmission-zgw.lambda';
-import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch } from '../RxMissionZgwConfiguration';
+import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch, getSubmissionPropsFromAppIdOrFormName } from '../RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from '../RxMissionZgwHandler';
+import assert from 'assert';
 
-const DEBUG_OUTPUT = true;
 // The ZgwHttpClient still uses process env
 let envMockRxMissionHandler = {
   ZGW_CLIENT_SECRET_ARN: 'testclientsecret',
   ZGW_CLIENT_ID: 'testclientid',
 };
-process.env = { ...process.env, ...envMockRxMissionHandler };
+
+process.env = {
+  ...process.env,
+  ...envMockRxMissionHandler,
+  CLIENT_ID: 'testclientid',
+  CLIENT_SECRET: 'testclientsecret',
+  ZGW_CLIENT_SECRET_ARN: 'testclientsecret',
+  ZGW_CLIENT_ID: 'testclientid',
+  BUCKET_NAME: 'testBucket',
+  TABLE_NAME: 'testTable',
+  ZAAKREFERENCE_TABLE_NAME: 'testReferenceTable',
+  ZAAKTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
+  ROLTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
+  ZAKEN_API_URL: 'https://zaken.preprod-rx-services.nl/api/v1/',
+  DOCUMENTEN_API_URL: 'https://documenten.preprod-rx-services.nl/api/v1/',
+  BRANCH: 'development',
+}
+
 
 let mockDBGetSubmission = jest.fn().mockResolvedValue({});
+mockClient(DynamoDBClient);
 jest.mock('../../../submission/Database', () => {
   return {
     DynamoDBDatabase: jest.fn(() => {
@@ -46,23 +63,7 @@ jest.mock('@gemeentenijmegen/utils', () => {
     ),
     AWS: {
       getSecret: jest.fn().mockResolvedValue('mockedSecretValue'),
-    },
-    environmentVariables: jest.fn().mockReturnValue(
-      {
-        CLIENT_ID: 'testclientid',
-        CLIENT_SECRET: 'testclientsecret',
-        ZGW_CLIENT_SECRET_ARN: 'testclientsecret',
-        ZGW_CLIENT_ID: 'testclientid',
-        BUCKET_NAME: 'testBucket',
-        TABLE_NAME: 'testTable',
-        ZAAKREFERENCE_TABLE_NAME: 'testReferenceTable',
-        ZAAKTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
-        ROLTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
-        ZAKEN_API_URL: 'https://zaken.preprod-rx-services.nl/api/v1/',
-        DOCUMENTEN_API_URL: 'https://documenten.preprod-rx-services.nl/api/v1/',
-        BRANCH: 'development',
-      },
-    ),
+    }
   };
 });
 
@@ -70,7 +71,9 @@ jest.mock('@gemeentenijmegen/utils', () => {
 describe('RxMissionZgwHandler', () => {
   test('Kamerverhuur Aanvraag', async () => {
     const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
-    mockSubmission.logMockInfo();
+    mockSubmission.debugLogMockInfo();
+    const rxMissionZgwConfig = getRxMissionZgwConfiguration('development');
+
     // Get data from database
     mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
     // Get submission json and attachment
@@ -83,20 +86,25 @@ describe('RxMissionZgwHandler', () => {
     const spyOnFetch = jest.spyOn(global, 'fetch').mockImplementation(fetchMock);
 
     // Does not return anything with the get right now, which means getZaakByUrl is not called. Check matcher if you add something here and it fails
-    mockClient(DynamoDBClient);
+
+    const config = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfig, { appId: mockSubmission.getAppId() });
     const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
     await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
 
-    // console.log('ALL CALLS MADE TO MAKE Kamerverhuuraanvraag');
-    // console.dir(spyOnFetch.mock.calls, { depth: null, colors: true, compact: true, showHidden: true, showProxy: true });
+    const create_zaak_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}zaken`);
+    const create_status_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}statussen`);
+    
+    expectfetchCallBodyToContain(create_zaak_call, config.productType);
+    expectfetchCallBodyToContain(create_status_call, config.statusType);
     writeOutputToFile('kamerverhuur', spyOnFetch.mock.calls);
   });
 
   test('Bouwmaterialen from lambda event', async () => {
     //Build mockinformation based on a specific json from a form
     const mockSubmission = new MockRxMissionSubmission('Bouwmaterialen');
-    mockSubmission.logMockInfo();
+    mockSubmission.debugLogMockInfo();
+    const rxMissionZgwConfig = getRxMissionZgwConfiguration('development');
 
     // Get data from database
     mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
@@ -110,7 +118,17 @@ describe('RxMissionZgwHandler', () => {
     const fetchMock: any = getFetchMockImplementation(fetchMockMatchers);
     const spyOnFetch = jest.spyOn(global, 'fetch').mockImplementation(fetchMock);
 
-    await handler(mockSubmission.getEvent());
+    const config = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfig, { appId: mockSubmission.getAppId() });
+
+    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
+    const { key, userId, userType } = mockSubmission.getSubmissionParameters();
+    await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
+
+
+    const create_zaak_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}zaken`);
+    const create_status_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}statussen`);
+    expectfetchCallBodyToContain(create_zaak_call, config.productType);
+    expectfetchCallBodyToContain(create_status_call, config.statusType);
     writeOutputToFile('bouwmaterialen', spyOnFetch.mock.calls);
   });
 });
@@ -120,7 +138,7 @@ describe('RxMissionZgwHandler', () => {
  */
 
 function writeOutputToFile(name: string, data: any) {
-  if (DEBUG_OUTPUT) {
+  if (process.env.DEBUG) {
     const outputDir = path.resolve(__dirname, 'output');
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
@@ -145,6 +163,11 @@ function writeOutputToFile(name: string, data: any) {
   }
 }
 
+function expectfetchCallBodyToContain(call: any, searchString?: string) {
+  assert(call);
+  const body = call[1]?.body as any;
+  expect(body).toContain(searchString);
+}
 
 interface FetchMockMatcher {
   method: string[];

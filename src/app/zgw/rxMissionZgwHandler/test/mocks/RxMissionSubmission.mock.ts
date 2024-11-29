@@ -123,8 +123,8 @@ export class MockRxMissionSubmission {
     this.event = this.createEvent();
   }
 
-  public logMockInfo(): void {
-    console.log(`Mock Submission Selected:
+  public debugLogMockInfo(): void {
+    console.debug(`Mock Submission Selected:
     - Form Name   : ${this.formName}
     - User Type   : ${this.userType}
     - User Id   : ${this.detail.userId}
