@@ -1,5 +1,5 @@
 import { EventBridgeEvent } from 'aws-lambda/trigger/eventbridge';
-import { UserType } from '../../shared/UserType';
+import { KnownUserType, UserType } from '../../shared/UserType';
 import { HashedUserId } from '../../submission/hash';
 
 export interface ZgwForwardEventDetail {
@@ -7,7 +7,7 @@ export interface ZgwForwardEventDetail {
   userId: string;
   pk: HashedUserId;
   sk: string;
-  userType: UserType;
+  userType: UserType | KnownUserType;
   Key: string;
 }
 

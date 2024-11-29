@@ -1,3 +1,4 @@
+import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 // @ts-ignore: Ignoring unused import
@@ -11,7 +12,6 @@ import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
 import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch, getSubmissionPropsFromAppIdOrFormName } from '../RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from '../RxMissionZgwHandler';
-import assert from 'assert';
 
 // The ZgwHttpClient still uses process env
 let envMockRxMissionHandler = {
@@ -34,7 +34,7 @@ process.env = {
   ZAKEN_API_URL: 'https://zaken.preprod-rx-services.nl/api/v1/',
   DOCUMENTEN_API_URL: 'https://documenten.preprod-rx-services.nl/api/v1/',
   BRANCH: 'development',
-}
+};
 
 
 let mockDBGetSubmission = jest.fn().mockResolvedValue({});
@@ -63,7 +63,7 @@ jest.mock('@gemeentenijmegen/utils', () => {
     ),
     AWS: {
       getSecret: jest.fn().mockResolvedValue('mockedSecretValue'),
-    }
+    },
   };
 });
 
@@ -94,7 +94,7 @@ describe('RxMissionZgwHandler', () => {
 
     const create_zaak_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}zaken`);
     const create_status_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}statussen`);
-    
+
     expectfetchCallBodyToContain(create_zaak_call, config.productType);
     expectfetchCallBodyToContain(create_status_call, config.statusType);
     writeOutputToFile('kamerverhuur', spyOnFetch.mock.calls);
@@ -237,6 +237,7 @@ const fetchMockMatchers = [
     method: ['POST'],
     urlPathMatch: '/enkelvoudiginformatieobjecten',
     response: {
+      url: 'https://somebasedomain.nl/enkelvoudiginformatieobjecturl',
       bestandsdelen: [{ url: 'https://somebasedomain.nl/bestandsdeelurl' }],
       lock: 'bla',
     }, // createInformatieObject
