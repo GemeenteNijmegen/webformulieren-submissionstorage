@@ -7,6 +7,15 @@ import { Submission } from '../submission/SubmissionSchema';
 export type UserType = 'person' | 'organisation' | 'anonymous';
 
 /**
+ * KnownUserType excludes 'anonymous' from UserType
+ */
+export type KnownUserType = Exclude<UserType, 'anonymous'>;
+
+export function isKnownUserType(userType: UserType): userType is KnownUserType {
+  return userType === 'person' || userType === 'organisation';
+}
+
+/**
    * Get the UserType from a submission.
    *
    * Submissions can be done with bsn, kvk

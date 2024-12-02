@@ -12,7 +12,7 @@ if (process.env.DEBUG !== 'true') {
  * Get specific config
  */
 const env = environmentVariables(['BRANCH']);
-const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH!);
+const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH);
 
 export async function handler(event: ZgwForwardProcessedFormEvent) {
   console.log('RxMission Event Detected and ready for processing', event);
