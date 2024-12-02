@@ -38,19 +38,9 @@ describe('ZGW Client', () => {
     test('original ZGWForwardHandler expected calls', async () => {
       const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
       console.debug(spyOnFetch);
-      await client.createZaak('R01.0001', 'mockFormulierNaam');
+      await client.createZaak({ identificatie: 'R01.0001', formulier: 'mockFormulierNaam01' });
       console.debug(spyOnFetch.mock.calls);
       expect(spyOnFetch).toHaveBeenNthCalledWith(1, 'https://zaken-api/zaken', {
-        method: 'POST',
-        body: expect.any(String),
-        headers: expect.objectContaining({
-          'Authorization': expect.stringMatching(/^Bearer\s.+/), // Matches any token prefixed with 'Bearer '
-          'Content-type': 'application/json',
-          'Content-Crs': 'EPSG:4326',
-          'Accept-Crs': 'EPSG:4326',
-        }),
-      });
-      expect(spyOnFetch).toHaveBeenNthCalledWith(2, 'https://zaken-api/statussen', {
         method: 'POST',
         body: expect.any(String),
         headers: expect.objectContaining({
@@ -63,7 +53,7 @@ describe('ZGW Client', () => {
     });
     test('original ZGWForwardHandler expected request content', async () => {
       const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
-      await client.createZaak('R02.0002', 'mockFormulierNaam');
+      await client.createZaak({ identificatie: 'R02.0002', formulier: 'mockFormulierNaam' });
       const createZaakRequest = spyOnFetch.mock.calls[0];
       console.debug(createZaakRequest);
       const parsedRequestBody = JSON.parse(createZaakRequest[1]!.body! as any);
@@ -71,6 +61,23 @@ describe('ZGW Client', () => {
 
       expect(parsedRequestBody.identificatie).toBe('R02.0002');
 
+    });
+  });
+  describe('addZaakStatus', () => {
+    test('original ZGWForwardHandler expected calls', async () => {
+      const spyOnFetch = jest.spyOn(global, 'fetch').mockResolvedValue(getFetchMockResponse({ url: 'someurl' }) as any as Response);
+      await client.addZaakStatus({ zaakUrl: 'https://url', statusType: 'https://statusurl' });
+      console.debug(spyOnFetch.mock.calls);
+      expect(spyOnFetch).toHaveBeenNthCalledWith(1, 'https://zaken-api/statussen', {
+        method: 'POST',
+        body: expect.any(String),
+        headers: expect.objectContaining({
+          'Authorization': expect.stringMatching(/^Bearer\s.+/), // Matches any token prefixed with 'Bearer '
+          'Content-type': 'application/json',
+          'Content-Crs': 'EPSG:4326',
+          'Accept-Crs': 'EPSG:4326',
+        }),
+      });
     });
   });
 });

@@ -1,4 +1,4 @@
-import { UserType } from '../../shared/User';
+import { UserType } from '../../shared/UserType';
 import { getHashedUserId, HashedUserId, hashString } from '../hash';
 
 describe('Hash function', () => {

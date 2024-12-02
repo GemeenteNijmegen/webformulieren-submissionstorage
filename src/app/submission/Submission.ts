@@ -7,7 +7,7 @@ import { getHashedUserId, HashedUserId } from './hash';
 import { s3Object } from './s3Object';
 import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
 import { dateArrayToDate } from '../../utils/dateArrayToDate';
-import { UserType } from '../shared/User';
+import { UserType } from '../shared/UserType';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
@@ -168,15 +168,9 @@ export class Submission {
   }
 
   /**
-   * Get the userid for this submission.
+   * Get the UserType for this submission.
    *
-   * Submissions can be done with bsn, kvk
-   * or anonymous (we ignore other logins for now).
-   * We store all submissions, but won't be able
-   * to retrieve anonymous submissions for regular
-   * users.
-   *
-   * @returns bsn or kvk or 'anonymous'
+   * @returns UserType person, organisation or anonymous
    */
   public getUserType(): UserType {
     if (this.bsn) {

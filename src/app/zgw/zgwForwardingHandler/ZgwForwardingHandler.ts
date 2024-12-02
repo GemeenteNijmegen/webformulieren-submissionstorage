@@ -2,6 +2,7 @@ import { Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { SubmissionSchema } from '../../submission/SubmissionSchema';
 import { SubmissionUtils } from '../SubmissionUtils';
+import { ZakenApiZaakResponse } from '../zgwClient/model/ZakenApiZaak.model';
 import { ZaakNotFoundError, ZgwClient } from '../zgwClient/ZgwClient';
 
 export class ZgwForwarderHandler {
@@ -52,13 +53,18 @@ export class ZgwForwarderHandler {
   }
 
   async sendSubmissionToZgw(key: string, userId: string, userType: 'person' | 'organisation') {
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw');
+    }
     await this.zgw.init();
-
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw zgw init done');
+    }
     // Get submission
     const submission = await this.database.getSubmission({ key, userId, userType });
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
     if (process.env.DEBUG==='true') {
-      console.debug('Submission', parsedSubmission);
+      console.log('Submission', parsedSubmission);
     }
 
     if (!submission) {
@@ -89,10 +95,21 @@ export class ZgwForwarderHandler {
         return;
       }
     }
-
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw before createZaak');
+    }
     // Create zaak
-    const zaak = await this.zgw.createZaak(key, submission.formTitle ?? 'Onbekend formulier'); // TODO expand with usefull fields
-
+    const zaak: ZakenApiZaakResponse = await this.zgw.createZaak({ identificatie: key, formulier: submission.formTitle ?? 'Onbekend formulier' });
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw after createZaak', zaak.url);
+    }
+    // Set status for zaak
+    if (zaak.url) {
+      await this.zgw.addZaakStatus({ zaakUrl: zaak.url });
+    }
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw after addedZaakstatus');
+    }
     if (parsedSubmission.bsn) {
       await this.zgw.addBsnRoleToZaak(zaak.url, new Bsn(submission.userId), email, telefoon, name);
     } else if (parsedSubmission.kvknummer) {
@@ -110,7 +127,9 @@ export class ZgwForwarderHandler {
     await this.uploadAttachment(key, zaak.url, `${key}.pdf`);
     const uploads = submission.attachments.map(async attachment => this.uploadAttachment(key, zaak.url, 'attachments/' + attachment));
     await Promise.all(uploads);
-
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw after uploadattachment');
+    }
     // Check for voorkeurskanaal eigenschap and store it
     if (process.env.KANAALVOORKEUR_EIGENSCHAP) {
       const voorkeur = SubmissionUtils.findKanaalvoorkeur(parsedSubmission);
@@ -118,7 +137,9 @@ export class ZgwForwarderHandler {
         await this.zgw.addZaakEigenschap(zaak.url, process.env.KANAALVOORKEUR_EIGENSCHAP, voorkeur);
       }
     }
-
+    if (process.env.DEBUG==='true') {
+      console.log('ZgwForwardingHandler: sendSubmissionToZgw done');
+    }
   }
 
   async submissionData(key: string) {

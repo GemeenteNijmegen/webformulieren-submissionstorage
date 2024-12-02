@@ -1,4 +1,5 @@
 import { Bsn } from '@gemeentenijmegen/utils';
+import { UserType } from './UserType';
 
 /**
  * Several types of user exist:
@@ -9,8 +10,6 @@ export interface User {
   identifier: string;
   type: UserType;
 }
-
-export type UserType = 'person' | 'organisation' | 'anonymous';
 
 /**
  * Convenience function for creating a user. Returns the correct type based on

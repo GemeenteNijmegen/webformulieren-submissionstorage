@@ -1,33 +1,62 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { UserType } from '../../../../shared/User';
+import { UserType } from '../../../../shared/UserType';
 import { SubmissionData } from '../../../../submission/Database';
 import { getHashedUserId } from '../../../../submission/hash';
 import { ZgwForwardEventDetail, ZgwForwardProcessedFormEvent } from '../../../shared/zgwForwardEvent.model';
 
-// Voorbeeld testgebruik
-
-// // Schrijf een unit test voor een specifieke mock submission
-// test('Handler verwerkt Kamerverhuur Vergunning correct', async () => {
-//   // Initialiseer de mock met de gewenste submission key
-//   const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
-
-//   // Log informatie over de mock submission
-//   mockSubmission.logMockInfo();
-
-//   // Haal het event op dat gebruikt kan worden in de handler
-//   const params = mockSubmission.getSubmissionParameters();
-
-//   // Roep de handler aan met het mock event
-//   await rxMissionZgwHandlerInstantie.sendSubmissionToRxMission(params);
-//    mock de response uit database metmockedDatabaseGetSubmission()
-
-//   // Voeg je assertions toe om te verifiëren dat de handler correct heeft gewerkt
-//   // Bijvoorbeeld, controleer of een functie is aangeroepen met de juiste parameters
-//   // expect(someFunction).toHaveBeenCalledWith(expectedParameters);
-// });
-
-
+/**
+ * MockRxMissionSubmission: A helper class to simulate and manage mock submission data for RxMission integration tests.
+ *
+ * This class is designed to facilitate testing of RxMission integrations by providing a streamlined way to
+ * access, manipulate, and use mock submission data. It includes methods to generate mock events, database
+ * responses, and other resources that mimic real-world scenarios. This makes it easier to test handlers
+ * and workflows end-to-end without relying on live data or external dependencies.
+ *
+ * ### Key Features:
+ * - Load mock submission data based on a key from a predefined set of submissions.
+ * - Generate mock events and database responses for seamless integration testing.
+ * - Access information in various forms (e.g., raw JSON, event objects, database-like structures).
+ * - Designed to test RxMission handlers and related processes, such as ZgwForward processing.
+ *
+ * ### Example Usage:
+ *
+ * ```typescript
+ * import { MockRxMissionSubmission } from './MockRxMissionSubmission';
+ *
+ * // Unit test for a specific submission type
+ * test('Handler processes Kamerverhuur Vergunning correctly', async () => {
+ *   // Initialize the mock submission
+ *   const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
+ *
+ *   // Log the details of the mock submission
+ *   mockSubmission.logMockInfo();
+ *
+ *   // Retrieve parameters for calling the handler
+ *   const params = mockSubmission.getSubmissionParameters();
+ * });
+ * ```
+ *
+ * ### Constructor:
+ * The class is initialized with a key corresponding to a mock submission defined in `MockSubmissions`.
+ *
+ * @param submissionKey {keyof typeof MockSubmissions} - The key to select a predefined mock submission.
+ *
+ * ### Example Mock Submission Key:
+ * `KamerverhuurVergunning`
+ *
+ * ### Methods Overview:
+ * - `logMockInfo`: Logs submission metadata (form name, user type, description).
+ * - `getJsonData`: Returns raw JSON data of the mock submission.
+ * - `getMockStorageSubmission`: Simulates retrieving a mock submission from storage.
+ * - `getMockStorageBlob`: Returns a mock binary file (e.g., for testing file uploads).
+ * - `getSubmissionParameters`: Provides parameters for calling handlers based on mock data.
+ * - `mockedDatabaseGetSubmission`: Generates a simulated database response based on the mock data.
+ * - `createDetail`: Creates a mock `ZgwForwardEventDetail` object.
+ * - `createEvent`: Generates a mock `ZgwForwardProcessedFormEvent` to call the lambda handler directly
+ *
+ * By using this class, developers can test integrations and workflows comprehensively in an isolated and predictable manner.
+ */
 interface MockSubmissionInfo {
   filename: string;
   formName: string;
@@ -85,7 +114,7 @@ export class MockRxMissionSubmission {
     this.userType = submissionInfo.userType;
     this.description = submissionInfo.description;
 
-    const filePath = path.join(__dirname, './mocks', filename);
+    const filePath = path.join(__dirname, filename);
     const jsonString = fs.readFileSync(filePath, 'utf8');
     this.jsonData = JSON.parse(jsonString);
     this.messageData = JSON.parse(this.jsonData.Message);
@@ -93,16 +122,35 @@ export class MockRxMissionSubmission {
     this.detail = this.createDetail();
     this.event = this.createEvent();
   }
-  public logMockInfo(): void {
-    console.log(`Mock Submission Selected:
+
+  public debugLogMockInfo(): void {
+    console.debug(`Mock Submission Selected:
     - Form Name   : ${this.formName}
     - User Type   : ${this.userType}
+    - User Id   : ${this.detail.userId}
     - Description : ${this.description}`);
   }
 
-
+  public getAppId(): string {
+    return this.detail.Key.substring(0, 3);
+  }
   public getJsonData(): any {
     return this.jsonData;
+  }
+
+  public getMockStorageSubmission(): any {
+    return { Body: { transformToString: () => { return JSON.stringify(this.jsonData); } } };
+  }
+
+  /**
+   * Mocks a file with bytes containing Hello
+   */
+  public getMockStorageBlob(): any {
+    return {
+      Body: {
+        transformToByteArray: jest.fn().mockResolvedValue(new Uint8Array([72, 101, 108, 108, 111])), // "Hello" in bytes
+      },
+    };
   }
 
   public getMessageData(): any {
@@ -131,7 +179,7 @@ export class MockRxMissionSubmission {
   /**
    * Gebruik om een mockresponse van de database te geven gebaseerd op de json
    */
-  public async mockedDatabaseGetSubmission(): Promise<SubmissionData | false> {
+  public mockedDatabaseGetSubmission(): SubmissionData {
     // Extract the mock data details
     const mockUserId = this.detail.userId;
     const mockKey = this.detail.Key;
@@ -143,8 +191,7 @@ export class MockRxMissionSubmission {
     const dateSubmitted = this.jsonData.Timestamp ?? '';
     const formName = this.messageData.formTypeId ?? 'onbekend';
     const formTitle = this.messageData.formTypeId ?? 'Onbekende aanvraag';
-    const attachments =
-        this.messageData.data?.toevoegen?.map((attachment: any) => attachment.reference) ?? [];
+    const attachments: string[] = this.messageData.data?.toevoegen?.map((attachment: any) => attachment.reference) ?? [];
 
     // Construct the SubmissionData object
     const submissionData: SubmissionData = {
@@ -172,10 +219,10 @@ export class MockRxMissionSubmission {
 
     return {
       Reference,
-      userId: userId,
+      userId,
       pk,
       sk,
-      userType: userType,
+      userType,
       Key,
     };
   }

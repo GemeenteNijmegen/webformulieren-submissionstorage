@@ -54,7 +54,7 @@ describe('ZGW Client Dbug', () => {
 
 
     //Make your client call
-    await client.createZaak('R01.0001', 'mockFormulierNaam');
+    await client.createZaak({ identificatie: 'R01.0001', formulier: 'mockFormulierNaam' });
 
     const interceptedRequest0 = spyOnFetch.mock.calls[0];
     console.dir(interceptedRequest0, { colors: true });
