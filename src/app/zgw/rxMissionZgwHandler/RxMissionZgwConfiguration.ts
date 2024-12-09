@@ -156,14 +156,14 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/06141a44-80d7-4bf7-18de-08dcce4a3fa1', // NMG-00003 Vergunning tijdelijk verhuren
       },
       {
-        // Dit formulier wordt waarschijnlijk nog niet omgezet, gaat nog via BDI. Nog checken waarom ze het via BDI laten lopen.
+        // VOORLOPIG NIET: Dit formulier wordt waarschijnlijk nog niet omgezet, gaat nog via BDI. Nog checken waarom ze het via BDI laten lopen. Hoort bij een andere afdeling
         appId: 'R03',
         formName: 'vergunningaanvragenverhurenwoonruimte',
       },
       {
-        // Dit wordt een DSO formulier die direct naar RxMission gaat.
+        // Half januari komt bouw starten / stoppen. Wordt nog gemaakt door Team Online
         appId: 'R04',
-        formName: 'vooroverlegomgevingsvergunningaanvragen',
+        formName: 'wijzignaarcorrectenaam',
       },
       {
         appId: 'R05',
