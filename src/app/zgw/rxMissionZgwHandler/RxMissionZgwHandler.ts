@@ -80,8 +80,10 @@ export class RxMissionZgwHandler {
     // TODO: check which attachments have already been added before adding all attachments again.
     if (zgwZaak.zaakinformatieobjecten.length < (submissionAttachments.length + 1)) {
       console.debug('creating documents');
-      await this.uploadAttachment(key, zgwZaak.url, `${key}.pdf`);
-      const uploads = submissionAttachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, 'attachments/' + attachment));
+      const informatieObjectTypeSubmissionPdf = this.submissionZaakProperties.informatieObjectTypeVerzoek ?? this.submissionZaakProperties.informatieObjectType;
+      const informatieObjectTypeSubmissionAttachments = this.submissionZaakProperties.informatieObjectTypeBijlageVerzoek ?? this.submissionZaakProperties.informatieObjectType;
+      await this.uploadAttachment(key, zgwZaak.url,informatieObjectTypeSubmissionPdf, `${key}.pdf`);
+      const uploads = submissionAttachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, informatieObjectTypeSubmissionAttachments, 'attachments/' + attachment));
       await Promise.all(uploads);
     }
   }
@@ -97,7 +99,7 @@ export class RxMissionZgwHandler {
     throw Error('No submission file');
   }
 
-  async uploadAttachment(key: string, zaak: string, attachment: string) {
+  async uploadAttachment(key: string, zaak: string, informatieObjectType: string, attachment: string) {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
     console.log('Inhoud Document: ', inhoud);
@@ -108,7 +110,7 @@ export class RxMissionZgwHandler {
     const blob = new Blob([bytes]);
     const document = new RXMissionDocument({
       fileName: attachment,
-      informatieObjectType: this.submissionZaakProperties.informatieObjectType ?? '',
+      informatieObjectType: informatieObjectType,
       zgwClient: this.zgwClient,
       contents: blob,
     });

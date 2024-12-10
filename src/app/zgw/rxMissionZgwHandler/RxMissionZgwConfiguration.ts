@@ -37,15 +37,15 @@ export interface SubmissionZaakProperties {
   productType?: string;
 
   /**
-   * InformatieObjectType for document.
+   * InformatieObjectType for document. Fallback if no specific types have been configured
    */
-  informatieObjectType?: string;
+  informatieObjectType: string;
   /**
-   * InformatieObjectType for document.
+   * InformatieObjectType for form pdf.
    */
   informatieObjectTypeVerzoek?: string;
   /**
-   * InformatieObjectType for document.
+   * InformatieObjectType for bijlages.
    */
   informatieObjectTypeBijlageVerzoek?: string;
 
@@ -165,16 +165,16 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/06141a44-80d7-4bf7-18de-08dcce4a3fa1', // NMG-00003 Vergunning tijdelijk verhuren
       },
-      {
-        // VOORLOPIG NIET: Dit formulier wordt waarschijnlijk nog niet omgezet, gaat nog via BDI. Nog checken waarom ze het via BDI laten lopen. Hoort bij een andere afdeling
-        appId: 'R03',
-        formName: 'vergunningaanvragenverhurenwoonruimte',
-      },
-      {
-        // Half januari komt bouw starten / stoppen. Wordt nog gemaakt door Team Online
-        appId: 'R04',
-        formName: 'wijzignaarcorrectenaam',
-      },
+      // {
+      //   // VOORLOPIG NIET: Dit formulier wordt waarschijnlijk nog niet omgezet, gaat nog via BDI. Nog checken waarom ze het via BDI laten lopen. Hoort bij een andere afdeling
+      //   appId: 'R03',
+      //   formName: 'vergunningaanvragenverhurenwoonruimte',
+      // },
+      // {
+      //   // Half januari komt bouw starten / stoppen. Wordt nog gemaakt door Team Online
+      //   appId: 'R04',
+      //   formName: 'wijzignaarcorrectenaam',
+      // },
       {
         appId: 'R05',
         formName: 'bouwmaterialenopopenbaarterreinmeldenofvergunningaanvragen',
@@ -185,12 +185,12 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/1c9cba39-0373-4d09-90f5-c27e7d910513', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
       },
-      {
-        appId: 'R06',
-        formName: 'contactformulier',
-        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
-        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7', //NMG-00001 Bouwobjectenvergunning
-      },
+      // {
+      //   appId: 'R06',
+      //   formName: 'contactformulier',
+      //   zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
+      //   productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7', //NMG-00001 Bouwobjectenvergunning
+      // },
       {
         appId: 'TDL',
         formName: 'test',
