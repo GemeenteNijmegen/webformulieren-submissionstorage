@@ -46,6 +46,11 @@ export class ZgwHttpClient {
         console.error(`Error of type ${json.type}: ${json.title}, `, json);
         throw Error('Not a 2xx response');
       }
+      if (method == HttpMethod.Post || method == HttpMethod.Put) {
+        if (json.url) {
+          console.debug(`Created object with url ${json.url}`);
+        }
+      }
       return json;
     } catch (error) {
       console.error(error);

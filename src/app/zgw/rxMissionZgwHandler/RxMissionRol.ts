@@ -24,6 +24,7 @@ export class RXMissionRol {
   }
 
   public async addRolToZaak(zaak: string, parsedSubmission: Submission, submission: SubmissionData) {
+    console.log('Adding role');
     console.debug(this.submissionZaakProperties);
     // Build the RolRequest based on submission and submissionZaakProperties
     // Maybe even add two roles (belanghebbende) if needed
@@ -43,7 +44,15 @@ export class RXMissionRol {
       console.warn('No BSN or KVK found so a rol will not be created.');
       return;
     }
-    await this.zgwClient.createRol({ zaak, userType, identifier: submission.userId, email, telefoon, name });
+    await this.zgwClient.createRol({
+      zaak,
+      userType,
+      identifier: submission.userId,
+      email,
+      telefoon,
+      name,
+      rolType: this.submissionZaakProperties.aanvragerRolType,
+    });
   };
 }
 

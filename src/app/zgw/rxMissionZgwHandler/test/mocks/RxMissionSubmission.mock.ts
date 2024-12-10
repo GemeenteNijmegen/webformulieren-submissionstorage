@@ -95,6 +95,12 @@ export const MockSubmissions: { [key: string]: MockSubmissionInfo } = {
     userType: 'person',
     description: 'Persoon bouwmaterialen, melden gaat naar O18',
   },
+  HadGeenBetrokkene: {
+    filename: 'R0531.151.json',
+    formName: 'Bij acc test had deze geen betrokkene. Bouwmaterialen Openbaar terrein melden of vergunning aanvragen',
+    userType: 'person',
+    description: 'Geen betrokkene in test',
+  },
 };
 
 export class MockRxMissionSubmission {

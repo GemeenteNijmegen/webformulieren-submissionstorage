@@ -100,9 +100,9 @@ describe('RxMissionZgwHandler', () => {
     writeOutputToFile('kamerverhuur', spyOnFetch.mock.calls);
   });
 
-  test('Bouwmaterialen from lambda event', async () => {
+  test('Bouwmaterialen HadGeenBetrokkene from lambda event', async () => {
     //Build mockinformation based on a specific json from a form
-    const mockSubmission = new MockRxMissionSubmission('Bouwmaterialen');
+    const mockSubmission = new MockRxMissionSubmission('HadGeenBetrokkene');
     mockSubmission.debugLogMockInfo();
     const rxMissionZgwConfig = getRxMissionZgwConfiguration('development');
 
@@ -129,7 +129,7 @@ describe('RxMissionZgwHandler', () => {
     const create_status_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}statussen`);
     expectfetchCallBodyToContain(create_zaak_call, config.productType);
     expectfetchCallBodyToContain(create_status_call, config.statusType);
-    writeOutputToFile('bouwmaterialen', spyOnFetch.mock.calls);
+    writeOutputToFile('hadgeenbetrokkene', spyOnFetch.mock.calls);
   });
 });
 

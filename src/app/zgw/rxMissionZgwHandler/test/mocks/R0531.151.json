@@ -1,0 +1,26 @@
+{
+  "Type": "Notification",
+  "MessageId": "4f3234f4-cddd-50c3-a223-6b243f2bf8cc",
+  "TopicArn": "arn:aws:sns:eu-central-1:338472043295:eform-submissions",
+  "Subject": null,
+  "Message": "{\"formId\":\"0f340f98-20bc-4401-bb30-1bd64682728c\",\"formTypeId\":\"bouwmaterialenopopenbaarterreinmeldenofvergunningaanvragen\",\"appId\":\"R05\",\"reference\":\"R0531.151\",\"data\":{\"waarGaatUDeBouwmaterialenPlaatsen\":\"werwer\",\"welkeBouwmaterialenWiltUPlaatsen\":[{\"container\":{\"bouwmateriaal\":\"bouwkeet\",\"lengte\":\"\"}}],\"datumVanafWanneerUDeBouwmaterialenWiltPlaatsen\":\"01-01-2025\",\"datumTotWanneerUDeBouwmaterialenWiltPlaatsen\":\"02-01-2025\",\"opmerkingen\":\"we\",\"totaalAantalBouwmaterialen01\":\"1\",\"mobieleKraanAfsluiting01\":\"nee\",\"aantalDagen01\":\"1\",\"regelsOptieZichtbaar01\":\"true\",\"paginaZichtbaarAndereRegels01\":\"true\",\"volgende\":true,\"bentUZelfDeContactpersoonVoorDezeAanvraag\":\"ja\",\"hoeWiltUDatDeGemeenteContactMetUOpneemtOverUwAanvraagMeldingAlsDatNodigIs\":\"viaEMail\",\"vorige1\":false,\"volgende2\":true,\"toevoegen\":[{\"storage\":\"url\",\"name\":\"GN304-08f9e744-7c5a-4c49-8fee-c2c7998e5b58.jpeg\",\"url\":\"https://app6-accp.nijmegen.nl/form/cloud/s3/upload/0f340f98-20bc-4401-bb30-1bd64682728c?baseUrl=https%3A%2F%2Fapp6-accp.nijmegen.nl&project=&form=/GN304-08f9e744-7c5a-4c49-8fee-c2c7998e5b58.jpeg\",\"size\":\"1479511\",\"type\":\"image/jpeg\",\"reference\":\"a20ac8fcf89c6ee42e8f1a96ae753aa3\",\"originalName\":\"GN304.jpeg\",\"location\":\"0f340f98-20bc-4401-bb30-1bd64682728c/files/GN304.jpeg\",\"bucketName\":\"webforms-eformgenericserv-eformattuploads951db329-lm1p2s2mgzv3\"}],\"tekeningVanDeBouwplaatsHieropStaatWaarDeBouwmaterialenGeplaatstWorden\":true,\"vorige2\":false,\"volgende3\":true,\"ikHebAlleVragenNaarWaarheidBeantwoord\":true,\"vorige3\":false,\"volgende4\":true,\"nonhiddenfieldsform\":{\"data\":{\"naamIngelogdeGebruiker\":\"H. de Jong\",\"straatnaam\":\"Kelfkensbos\",\"huisnummerfield\":\"80-A-1\",\"postcode\":\"6511 RN\",\"woonplaats\":\"Nijmegen\"},\"metadata\":{}},\"houdtUZichAanDezeRegels\":\"ja\",\"vorige\":false,\"volgende1\":true,\"email\":{\"eMailadres\":\"w.kremer@nijmegen.nl\",\"telefoonnummer\":\"93487534\"}},\"metadata\":{\"selectData\":{\"welkeBouwmaterialenWiltUPlaatsen\":[{\"container\":[{\"bouwmateriaal\":{\"label\":\"bouwkeet\"}}]}]},\"timezone\":\"Europe/Amsterdam\",\"offset\":60,\"origin\":\"https://app6-accp.nijmegen.nl\",\"referrer\":\"\",\"browserName\":\"Netscape\",\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0\",\"pathName\":\"/\",\"onLine\":true,\"timestamp\":[2024,12,9,13,29,21,644476463]},\"employeeData\":{},\"pdf\":{\"reference\":\"b95d607b0917efdc78c346ba2643d271\",\"location\":\"0f340f98-20bc-4401-bb30-1bd64682728c/pdf/R0531.151\",\"bucketName\":\"webforms-eformgenericserv-eformattuploads951db329-lm1p2s2mgzv3\"},\"brpData\":{\"Persoon\":{\"BSN\":{\"BSN\":\"900026236\"},\"Persoonsgegevens\":{\"Voorletters\":\"H.\",\"Voornamen\":\"Hans\",\"Voorvoegsel\":\"de\",\"Geslachtsnaam\":\"Jong\",\"Achternaam\":\"de Jong\",\"Naam\":\"H. de Jong\",\"Geboortedatum\":\"01-01-1956\",\"Geslacht\":\"M\",\"NederlandseNationaliteit\":\"Ja\",\"Geboorteplaats\":\"Nijmegen\",\"Geboorteland\":\"Nederland\"},\"Adres\":{\"Straat\":\"Kelfkensbos\",\"Huisnummer\":\"80-A-1\",\"Gemeente\":\"Nijmegen\",\"Postcode\":\"6511 RN\",\"Woonplaats\":\"Nijmegen\"},\"Reisdocument\":{\"Documentsoort\":\"\",\"Documentnummer\":\"\",\"Uitgiftedatum\":\"\",\"Verloopdatum\":\"\"},\"ageLimits\":{\"over12\":\"Yes\",\"over16\":\"Yes\",\"over18\":\"Yes\",\"over21\":\"Yes\",\"over65\":\"Yes\"}}},\"bsn\":\"900026236\"}",
+  "Timestamp": "2024-12-09T13:29:26.782Z",
+  "SignatureVersion": "1",
+  "Signature": "signaturelangestring",
+  "SigningCertUrl": "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-uuid.pem",
+  "UnsubscribeUrl": "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:338472043295:eform-submissions:uuid",
+  "MessageAttributes": {
+    "BRP_data": {
+      "Type": "String",
+      "Value": "true"
+    },
+    "AppId": {
+      "Type": "String",
+      "Value": "R05"
+    },
+    "KVK_data": {
+      "Type": "String",
+      "Value": "false"
+    }
+  }
+}
