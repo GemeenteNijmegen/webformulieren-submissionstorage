@@ -252,7 +252,7 @@ export class ZgwClient {
       roltoelichting: 'aanvrager',
       betrokkeneIdentificatie,
     };
-    
+
     // Construct the contactpersoonRol object.
     // When no name is provided keep it undefined as this is a required field.
     let contactpersoonRol: any = {

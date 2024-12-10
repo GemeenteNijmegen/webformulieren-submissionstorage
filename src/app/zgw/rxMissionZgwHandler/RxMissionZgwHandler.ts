@@ -80,10 +80,17 @@ export class RxMissionZgwHandler {
     // TODO: check which attachments have already been added before adding all attachments again.
     if (zgwZaak.zaakinformatieobjecten.length < (submissionAttachments.length + 1)) {
       console.debug('creating documents');
-      const informatieObjectTypeSubmissionPdf = this.submissionZaakProperties.informatieObjectTypeVerzoek ?? this.submissionZaakProperties.informatieObjectType;
-      const informatieObjectTypeSubmissionAttachments = this.submissionZaakProperties.informatieObjectTypeBijlageVerzoek ?? this.submissionZaakProperties.informatieObjectType;
-      await this.uploadAttachment(key, zgwZaak.url,informatieObjectTypeSubmissionPdf, `${key}.pdf`);
-      const uploads = submissionAttachments.map(async attachment => this.uploadAttachment(key, zgwZaak.url, informatieObjectTypeSubmissionAttachments, 'attachments/' + attachment));
+      const informatieObjectTypeSubmissionPdf = this.submissionZaakProperties.informatieObjectTypeVerzoek
+        ?? this.submissionZaakProperties.informatieObjectType;
+      const informatieObjectTypeSubmissionAttachments = this.submissionZaakProperties.informatieObjectTypeBijlageVerzoek
+        ?? this.submissionZaakProperties.informatieObjectType;
+      await this.uploadAttachment(key, zgwZaak.url, informatieObjectTypeSubmissionPdf, `${key}.pdf`);
+      const uploads = submissionAttachments.map(
+        async attachment => this.uploadAttachment(
+          key,
+          zgwZaak.url,
+          informatieObjectTypeSubmissionAttachments,
+          'attachments/' + attachment));
       await Promise.all(uploads);
     }
   }

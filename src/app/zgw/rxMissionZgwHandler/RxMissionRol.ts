@@ -44,14 +44,14 @@ export class RXMissionRol {
       console.warn('No BSN or KVK found so a rol will not be created.');
       return;
     }
-    await this.zgwClient.createRol({ 
+    await this.zgwClient.createRol({
       zaak,
       userType,
       identifier: submission.userId,
       email,
       telefoon,
       name,
-      rolType: this.submissionZaakProperties.aanvragerRolType 
+      rolType: this.submissionZaakProperties.aanvragerRolType,
     });
   };
 }
