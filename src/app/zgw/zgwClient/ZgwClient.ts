@@ -202,6 +202,7 @@ export class ZgwClient {
   //RxMission new
   async createRol(config: {
     zaak: string;
+    rolType?: string;
     userType: 'natuurlijk_persoon' | 'niet_natuurlijk_persoon';
     identifier: string;
     email?: string;
@@ -210,28 +211,29 @@ export class ZgwClient {
   }): Promise<ZakenApiRolResponse> {
     if (config.userType == 'natuurlijk_persoon') {
       const bsn = new Bsn(config.identifier);
-      return this.addBsnRoleToZaak(config.zaak, bsn, config.email, config.telefoon, config.name);
+      return this.addBsnRoleToZaak(config.zaak, bsn, config.email, config.telefoon, config.name, config.rolType);
     } else if (config.userType == 'niet_natuurlijk_persoon') {
-      return this.addKvkRoleToZaak(config.zaak, config.identifier, config.email, config.telefoon, config.name);
+      return this.addKvkRoleToZaak(config.zaak, config.identifier, config.email, config.telefoon, config.name, config.rolType);
     } else {
       throw Error('Unexpectedly didnt get a valid usertype');
     }
   }
 
   // Original ZgwForwardHandler
-  async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string) {
+  async addBsnRoleToZaak(zaak: string, bsn: Bsn, email?: string, telefoon?: string, name?: string, rolType?: string) {
     const betrokkeneIdentificatie = {
       inpBsn: bsn.bsn,
     };
-    return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
+    return this.addRoleToZaak(zaak, 'natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name, rolType);
   }
   // Original ZgwForwardHandler
-  async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string) {
+  async addKvkRoleToZaak(zaak: string, kvk: string, email?: string, telefoon?: string, name?: string, rolType?: string) {
     const betrokkeneIdentificatie = {
       annIdentificatie: kvk,
     };
-    return this.addRoleToZaak(zaak, 'niet_natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name);
+    return this.addRoleToZaak(zaak, 'niet_natuurlijk_persoon', betrokkeneIdentificatie, email, telefoon, name, rolType);
   }
+
 
   // Original ZgwForwardHandler
   private async addRoleToZaak(
@@ -241,11 +243,12 @@ export class ZgwClient {
     email?: string,
     telefoon?: string,
     name?: string,
+    rolType?: string,
   ): Promise<ZakenApiRolResponse> {
     const roleRequest = {
       zaak,
       betrokkeneType: betrokkeneType,
-      roltype: this.options.roltype,
+      roltype: rolType ?? this.options.roltype,
       roltoelichting: 'aanvrager',
       betrokkeneIdentificatie,
     };
@@ -258,9 +261,10 @@ export class ZgwClient {
       naam: name,
     };
     if (!name) {
+      console.debug('Not adding contactpersoon because of missing name');
       contactpersoonRol = undefined;
     }
-
+    console.debug(roleRequest);
     return this.callZaakApi(HttpMethod.Post, 'rollen', {
       ...roleRequest,
       contactpersoonRol,
