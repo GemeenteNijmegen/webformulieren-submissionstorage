@@ -252,7 +252,7 @@ export class ZgwClient {
       roltoelichting: 'aanvrager',
       betrokkeneIdentificatie,
     };
-
+    
     // Construct the contactpersoonRol object.
     // When no name is provided keep it undefined as this is a required field.
     let contactpersoonRol: any = {
@@ -261,9 +261,10 @@ export class ZgwClient {
       naam: name,
     };
     if (!name) {
+      console.debug('Not adding contactpersoon because of missing name');
       contactpersoonRol = undefined;
     }
-
+    console.debug(roleRequest);
     return this.callZaakApi(HttpMethod.Post, 'rollen', {
       ...roleRequest,
       contactpersoonRol,
