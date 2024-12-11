@@ -54,7 +54,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.699.0",
+    "@aws-sdk/client-secrets-manager": "^3.709.0",
     "@gemeentenijmegen/projen-project-type": "^1.8.4",
     "@stylistic/eslint-plugin": "^2",
     "@testcontainers/localstack": "^10.16.0",
@@ -81,15 +81,15 @@
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.11.0",
-    "@aws-sdk/client-dynamodb": "^3.705.0",
-    "@aws-sdk/client-eventbridge": "^3.703.0",
-    "@aws-sdk/client-s3": "^3.705.0",
-    "@aws-sdk/client-ssm": "^3.699.0",
-    "@aws-sdk/s3-request-presigner": "^3.705.0",
-    "@gemeentenijmegen/apigateway-http": "^0.0.18",
-    "@gemeentenijmegen/aws-constructs": "^0.0.24",
-    "@gemeentenijmegen/dnssec-record": "^0.0.23",
-    "@gemeentenijmegen/utils": "^0.0.20",
+    "@aws-sdk/client-dynamodb": "^3.709.0",
+    "@aws-sdk/client-eventbridge": "^3.709.0",
+    "@aws-sdk/client-s3": "^3.709.0",
+    "@aws-sdk/client-ssm": "^3.709.0",
+    "@aws-sdk/s3-request-presigner": "^3.709.0",
+    "@gemeentenijmegen/apigateway-http": "^0.0.19",
+    "@gemeentenijmegen/aws-constructs": "^0.0.25",
+    "@gemeentenijmegen/dnssec-record": "^0.0.24",
+    "@gemeentenijmegen/utils": "^0.0.21",
     "@types/aws-lambda": "^8.10.146",
     "aws-cdk-lib": "^2.1.0",
     "axios": "^1.7.9",
@@ -99,7 +99,7 @@
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
     "sns-validator": "^0.3.5",
-    "zod": "^3.23.8"
+    "zod": "^3.24.0"
   },
   "license": "EUPL-1.2",
   "publishConfig": {
