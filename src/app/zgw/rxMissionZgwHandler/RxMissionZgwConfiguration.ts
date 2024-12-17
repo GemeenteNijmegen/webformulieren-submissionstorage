@@ -185,12 +185,16 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/1c9cba39-0373-4d09-90f5-c27e7d910513', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
       },
-      // {
-      //   appId: 'R06',
-      //   formName: 'contactformulier',
-      //   zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707', //Aanvraag Beschikking Behandelen
-      //   productType: 'https://producten.preprod-rx-services.nl/api/v1/product/058f0902-6248-40cf-bd3d-08dcd0bf97b7', //NMG-00001 Bouwobjectenvergunning
-      // },
+      {
+        appId: 'R06',
+        formName: 'contactformulier',
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/09790f18-0a91-4b6f-9626-82f68f7a33a4', //Incidentmelding behandelen RX-INCMLD
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/e65fd89d-8eaa-4d07-cd6b-08dc764eec1f', //RX-00044 KLACHT
+        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/a75b32b4-85c9-4ef4-ac6d-4a3ae2892564', // Zaak gestart
+        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/2d3ad8d3-2592-41b7-99f3-8c50f869fff6', // Melder
+        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
+        informatieObjectTypeVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
+      },
       {
         appId: 'TDL',
         formName: 'test',
@@ -237,6 +241,16 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         belanghebbendeRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/f3b9ed7f-9245-4e43-ab60-9e3294b1dadf', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
         statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/1c9cba39-0373-4d09-90f5-c27e7d910513', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
+      },
+      {
+        appId: 'R06',
+        formName: 'contactformulier',
+        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/09790f18-0a91-4b6f-9626-82f68f7a33a4', //Incidentmelding behandelen RX-INCMLD
+        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/e65fd89d-8eaa-4d07-cd6b-08dc764eec1f', //RX-00044 KLACHT
+        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/a75b32b4-85c9-4ef4-ac6d-4a3ae2892564', // Zaak gestart
+        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/2d3ad8d3-2592-41b7-99f3-8c50f869fff6', // Melder
+        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
+        informatieObjectTypeVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
       },
     ],
   },
