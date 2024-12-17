@@ -257,7 +257,7 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
     ],
   },
   production: {
-    branchName: 'production',
+    branchName: 'main',
     submissionZaakProperties: [
 
       {
