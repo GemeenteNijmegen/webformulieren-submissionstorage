@@ -142,6 +142,6 @@ const configurations: { [name: string] : Configuration } = {
     ],
     useDnsSec: true,
     useGatewayAuthorizer: false,
-    enableRxMissionZwgHandler: false,
+    enableRxMissionZwgHandler: true,
   },
 };
