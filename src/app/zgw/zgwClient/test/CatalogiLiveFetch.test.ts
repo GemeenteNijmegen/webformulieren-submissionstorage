@@ -14,7 +14,7 @@ xdescribe('Live fetch ZGW catalogi config', () => {
   const BASE_URL_CATALOGI = PROD ? 'https://catalogi.rx-services.nl/api/v1/' :'https://catalogi.preprod-rx-services.nl/api/v1/';
 
   test('Zaaktype Aanvraag Beschikking Overige', async () => {
-    const ZAAKTYPE_UUID_AANVRAAG_BESCHIKKING_OVERIGE = PROD ? '' :'3d845f0f-0971-4a8f-9232-439696bf1504';
+    const ZAAKTYPE_UUID_AANVRAAG_BESCHIKKING_OVERIGE = PROD ? 'dca652be-eaa8-4d05-b336-59cb4466880e' :'3d845f0f-0971-4a8f-9232-439696bf1504';
 
     const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
     expect(zgwHttpClient).toBeTruthy(); // Constructs httpclient with local env vars
@@ -46,7 +46,7 @@ xdescribe('Live fetch ZGW catalogi config', () => {
 
   test('Zaaktype Incident Behandelen', async () => {
 
-    const ZAAKTYPE_UUID_INCIDENT_BEHANDELEN = PROD ? '' :'09790f18-0a91-4b6f-9626-82f68f7a33a4';
+    const ZAAKTYPE_UUID_INCIDENT_BEHANDELEN = PROD ? '617234fd-b99c-4c4d-9eee-9ced620830e2' :'09790f18-0a91-4b6f-9626-82f68f7a33a4';
 
     const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
     expect(zgwHttpClient).toBeTruthy(); // Constructs httpclient with local env vars
