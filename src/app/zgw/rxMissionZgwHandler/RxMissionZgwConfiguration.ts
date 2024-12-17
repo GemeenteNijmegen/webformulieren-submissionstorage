@@ -196,16 +196,16 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         informatieObjectTypeVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
         informatieObjectTypeBijlageVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
       },
-      {
-        appId: 'TDL',
-        formName: 'test',
-        zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/3d845f0f-0971-4a8f-9232-439696bf1504', //Aanvraag Beschikking Behandelen - Overige vergunningen
-        aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/13bbbb46-288f-40ef-bf47-2cad1fc18d4e', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
-        belanghebbendeRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/f3b9ed7f-9245-4e43-ab60-9e3294b1dadf', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
-        statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/1c9cba39-0373-4d09-90f5-c27e7d910513', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
-        informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
-        productType: 'https://producten.preprod-rx-services.nl/api/v1/product/5152a5d9-b915-4679-18dd-08dcce4a3fa1', // NMG-00002 Omzetvergunning
-      },
+      // {
+      //   appId: 'TDL',
+      //   formName: 'test',
+      //   zaakType: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/3d845f0f-0971-4a8f-9232-439696bf1504', //Aanvraag Beschikking Behandelen - Overige vergunningen
+      //   aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/13bbbb46-288f-40ef-bf47-2cad1fc18d4e', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+      //   belanghebbendeRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/f3b9ed7f-9245-4e43-ab60-9e3294b1dadf', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+      //   statusType: 'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/1c9cba39-0373-4d09-90f5-c27e7d910513', // Zaak gestart (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+      //   informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
+      //   productType: 'https://producten.preprod-rx-services.nl/api/v1/product/5152a5d9-b915-4679-18dd-08dcce4a3fa1', // NMG-00002 Omzetvergunning
+      // },
     ],
   },
   acceptance: {
