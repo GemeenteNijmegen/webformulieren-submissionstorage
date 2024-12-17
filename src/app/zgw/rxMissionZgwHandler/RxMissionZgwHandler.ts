@@ -109,7 +109,6 @@ export class RxMissionZgwHandler {
   async uploadAttachment(key: string, zaak: string, informatieObjectType: string, attachment: string) {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
-    console.log('Inhoud Document: ', inhoud);
     const bytes = await inhoud?.Body?.transformToByteArray();
     if (!bytes) {
       throw Error('error converting file');
@@ -123,5 +122,4 @@ export class RxMissionZgwHandler {
     });
     return document.addToZaak(zaak);
   }
-
 }
