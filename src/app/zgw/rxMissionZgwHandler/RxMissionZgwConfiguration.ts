@@ -194,6 +194,7 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/2d3ad8d3-2592-41b7-99f3-8c50f869fff6', // Melder
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
         informatieObjectTypeVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
+        informatieObjectTypeBijlageVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
       },
       {
         appId: 'TDL',
@@ -251,11 +252,62 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         aanvragerRolType: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/2d3ad8d3-2592-41b7-99f3-8c50f869fff6', // Melder
         informatieObjectType: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
         informatieObjectTypeVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
+        informatieObjectTypeBijlageVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
       },
     ],
   },
   production: {
     branchName: 'production',
-    submissionZaakProperties: [],
+    submissionZaakProperties: [
+
+      {
+        appId: 'R01',
+        formName: 'kamerverhuurvergunningaanvragen',
+        zaakType: 'https://catalogi.rx-services.nl/api/v1/zaaktypen/dca652be-eaa8-4d05-b336-59cb4466880e', // Prod Aanvraag Beschikking behandelen - Overige
+        productType: 'https://producten.rx-services.nl/api/v1/product/4cdd787c-4ac0-4eb6-3c93-08dcf73ae7ca', //NMG-00002 Prod Omzettingsvergunning
+        aanvragerRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/15289782-7977-47f9-912c-13acfc46cf1a', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        belanghebbendeRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/1410896e-bce8-49fc-8a2a-934fd7494c7b', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        statusType: 'https://catalogi.rx-services.nl/api/v1/statustypen/72759b63-f6ee-4ff0-b55c-b434a00dec2a', // Zaak gestart
+        informatieObjectType: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeBijlageVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/169c89ab-e6ae-42bf-8436-7fa7e4970634', // Bijlage bij verzoek
+      },
+      {
+        appId: 'R02',
+        formName: 'vergunningaanvragentijdelijkverhurenwoning',
+        zaakType: 'https://catalogi.rx-services.nl/api/v1/zaaktypen/dca652be-eaa8-4d05-b336-59cb4466880e', // Prod Aanvraag Beschikking behandelen - Overige
+        productType: 'https://producten.rx-services.nl/api/v1/product/f9c08801-c877-41b8-3c94-08dcf73ae7ca', //NMG-00003 Prod Vergunning tijdelijke verhuur
+        aanvragerRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/15289782-7977-47f9-912c-13acfc46cf1a', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        belanghebbendeRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/1410896e-bce8-49fc-8a2a-934fd7494c7b', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        statusType: 'https://catalogi.rx-services.nl/api/v1/statustypen/72759b63-f6ee-4ff0-b55c-b434a00dec2a', // Zaak gestart
+        informatieObjectType: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeBijlageVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/169c89ab-e6ae-42bf-8436-7fa7e4970634', // Bijlage bij verzoek
+      },
+      {
+        appId: 'R05',
+        formName: 'bouwmaterialenopopenbaarterreinmeldenofvergunningaanvragen',
+        zaakType: 'https://catalogi.rx-services.nl/api/v1/zaaktypen/dca652be-eaa8-4d05-b336-59cb4466880e', // Prod Aanvraag Beschikking behandelen - Overige
+        productType: 'https://producten.rx-services.nl/api/v1/product/aa929851-720b-4e1d-3c92-08dcf73ae7ca', // NMG-000001 Prod Bouwobjectenvergunning
+        aanvragerRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/15289782-7977-47f9-912c-13acfc46cf1a', // Initiator rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        belanghebbendeRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/1410896e-bce8-49fc-8a2a-934fd7494c7b', // Belanghebbende rol (altijd zelfde bij deze zaak, misschien op hoger niveau zetten in config)
+        statusType: 'https://catalogi.rx-services.nl/api/v1/statustypen/72759b63-f6ee-4ff0-b55c-b434a00dec2a', // Zaak gestart
+        informatieObjectType: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeBijlageVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/169c89ab-e6ae-42bf-8436-7fa7e4970634', // Bijlage bij verzoek
+      },
+      {
+        appId: 'R06',
+        formName: 'contactformulier',
+        zaakType: 'https://catalogi.rx-services.nl/api/v1/zaaktypen/617234fd-b99c-4c4d-9eee-9ced620830e2', //Klachttmelding behandelen RX-INCMLD
+        productType: 'https://producten.rx-services.nl/api/v1/product/dae31788-04a9-4162-3c7c-08dcf73ae7ca', // RX-00044 Klacht
+        statusType: 'https://catalogi.rx-services.nl/api/v1/statustypen/7a238ee2-f816-4f9e-889b-d04c87d51abd', // Zaak gestart
+        aanvragerRolType: 'https://catalogi.rx-services.nl/api/v1/roltypen/96b7343c-ae89-445c-be3c-2834b57b4e5e', // Melder
+        informatieObjectType: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/495a066a-24e6-4c53-a0da-bb4b11a5f635', // Verzoek
+        informatieObjectTypeBijlageVerzoek: 'https://catalogi.rx-services.nl/api/v1/informatieobjecttypen/169c89ab-e6ae-42bf-8436-7fa7e4970634', // Bijlage Verzoek
+      },
+
+    ],
   },
 };
