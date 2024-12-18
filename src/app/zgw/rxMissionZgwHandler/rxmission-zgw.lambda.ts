@@ -15,7 +15,7 @@ const env = environmentVariables(['BRANCH']);
 const rxMissionZgwConfig = getRxMissionZgwConfiguration(env.BRANCH);
 
 export async function handler(event: ZgwForwardProcessedFormEvent) {
-  console.log('RxMission Event Detected and ready for processing', event);
+  console.log('RxMission Event Detected and ready for processing', event.detail.Reference, 'Event id: ', event.id);
   const submissionZaakProperties = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfig, { appId: event.detail.Key.substring(0, 3) ?? 'TLD' });
   const rxMissionZgwHandler = new RxMissionZgwHandler(rxMissionZgwConfig, submissionZaakProperties);
   await rxMissionZgwHandler.sendSubmissionToRxMission(event.detail.Key, event.detail.userId, event.detail.userType);
