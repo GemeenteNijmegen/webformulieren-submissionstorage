@@ -17,11 +17,8 @@ export class RXMissionZaak {
   }
 
   async create(submission: Submission, submissionData: SubmissionData) {
-    // Handle idempotency by checking if the zaak already exists
-    // Deze vlieger gaat niet op als er geen FormulierReference gebruikt wordt
-    // Als het zaaknummer in RxMission aangemaakt wordt, dan weten we de id hier nog niet
-    // Zie Readme voor uiteenzetting probleem
-
+    
+  // Handle idempotency by checking if the zaak already exists
     try {
       const zaakMapping = await this.zaakReference.get(submission.reference);
       if (zaakMapping) {
@@ -46,6 +43,10 @@ export class RXMissionZaak {
       productenOfDiensten: [this.submissionZaakProperties.productType ?? ''],
     });
     await this.zaakReference.set(submission.reference, zaak.url);
+
+    if(this.submissionZaakProperties.formReferenceEigenschap) {
+      this.zgwClient.addZaakEigenschap(zaak.url, this.submissionZaakProperties.formReferenceEigenschap,submission.reference);
+    }
 
     // Set zaakstatus
     await this.zgwClient.addZaakStatus({ zaakUrl: zaak.url, statusType: this.submissionZaakProperties.statusType, statustoelichting: 'RxMissionZaak DevOps webformulieren' });

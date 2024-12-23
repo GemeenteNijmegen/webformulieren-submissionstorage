@@ -21,6 +21,22 @@ const envKeys = [
 ] as const;
 
 
+/**
+ * Send submissions to RxMission as ZGW (Zaakgericht Werken) cases.
+ * It interacts with S3 and DynamoDB for retrieving submissions, and ZgwClient for ZGW API interactions.
+ * 
+ * The handler performs the following main tasks:
+ * - Initializes the necessary services and clients
+ * - Retrieves and parses submission data from the database.
+ * - Creates or updates ZGW cases (zaken) based on the submission data.
+ * - Adds roles and documents to the ZGW cases as needed.
+ * 
+ * @class RxMissionZgwHandler
+ * 
+ * @param {RxMissionZgwConfiguration} _rxMissionZgwConfiguration - Configuration object for RxMission ZGW.
+ * @param {SubmissionZaakProperties} submissionZaakProperties - Properties related to the submission zaak.
+
+ */
 export class RxMissionZgwHandler {
   private storage: S3Storage;
   private database: Database;
@@ -47,7 +63,14 @@ export class RxMissionZgwHandler {
     });
   }
 
-
+  /**
+   * Sends a submission to rxmission as a zgw zaak
+   * 
+   * 
+   * @param key the AppId of the submission
+   * @param userId the bsn or kvk for the submission user
+   * @param userType 
+   */
   async sendSubmissionToRxMission(key: string, userId: string, userType: UserType) {
     await this.zgwClient.init();
 

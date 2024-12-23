@@ -37,6 +37,11 @@ export interface SubmissionZaakProperties {
   productType?: string;
 
   /**
+   * ZaakEigenschap for storing the form reference (appId)
+   */
+  formReferenceEigenschap?: string;
+
+  /**
    * InformatieObjectType for document. Fallback if no specific types have been configured
    */
   informatieObjectType: string;
