@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { describeIntegration } from '../../../test-utils/describeIntegration';
 import { HttpMethod, ZgwHttpClient } from '../ZgwHttpClient';
 
 
@@ -10,7 +11,7 @@ import { HttpMethod, ZgwHttpClient } from '../ZgwHttpClient';
  * Kies voor prod of preprod met de PROD boolean
  */
 
-xdescribe('Live fetch ZGW catalogi config', () => {
+describeIntegration('Live fetch ZGW catalogi config', () => {
   const PROD: boolean = false; //false is PREPROD
   const BASE_URL_CATALOGI = PROD ? 'https://catalogi.rx-services.nl/api/v1/' :'https://catalogi.preprod-rx-services.nl/api/v1/';
 
@@ -57,18 +58,25 @@ xdescribe('Live fetch ZGW catalogi config', () => {
       zaakType.resultaattypen!.map(
         resultaatUrl => zgwHttpClient.request(HttpMethod.Get, resultaatUrl),
       ),
-    )).map((resultaattype) => { return { 
+    )).map((resultaattype) => {
+      return {
         url: resultaattype.url,
         omschrijving: resultaattype.omschrijving,
-        omschrijvingGeneriek: resultaattype.omschrijvingGeneriek 
-      }; 
+        omschrijvingGeneriek: resultaattype.omschrijvingGeneriek,
+      };
     });
 
     const besluittypen = (await Promise.all(
       zaakType.besluittypen!.map(
         besluitUrl => zgwHttpClient.request(HttpMethod.Get, besluitUrl),
       ),
-    )).map((besluittype) => { return { url: besluittype.url, omschrijving: besluittype.omschrijving, omschrijvingGeneriek: besluittype.omschrijvingGeneriek }; });
+    )).map((besluittype) => {
+      return {
+        url: besluittype.url,
+        omschrijving: besluittype.omschrijving,
+        omschrijvingGeneriek: besluittype.omschrijvingGeneriek,
+      };
+    });
 
     // Write output to file
     writeOutputToFile(`${config.outputFileName}-${ PROD ? 'prod' : 'preprod'}`, {
