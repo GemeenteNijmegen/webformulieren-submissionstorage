@@ -34,6 +34,10 @@
       "type": "build"
     },
     {
+      "name": "@types/xlsx",
+      "type": "build"
+    },
+    {
       "name": "@typescript-eslint/eslint-plugin",
       "version": "^8",
       "type": "build"
@@ -179,6 +183,14 @@
     },
     {
       "name": "sns-validator",
+      "type": "runtime"
+    },
+    {
+      "name": "ts-node",
+      "type": "runtime"
+    },
+    {
+      "name": "xslx",
       "type": "runtime"
     },
     {

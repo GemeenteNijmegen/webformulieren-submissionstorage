@@ -11,6 +11,7 @@ const project = new GemeenteNijmegenCdkApp({
     'testcontainers',
     '@testcontainers/localstack',
     '@types/jsonwebtoken',
+    '@types/xlsx',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
@@ -31,6 +32,8 @@ const project = new GemeenteNijmegenCdkApp({
     'cdk-remote-stack',
     'jose', // 🌮
     'jsonwebtoken',
+    'xslx',
+    'ts-node'
   ],
   jestOptions: {
     jestConfig: {
@@ -41,6 +44,7 @@ const project = new GemeenteNijmegenCdkApp({
   gitignore: [
     'src/app/submission/test/docker/',
     '**/output/',
+    '**/sensitive-files/',
   ],
   depsUpgradeOptions: {
     workflowOptions: {
