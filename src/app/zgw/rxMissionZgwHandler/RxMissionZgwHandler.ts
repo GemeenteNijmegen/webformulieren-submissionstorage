@@ -9,6 +9,7 @@ import { UserType } from '../../shared/UserType';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { SubmissionSchema } from '../../submission/SubmissionSchema';
 import { ZgwClient } from '../zgwClient/ZgwClient';
+import { RxMissionEigenschap } from './RxMissionEigenschap';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -81,7 +82,6 @@ export class RxMissionZgwHandler {
       throw Error(`Could not find submission ${key}`);
     }
     const parsedSubmission = SubmissionSchema.passthrough().parse(await this.submissionData(key));
-    console.log('parsedsubmission: ', parsedSubmission.appId);
     const submissionAttachments: string[] = submission.attachments ?? [];
     if (process.env.DEBUG==='true') {
       console.debug('Submission', parsedSubmission, 'Attachments', submissionAttachments.length);
@@ -91,6 +91,9 @@ export class RxMissionZgwHandler {
     const zgwZaak = await zaak.create(parsedSubmission, submission);
     console.debug('created zaak');
 
+    //Add formulierkenmerk
+    const eigenschap = new RxMissionEigenschap({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties, zaakUrl:zgwZaak.url})
+    await eigenschap.addEigenschapToZaak('FormulierKenmerk', submission.key); // TODO: key does not seem to be the best option.
     // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
     if (zgwZaak.rollen.length == 0) {
       console.debug('creating roles');
