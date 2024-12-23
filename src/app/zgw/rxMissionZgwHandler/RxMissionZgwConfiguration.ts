@@ -12,6 +12,12 @@ export interface RxMissionZgwConfiguration {
   submissionZaakProperties: SubmissionZaakProperties[];
 }
 
+export type RxMissionEigenschapName = 'FormulierKenmerk' | 'CorsaNummer';
+export interface RxMissionZaakEigenschap {
+  name: RxMissionEigenschapName;
+  url: string;
+}
+
 /**
  * All properties of the submission and RxMission zaak that are linked
  * For example: a certain submission is linked to a standard zaakType in RxMission
@@ -62,6 +68,10 @@ export interface SubmissionZaakProperties {
    * Role type for belanghebbende-role
    */
   belanghebbendeRolType?: string;
+  /**
+   * Zaakeigenschappen
+   */
+  zaakEigenschappen?: RxMissionZaakEigenschap[];
 }
 
 /**
@@ -153,7 +163,12 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         informatieObjectTypeVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/d0eedfaa-3262-4cfc-a91e-ac0dc7b5af77', // Verzoek
         informatieObjectTypeBijlageVerzoek: 'https://catalogi.preprod-rx-services.nl/api/v1/informatieobjecttypen/91594e2f-63f4-4012-bc59-03813b3a30f8', // Bijlage bij verzoek
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/5152a5d9-b915-4679-18dd-08dcce4a3fa1', // NMG-00002 Omzetvergunning
-
+        zaakEigenschappen: [
+          {
+            name:'FormulierKenmerk',
+            url: 'https://',
+          }
+        ],
       },
       {
         // Periode van de activiteit is van belang. Het verhuren tot wanneer is belangrijk.

@@ -257,4 +257,9 @@ const fetchMockMatchers = [
     urlPathMatch: '/unlock',
     response: { statusCode: 204 }, // unlock
   },
+  {
+    method: ['POST'],
+    urlPathMatch: '/zaakeigenschappen',
+    response: { url: 'https://zaakeigenschapurl' }, // addZaakEigenschap
+  },
 ];
