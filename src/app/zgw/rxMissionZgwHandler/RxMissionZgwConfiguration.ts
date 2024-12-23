@@ -43,6 +43,11 @@ export interface SubmissionZaakProperties {
   productType?: string;
 
   /**
+   * ZaakEigenschap for storing the form reference (appId)
+   */
+  formReferenceEigenschap?: string;
+
+  /**
    * InformatieObjectType for document. Fallback if no specific types have been configured
    */
   informatieObjectType: string;
@@ -165,9 +170,9 @@ const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = 
         productType: 'https://producten.preprod-rx-services.nl/api/v1/product/5152a5d9-b915-4679-18dd-08dcce4a3fa1', // NMG-00002 Omzetvergunning
         zaakEigenschappen: [
           {
-            name:'FormulierKenmerk',
+            name: 'FormulierKenmerk',
             url: 'https://',
-          }
+          },
         ],
       },
       {

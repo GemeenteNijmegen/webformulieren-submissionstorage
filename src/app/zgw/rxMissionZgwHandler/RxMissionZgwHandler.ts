@@ -9,7 +9,6 @@ import { UserType } from '../../shared/UserType';
 import { Database, DynamoDBDatabase } from '../../submission/Database';
 import { SubmissionSchema } from '../../submission/SubmissionSchema';
 import { ZgwClient } from '../zgwClient/ZgwClient';
-import { RxMissionEigenschap } from './RxMissionEigenschap';
 
 const envKeys = [
   'BUCKET_NAME',
@@ -22,6 +21,22 @@ const envKeys = [
 ] as const;
 
 
+/**
+ * Send submissions to RxMission as ZGW (Zaakgericht Werken) cases.
+ * It interacts with S3 and DynamoDB for retrieving submissions, and ZgwClient for ZGW API interactions.
+ *
+ * The handler performs the following main tasks:
+ * - Initializes the necessary services and clients
+ * - Retrieves and parses submission data from the database.
+ * - Creates or updates ZGW cases (zaken) based on the submission data.
+ * - Adds roles and documents to the ZGW cases as needed.
+ *
+ * @class RxMissionZgwHandler
+ *
+ * @param {RxMissionZgwConfiguration} _rxMissionZgwConfiguration - Configuration object for RxMission ZGW.
+ * @param {SubmissionZaakProperties} submissionZaakProperties - Properties related to the submission zaak.
+
+ */
 export class RxMissionZgwHandler {
   private storage: S3Storage;
   private database: Database;
@@ -48,7 +63,14 @@ export class RxMissionZgwHandler {
     });
   }
 
-
+  /**
+   * Sends a submission to rxmission as a zgw zaak
+   *
+   *
+   * @param key the AppId of the submission
+   * @param userId the bsn or kvk for the submission user
+   * @param userType
+   */
   async sendSubmissionToRxMission(key: string, userId: string, userType: UserType) {
     await this.zgwClient.init();
 
@@ -68,9 +90,6 @@ export class RxMissionZgwHandler {
     const zgwZaak = await zaak.create(parsedSubmission, submission);
     console.debug('created zaak');
 
-    //Add formulierkenmerk
-    const eigenschap = new RxMissionEigenschap({ zgwClient: this.zgwClient, submissionZaakProperties: this.submissionZaakProperties, zaakUrl:zgwZaak.url})
-    await eigenschap.addEigenschapToZaak('FormulierKenmerk', submission.key); // TODO: key does not seem to be the best option.
     // We may have returned an existing zaak, in which role creation failed. If there are no roles added to the zaak, we try adding them.
     if (zgwZaak.rollen.length == 0) {
       console.debug('creating roles');
