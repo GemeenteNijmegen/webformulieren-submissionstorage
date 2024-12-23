@@ -10,7 +10,7 @@ import { HttpMethod, ZgwHttpClient } from '../ZgwHttpClient';
  * Kies voor prod of preprod met de PROD boolean
  */
 
-describe('Live fetch ZGW catalogi config', () => {
+xdescribe('Live fetch ZGW catalogi config', () => {
   const PROD: boolean = false; //false is PREPROD
   const BASE_URL_CATALOGI = PROD ? 'https://catalogi.rx-services.nl/api/v1/' :'https://catalogi.preprod-rx-services.nl/api/v1/';
 
@@ -18,91 +18,96 @@ describe('Live fetch ZGW catalogi config', () => {
     zaakTypeUuid: string;
     outputFileName: string;
   }
-  
+
   const fetchZaakTypeDetails = async (config: ZaakTypeConfig) => {
     const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
     expect(zgwHttpClient).toBeTruthy(); // Constructs httpclient with local env vars
-  
+
     const zaakTypeUrl = `${BASE_URL_CATALOGI}zaaktypen/${config.zaakTypeUuid}`;
     const zaakType: CatalogiZaaktypeTemp = await zgwHttpClient.request(HttpMethod.Get, zaakTypeUrl);
-  
+
     // Fetch statusTypen
     const statusTypen = (await Promise.all(
       zaakType.statustypen!.map(
         statusurl => zgwHttpClient.request(HttpMethod.Get, statusurl),
       ),
     )).map((statussen) => { return { url: statussen.url, omschrijving: statussen.omschrijving }; });
-  
+
     // Fetch informatieObjectTypen
     const informatieObjectTypen = (await Promise.all(
       zaakType.informatieobjecttypen!.map(
         infoUrl => zgwHttpClient.request(HttpMethod.Get, infoUrl),
       ),
     )).map((infoObject) => { return { url: infoObject.url, omschrijving: infoObject.omschrijving }; });
-  
+
     // Fetch rolTypen
     const rolTypen = (await Promise.all(
       zaakType.roltypen!.map(
         rolUrl => zgwHttpClient.request(HttpMethod.Get, rolUrl),
       ),
     )).map((roltype) => { return { url: roltype.url, omschrijving: roltype.omschrijving }; });
-  
+
     const eigenschappen = (await Promise.all(
-          zaakType.eigenschappen!.map(
-            eigenschapUrl => zgwHttpClient.request(HttpMethod.Get, eigenschapUrl),
-          ),
+      zaakType.eigenschappen!.map(
+        eigenschapUrl => zgwHttpClient.request(HttpMethod.Get, eigenschapUrl),
+      ),
     )).map((eigenschaptype) => { return { url: eigenschaptype.url, omschrijving: eigenschaptype.naam }; });
 
     const resultaten = (await Promise.all(
-          zaakType.resultaattypen!.map(
-            resultaatUrl => zgwHttpClient.request(HttpMethod.Get, resultaatUrl),
-          ),
-    )).map((resultaattype) => { return { url: resultaattype.url, omschrijving: resultaattype.omschrijving, omschrijvingGeneriek: resultaattype.omschrijvingGeneriek }; });
-      
+      zaakType.resultaattypen!.map(
+        resultaatUrl => zgwHttpClient.request(HttpMethod.Get, resultaatUrl),
+      ),
+    )).map((resultaattype) => { return { 
+        url: resultaattype.url,
+        omschrijving: resultaattype.omschrijving,
+        omschrijvingGeneriek: resultaattype.omschrijvingGeneriek 
+      }; 
+    });
+
     const besluittypen = (await Promise.all(
-          zaakType.besluittypen!.map(
-            besluitUrl => zgwHttpClient.request(HttpMethod.Get, besluitUrl),
-          ),
+      zaakType.besluittypen!.map(
+        besluitUrl => zgwHttpClient.request(HttpMethod.Get, besluitUrl),
+      ),
     )).map((besluittype) => { return { url: besluittype.url, omschrijving: besluittype.omschrijving, omschrijvingGeneriek: besluittype.omschrijvingGeneriek }; });
-      
+
     // Write output to file
-    writeOutputToFile(`${config.outputFileName}-${ PROD ? 'prod' : 'preprod'}`, { 
-      STATUSTYPEN: statusTypen, 
-      INFORMATIEOBJECTTYPEN: informatieObjectTypen, 
-      ROLTYPEN: rolTypen, 
+    writeOutputToFile(`${config.outputFileName}-${ PROD ? 'prod' : 'preprod'}`, {
+      STATUSTYPEN: statusTypen,
+      INFORMATIEOBJECTTYPEN: informatieObjectTypen,
+      ROLTYPEN: rolTypen,
       EIGENSCHAPPEN: eigenschappen,
       RESULTATEN: resultaten,
       BESLUITTYPEN: besluittypen,
-     });
+    });
   };
-  
+
   test('Zaaktype Aanvraag Beschikking Overige', async () => {
     const config: ZaakTypeConfig = {
       zaakTypeUuid: PROD ? 'dca652be-eaa8-4d05-b336-59cb4466880e' : '3d845f0f-0971-4a8f-9232-439696bf1504',
-      outputFileName: 'aanvraagBeschikking'
+      outputFileName: 'aanvraagBeschikking',
     };
-  
+
     await fetchZaakTypeDetails(config);
   });
-  
+
   test('Zaaktype Incident Behandelen', async () => {
     const config: ZaakTypeConfig = {
       zaakTypeUuid: PROD ? '617234fd-b99c-4c4d-9eee-9ced620830e2' : '09790f18-0a91-4b6f-9626-82f68f7a33a4',
-      outputFileName: 'incident'
+      outputFileName: 'incident',
     };
-  
+
     await fetchZaakTypeDetails(config);
   });
 
   test('Zaaktype SchaduwZaak', async () => {
     const config: ZaakTypeConfig = {
       zaakTypeUuid: PROD ? '4dfe121a-76a7-4d40-a61f-a4faa4562e78' : '2662aef5-bfab-441a-8c34-81362a454549',
-      outputFileName: 'schaduwzaak'
+      outputFileName: 'schaduwzaak',
     };
-  
+
     await fetchZaakTypeDetails(config);
   });
-  
+
 
   // Fetch all zaaktypen (paginated API call)
   const fetchAllZaaktypen = async () => {
@@ -124,13 +129,14 @@ describe('Live fetch ZGW catalogi config', () => {
     console.log(`Fetched ${allZaaktypen.length} zaaktypen`);
 
     const zaakTypenOverview = allZaaktypen.map(
-      (zaaktype) => { 
-        return { 
-          url: zaaktype.url, 
-          identificatie: zaaktype.identificatie, 
-          omschrijving: zaaktype.omschrijving }
-      })
-  
+      (zaaktype) => {
+        return {
+          url: zaaktype.url,
+          identificatie: zaaktype.identificatie,
+          omschrijving: zaaktype.omschrijving,
+        };
+      });
+
     // Write output to file
     writeOutputToFile(`alleZaaktypen-${ PROD ? 'prod' : 'preprod'}`, zaakTypenOverview);
 

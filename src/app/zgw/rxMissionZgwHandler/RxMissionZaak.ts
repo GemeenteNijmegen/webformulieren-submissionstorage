@@ -17,8 +17,8 @@ export class RXMissionZaak {
   }
 
   async create(submission: Submission, submissionData: SubmissionData) {
-    
-  // Handle idempotency by checking if the zaak already exists
+
+    // Handle idempotency by checking if the zaak already exists
     try {
       const zaakMapping = await this.zaakReference.get(submission.reference);
       if (zaakMapping) {
@@ -44,8 +44,8 @@ export class RXMissionZaak {
     });
     await this.zaakReference.set(submission.reference, zaak.url);
 
-    if(this.submissionZaakProperties.formReferenceEigenschap) {
-      this.zgwClient.addZaakEigenschap(zaak.url, this.submissionZaakProperties.formReferenceEigenschap,submission.reference);
+    if (this.submissionZaakProperties.formReferenceEigenschap) {
+      await this.zgwClient.addZaakEigenschap(zaak.url, this.submissionZaakProperties.formReferenceEigenschap, submission.reference);
     }
 
     // Set zaakstatus
