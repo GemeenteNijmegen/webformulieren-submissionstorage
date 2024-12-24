@@ -1,6 +1,6 @@
 import { describeIntegration } from "../../app/test-utils/describeIntegration";
 import { HttpMethod, ZgwHttpClient } from "../../app/zgw/zgwClient/ZgwHttpClient";
-import { ZgwCatalogiZaakTypeSetup, schaduwZaakCatalogiSetup, zgwCatalogiConfig } from "./GenerateConfigInterfaces";
+import { ZgwCatalogiZaakTypeSetup, aanvraagBeschikkingZaakCatalogiSetup, schaduwZaakCatalogiSetup, zgwCatalogiConfig } from "./GenerateConfigInterfaces";
 import fs from 'fs';
 import path from 'path';
 
@@ -31,13 +31,13 @@ export async function fetchZaakTypeConfig(
     }
   
     //  Filter op zaaktypen zonder einddatum (waarschijnlijk nieuwste)
-    const latestZaakType = zaaktypen.filter((zaaktype: any) => !zaaktype.eindeGeldigheid);
-  
-    if (latestZaakType.length === 0) {
-      throw new Error(`Geen zaaktypen zonder einddatum gevonden voor identificatie: ${zaaktypeIdentificatie}`);
+    const latestZaakType = zaaktypen.filter((zaaktype: any) => !zaaktype.eindeGeldigheid)[0];
+
+    if (latestZaakType.length > 1 || latestZaakType.length === 0) {
+      throw new Error(`Geen of meer dan 1 zaaktypen zonder einddatum gevonden voor identificatie: ${zaaktypeIdentificatie}. Aantal: ${latestZaakType.length}`);
     }
   
-    // // Sorteer de gefilterde zaaktypen op versiedatum en selecteer de laatste, misschien niet de beste optie
+    // Sorteer de gefilterde zaaktypen op versiedatum en selecteer de laatste, misschien niet de beste optie
     // const latestZaakType = zaaktypenZonderEinddatum.sort((a: any, b: any) =>
     //   new Date(b.versiedatum).getTime() - new Date(a.versiedatum).getTime()
     // )[0];
@@ -47,6 +47,7 @@ export async function fetchZaakTypeConfig(
       urls: string[],
       originals: { kenmerk: string; omschrijving?: string; naam?: string; default?: boolean }[]
     ) => {
+      if(!urls || urls.length === 0 || !originals || originals.length === 0) { return []}
       const results = await Promise.all(
         urls.map(async (url) => {
           const detail = await zgwHttpClient.request(HttpMethod.Get, url);
@@ -76,11 +77,12 @@ export async function fetchZaakTypeConfig(
         naam?: string;
         default?: boolean;
       }[];
+
     };
   
     const statusTypen = await fetchDetails(latestZaakType.statustypen, zaakTypeSetup.statusTypen);
-    const resultaatTypen = await fetchDetails(latestZaakType.resultaattypen, zaakTypeSetup.resultaatTypen);
-    const eigenschappen = await fetchDetails(latestZaakType.eigenschappen, zaakTypeSetup.eigenschappen);
+    const resultaatTypen = latestZaakType.resultaatTypen ? await fetchDetails(latestZaakType.resultaattypen, zaakTypeSetup.resultaatTypen|| []) : [];
+    const eigenschappen = latestZaakType.eigenschappen ? await fetchDetails(latestZaakType.eigenschappen, zaakTypeSetup.eigenschappen|| []) : [];
     const informatieObjectTypen = latestZaakType.informatieobjecttypen
       ? await fetchDetails(latestZaakType.informatieobjecttypen, zaakTypeSetup.informatieObjectTypen || [])
       : [];
@@ -117,6 +119,16 @@ describeIntegration('generateConfig with latest version zaakType', () => {
             console.error('Error fetching zaaktype config:', error);
           }
     });
+
+    test('Aanvraag beschikking - todo move', async() => {
+      try {
+          const config = await fetchZaakTypeConfig('NMG-AANVRBS-OVERIG', aanvraagBeschikkingZaakCatalogiSetup);
+          writeOutputToFile('aanvraag-beschikking', config);
+          console.log('Generated Config: Aanvraag Beschikking');
+        } catch (error) {
+          console.error('Error fetching zaaktype config:', error);
+        }
+  });
 });
 
 

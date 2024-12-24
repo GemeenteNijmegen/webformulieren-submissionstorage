@@ -12,8 +12,8 @@ export interface zgwCatalogiConfig {
     zaakTypeUrl?: string; // url for specific zaaktype in that environment
     zaakTypeBeschrijving: string; // Description for human readability
     statusTypen:{ url: string; kenmerk?: string; omschrijving?: string; default?: boolean;}[];
-    resultaatTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean;}[];
-    eigenschappen: { url: string; kenmerk?: string; naam?: string; default?: boolean;}[];
+    resultaatTypen?: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean;}[];
+    eigenschappen?: { url: string; kenmerk?: string; naam?: string; default?: boolean;}[];
     informatieObjectTypen?: { url: string; kenmerk?: string; omschrijving?: string;default?: boolean;}[];
     rolTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean;}[];
 }
@@ -22,8 +22,8 @@ export interface ZgwCatalogiZaakTypeSetup {
 beschrijving?: string;  
  zaaktypeIdentificatie: string;
  statusTypen:{kenmerk: string; omschrijving: string; default?: boolean;}[];
- resultaatTypen: {kenmerk: string; omschrijving: string; default?: boolean;}[];
- eigenschappen: {kenmerk: string; naam: string; default?: boolean;}[];
+ resultaatTypen?: {kenmerk: string; omschrijving: string; default?: boolean;}[];
+ eigenschappen?: {kenmerk: string; naam: string; default?: boolean;}[];
  informatieObjectTypen?: {kenmerk: string; omschrijving: string;default?: boolean;}[];
  rolTypen: {kenmerk: string; omschrijving: string; default?: boolean;}[];
 }
@@ -59,4 +59,46 @@ export const schaduwZaakCatalogiSetup: ZgwCatalogiZaakTypeSetup = {
         omschrijving: 'Initiator',
         default: true,
     }]
+}
+
+
+//Voor eigen gemak hier ook aanvraag beschikking om snel de nieuwe versie in RxMission config te kunnen zetten
+//TODO: verplaats naar niet migratie van RxMission
+
+export const aanvraagBeschikkingZaakCatalogiSetup: ZgwCatalogiZaakTypeSetup = {
+    beschrijving: 'Aanvraag Beschikking Overige',
+    zaaktypeIdentificatie:'NMG-AANVRBS-OVERIG',
+    statusTypen: [{
+        kenmerk: 'START',
+        omschrijving: 'Zaak gestart',
+        default: true,
+    }],
+    informatieObjectTypen: [
+        {
+            kenmerk:'VERZOEK',
+            omschrijving: 'Verzoek'
+        },
+        {
+            kenmerk:'BIJLAGE_VERZOEK',
+            omschrijving: 'Bijlage bij verzoek'
+        },
+    ],
+    eigenschappen: [
+        {
+            kenmerk: 'FORMULIER_KENMERK',
+            naam: 'Formulier kenmerk',
+        }
+    ],
+    rolTypen: [
+        {
+        kenmerk: 'INITIATOR',
+        omschrijving: 'Initiator',
+        default: true,
+    },
+    {
+        kenmerk: 'BELANGHEBBENDE',
+        omschrijving: 'Belanghebbende',
+        default: true,
+    }
+]
 }
