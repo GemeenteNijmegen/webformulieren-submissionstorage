@@ -41,6 +41,7 @@ const project = new GemeenteNijmegenCdkApp({
   gitignore: [
     'src/app/submission/test/docker/',
     '**/output/',
+    '**/sensitive-files/',
   ],
   depsUpgradeOptions: {
     workflowOptions: {

@@ -32,6 +32,7 @@ jspm_packages/
 .cache
 src/app/submission/test/docker/
 **/output/
+**/sensitive-files/
 test-reports/junit.xml
 test/__snapshots__/*
 .env
