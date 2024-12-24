@@ -87,7 +87,7 @@
     "@aws-sdk/client-ssm": "^3.716.0",
     "@aws-sdk/s3-request-presigner": "^3.717.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.19",
-    "@gemeentenijmegen/aws-constructs": "^0.0.25",
+    "@gemeentenijmegen/aws-constructs": "^0.0.26",
     "@gemeentenijmegen/dnssec-record": "^0.0.24",
     "@gemeentenijmegen/utils": "^0.0.22",
     "@types/aws-lambda": "^8.10.146",
