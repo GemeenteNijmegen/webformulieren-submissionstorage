@@ -30,6 +30,10 @@
       "type": "build"
     },
     {
+      "name": "@types/proj4",
+      "type": "build"
+    },
+    {
       "name": "@types/sns-validator",
       "type": "build"
     },
@@ -175,6 +179,10 @@
     },
     {
       "name": "jsonwebtoken",
+      "type": "runtime"
+    },
+    {
+      "name": "proj4",
       "type": "runtime"
     },
     {

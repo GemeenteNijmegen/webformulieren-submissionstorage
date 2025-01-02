@@ -11,6 +11,7 @@ const project = new GemeenteNijmegenCdkApp({
     'testcontainers',
     '@testcontainers/localstack',
     '@types/jsonwebtoken',
+    '@types/proj4',
   ],
   deps: [
     '@gemeentenijmegen/aws-constructs',
@@ -33,6 +34,7 @@ const project = new GemeenteNijmegenCdkApp({
     'jsonwebtoken',
     'xlsx@0.18.5',
     'ts-node',
+    'proj4',
   ],
   jestOptions: {
     jestConfig: {
