@@ -16,11 +16,12 @@ export class RxMissionMigratie {
   private outputDir: string;
   private jsonFilePaths: { [key in JsonFileType]: string };
   private logFilePaths: { [key in LogFileType]: string };
+  private baseOutputDir: string;
 
   constructor(inputFileName: string = 'small-sample.xlsx') {
-    const baseOutputDir = path.join(__dirname, 'output');
     const timestamp = Date.now(); // Epoch in milliseconds
-    this.outputDir = path.join(baseOutputDir, `migrate_${timestamp}`);
+    this.baseOutputDir = path.join(__dirname, 'output');
+    this.outputDir = path.join(this.baseOutputDir, `migrate_${timestamp}`);
     this.inputFilePath = path.join(__dirname, 'sensitive-files', inputFileName);
 
     // Create output directory
@@ -32,7 +33,8 @@ export class RxMissionMigratie {
     this.jsonFilePaths = {
       [JsonFileType.SUCCESS]: this.initJsonFile(JsonFileType.SUCCESS, []),
       [JsonFileType.FAILURE]: this.initJsonFile(JsonFileType.FAILURE, []),
-      [JsonFileType.CREATED_ZAKEN]: this.initJsonFile(JsonFileType.CREATED_ZAKEN, []),
+      [JsonFileType.PROCESSED_ROWS]: this.initJsonFile(JsonFileType.PROCESSED_ROWS, []), // Can be used to start processing from a certain row if interrupted
+      [JsonFileType.CREATED_ZAAKURLS]: this.initJsonFile(JsonFileType.CREATED_ZAAKURLS, []), // Can be used to delete all created zaken
     };
 
     this.logFilePaths = {
@@ -95,10 +97,13 @@ export class RxMissionMigratie {
 
   /**
    * Check if a row has already been processed.
+   * If you want to use the file from a previous migration, just put the particular PROCESSED_ROWS in output and uncomment the first lines
    */
   private isRowProcessed(row: Row): boolean {
-    const successData = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.SUCCESS], 'utf8'));
-    return successData.some((r: Row) => r.openwavezaaknummer === row.openwavezaaknummer);
+    //const filePath = path.resolve(this.baseOutputDir, JsonFileType.PROCESSED_ROWS);
+    //const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.PROCESSED_ROWS], 'utf8'));
+    const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.PROCESSED_ROWS], 'utf8'));
+    return processedValues.includes(row.openwavezaaknummer);
   }
 
   /**
@@ -123,9 +128,12 @@ export class RxMissionMigratie {
       }
   
       try {
-        const zaakUrl: string = await handleMigration.createZaak(row);
-        this.appendToJsonFile(JsonFileType.CREATED_ZAKEN, zaakUrl);
-        this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaakUrl}.`);
+        const zaak: {url: string; identification: string | undefined;} = await handleMigration.createZaak(row);
+        this.appendToJsonFile(JsonFileType.CREATED_ZAAKURLS, zaak.url);
+        // Status, rol, zaakeigenschappen aanmaken
+        this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
+        this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer});
+        this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
       } catch (error: any) {
         this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error}`);
         this.appendToJsonFile(JsonFileType.FAILURE, { row, error: error.message || error });
@@ -142,7 +150,8 @@ export class RxMissionMigratie {
 export enum JsonFileType {
   SUCCESS = 'success.json',
   FAILURE = 'failure.json',
-  CREATED_ZAKEN = 'createdzaken.json'
+  CREATED_ZAAKURLS = 'createdzaakurls.json',
+  PROCESSED_ROWS = 'processedrows.json',
 }
 
 /**
@@ -190,7 +199,7 @@ export async function runMigration(inputFileName: string = 'one-row.xlsx'): Prom
 
 if (require.main === module) {
   runMigration()
-    .then(() => console.log('Migration finished successfully!'))
+    .then(() => console.log('Migration finished!'))
     .catch((error) => {
       console.error('Migration failed:', error);
       process.exit(1);

@@ -22,6 +22,7 @@ export class HandleRxMissionMigration {
   private producten: {melding: string; vergunning: string};
   private geometrieTransformer: GeometrieTransformer;
 
+  // Nu PROD hard op false, later in eindfase toevoegen om PROD te kunnen kiezen
   constructor(PROD: boolean = false) {
     if(PROD){
       console.log(`
@@ -64,17 +65,19 @@ export class HandleRxMissionMigration {
     this.geometrieTransformer = new GeometrieTransformer();
   }
 
-  async createZaak(row: Row) {
+  async createZaak(row: Row): Promise<{url: string; identification: string | undefined;}> {
     const zaakGeometrie = this.geometrieTransformer.processGeometry(row.zaakgeometrie); // Returns undefined on fail
+    // check if row.zaaktype (cases insensitive) contains the word aanvraag
+    const product = row.zaaktype && row.zaaktype.toLowerCase().includes('aanvraag') ? [this.producten.vergunning] : [this.producten.melding]; 
     try{
       const zaakResult: ZakenApiZaakResponse = await this.zgwClient.createZaak({
-        productenOfDiensten: [this.producten.melding], // TODO: change to melding or vergunning based on row 
-        toelichting: `TESTEN MIGRATIE ${row.openwavezaaknummer}`,
+        productenOfDiensten: product,
+        toelichting: `TESTEN MIGRATIE ${row.openwavezaaknummer}`, // TODO: vullen met rest informatie
         zaakgeometrie: zaakGeometrie, // api call works with undefined
         omschrijving: 'DEVOPS MIGRATIE TESTEN',
       } as CreateZaakParameters);
-      console.log(`[HandleMigration createZaak] ${zaakResult.url}. Succesvol aangemaakt.`)
-      return zaakResult.url;
+      console.log(`[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`)
+      return {url: zaakResult.url, identification: zaakResult.identificatie};
     }
     catch(error: any){
       console.error(`CREATING ZAAK FAILED: ${row} ${JSON.stringify(error)}`);
