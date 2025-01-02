@@ -129,10 +129,20 @@ export class RxMissionMigratie {
   
       try {
         const zaak: {url: string; identification: string | undefined;} = await handleMigration.createZaak(row);
+        if(!zaak.url){
+          this.appendToLogFile(LogFileType.ERROR_LOG,`zaak url is undefined ${zaak}. Stop and throw error to be caught`);
+          throw Error('Zaak url is undefined.');
+          continue;
+        }
         this.appendToJsonFile(JsonFileType.CREATED_ZAAKURLS, zaak.url);
         // Status, rol, zaakeigenschappen aanmaken
+        
+        // status
+        const status: boolean = await handleMigration.addStatus(zaak.url);
+        if(!status){ this.appendToLogFile(LogFileType.ERROR_LOG,`No status added ${zaak.identification} - ${zaak.url}.`); }
+
         this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
-        this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer});
+        this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer, status: status});
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
       } catch (error: any) {
         this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error}`);
@@ -192,7 +202,6 @@ export interface Row {
  * one-row.xlsx en small-sample.xlsx voor testen
  */
 export async function runMigration(inputFileName: string = 'one-row.xlsx'): Promise<void> {
-  console.log('Node.js Arguments:', process.execArgv);
   const migrator = new RxMissionMigratie(inputFileName);
   await migrator.migrateData();
 }

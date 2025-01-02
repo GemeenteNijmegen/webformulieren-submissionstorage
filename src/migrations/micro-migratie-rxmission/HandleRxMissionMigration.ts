@@ -1,5 +1,5 @@
 import { ZakenApiZaakResponse } from "../../app/zgw/zgwClient/model/ZakenApiZaak.model";
-import { CreateZaakParameters, ZgwClient } from "../../app/zgw/zgwClient/ZgwClient";
+import { AddZaakStatusParameters, CreateZaakParameters, ZgwClient } from "../../app/zgw/zgwClient/ZgwClient";
 import { HttpMethod } from "../../app/zgw/zgwClient/ZgwHttpClient";
 import { zgwCatalogiConfig } from "./GenerateConfigInterfaces";
 import { GeometrieTransformer } from "./GeometrieTransformer";
@@ -7,12 +7,10 @@ import { Row } from "./RxMissionMigratie";
 import * as ZAAK_CONFIG from "./RxMissionZaakConfig";
 
 export class HandleRxMissionMigration {
-
-  // Maak zaak, sla zaaknummer op
-  // Error handling
   // Rol
   // Zaakeigenschappen
   // Status
+  // Zaakresultaat
 
   // Eenmalig ZgwClient aanmaken
   private zgwClient: ZgwClient;
@@ -85,6 +83,19 @@ export class HandleRxMissionMigration {
     }
   }
   /**
+   * Levert geen error op
+   */
+  async addStatus(zaakUrl: string): Promise<boolean>{
+    const params: AddZaakStatusParameters = {
+      zaakUrl: zaakUrl,
+      statusType: ZAAK_CONFIG.getStatusTypeUrl(this.zaakConfig),
+      statustoelichting: 'Devops aangemaakt in migratie'
+    };
+    const status = await this.zgwClient.addZaakStatus(params);
+    return !!status.url
+  }
+
+  /**
    * Kijken of dit nodig is om op te ruimen en of we uberhaupt rechten hebben.
    */
   async deleteZaak(zaakUrl: string): Promise<void>{
@@ -95,27 +106,6 @@ export class HandleRxMissionMigration {
     catch(error: any){
       console.error(`DELETING ZAAK FAILED: ${zaakUrl}`);
       throw Error(`DELETING ZAAK FAILED: ${zaakUrl}`);
-    }
-  }
-  cleanZaakgeometrie(input: string): any {
-    console.log('ZAAKGEOMETRIE: ', input);
-    console.log('ZAAKGEOMETRIE: ', JSON.stringify(input));
-    try {
-      // Remove unwanted characters (e.g., \r\n)
-      const cleanedInput = input.replace(/\r?\n|\r/g, '').trim();
-  
-      // Parse the cleaned string into a JSON object
-      const zaakgeometrie = JSON.parse(cleanedInput);
-  
-      // Validate the basic structure of the GeoJSON (optional)
-      if (!zaakgeometrie.type || !zaakgeometrie.coordinates) {
-        throw new Error('Invalid GeoJSON structure');
-      }
-  
-      return zaakgeometrie;
-    } catch (error: any) {
-      console.error('Failed to clean zaakgeometrie:', error.message);
-      throw new Error('Invalid zaakgeometrie input');
     }
   }
 }

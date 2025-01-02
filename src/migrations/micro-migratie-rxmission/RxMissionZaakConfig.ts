@@ -130,6 +130,20 @@ export function getRolTypeUrl(config: zgwCatalogiConfig): string {
   // Als een INITIATOR bestaat, retourneer de URL daarvan, anders de URL van het eerste roltype
   return initiator?.url || rolTypen[0]?.url || '';
 }
+export function getStatusTypeUrl(config: zgwCatalogiConfig): string {
+  const { statusTypen } = config;
+  if(!statusTypen){
+    console.error('Check de catalogus config van de zaak. Er zijn geen statustypen aanwezig!');
+  }
+  // Zoek naar een statustype met kenmerk 'START'
+  const start = statusTypen.find((status) => status.kenmerk === 'START');
+
+  if(start?.url){
+    console.error('De catalogus config heeft geen START status');
+  }
+  // Als een START status bestaat, retourneer de URL daarvan, anders de URL van het eerste statustype
+  return start?.url || statusTypen[0]?.url || '';
+}
 export function getZaakTypeUrl(config: zgwCatalogiConfig): string {
   if(!config.zaakTypeUrl){
     console.error('ER IS GEEN ZAAKTYPEURL IN DE CONFIG AANWEZIG');
