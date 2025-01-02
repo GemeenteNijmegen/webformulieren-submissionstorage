@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-// eslint-disable-next-line import/no-unresolved
-import * as xlsx from 'xslx';
+import { readFile, utils } from 'xlsx';
 import { HandleRxMissionMigration } from './HandleRxMissionMigration';
 
 
@@ -38,10 +37,10 @@ export class RxMissionMigratie {
 
 
   private readExcelFile(): any[] {
-    const workbook = xlsx.readFile(this.inputFilePath);
+    const workbook = readFile(this.inputFilePath);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const jsonWorksheet = xlsx.utils.sheet_to_json(worksheet);
+    const jsonWorksheet = utils.sheet_to_json(worksheet);
     console.log('JSON WORKSHEET');
     console.dir(jsonWorksheet);
     return jsonWorksheet;
@@ -158,3 +157,4 @@ if (require.main === module) {
       process.exit(1);
     });
 }
+

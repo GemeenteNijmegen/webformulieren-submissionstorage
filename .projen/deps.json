@@ -186,7 +186,8 @@
       "type": "runtime"
     },
     {
-      "name": "xslx",
+      "name": "xlsx",
+      "version": "0.18.5",
       "type": "runtime"
     },
     {
