@@ -155,43 +155,40 @@ describeIntegration('Live fetch ZGW catalogi config', () => {
   });
 
 
+  // Nieuwe helper functie om eigenschappen te fetchen
+  const fetchAllEigenschappenWithZaaktype = async () => {
+    const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
 
-// Nieuwe helper functie om eigenschappen te fetchen
-const fetchAllEigenschappenWithZaaktype = async () => {
-  const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
+    let nextPageUrl: string | null = `${BASE_URL_CATALOGI}eigenschappen/`;
+    let allEigenschappen: any[] = [];
 
-  let nextPageUrl: string | null = `${BASE_URL_CATALOGI}eigenschappen/`;
-  let allEigenschappen: any[] = [];
+    while (nextPageUrl) {
+      const response = await zgwHttpClient.request(HttpMethod.Get, nextPageUrl);
+      const eigenschappen = response.results;
+      allEigenschappen = [...allEigenschappen, ...eigenschappen];
+      nextPageUrl = response.next;
+    }
 
-  while (nextPageUrl) {
-    const response = await zgwHttpClient.request(HttpMethod.Get, nextPageUrl);
-    const eigenschappen = response.results;
-    allEigenschappen = [...allEigenschappen, ...eigenschappen];
-    nextPageUrl = response.next;
-  }
+    console.log(`Fetched ${allEigenschappen.length} eigenschappen`);
 
-  console.log(`Fetched ${allEigenschappen.length} eigenschappen`);
+    const eigenschappenOverview = await Promise.all(
+      allEigenschappen.map(async (eigenschap) => {
+        const zaaktypeResponse = await zgwHttpClient.request(HttpMethod.Get, eigenschap.zaaktype);
+        return {
+          url: eigenschap.url,
+          naam: eigenschap.naam,
+          zaaktypeUrl: eigenschap.zaaktype,
+          zaaktypeOmschrijving: zaaktypeResponse.omschrijving,
+        };
+      }),
+    );
 
-  const eigenschappenOverview = await Promise.all(
-    allEigenschappen.map(async (eigenschap) => {
-      const zaaktypeResponse = await zgwHttpClient.request(HttpMethod.Get, eigenschap.zaaktype);
-      return {
-        url: eigenschap.url,
-        naam: eigenschap.naam,
-        zaaktypeUrl: eigenschap.zaaktype,
-        zaaktypeOmschrijving: zaaktypeResponse.omschrijving,
-      };
-    })
-  );
+    writeOutputToFile(`alleEigenschappen-${PROD ? 'prod' : 'preprod'}`, eigenschappenOverview);
+  };
 
-  writeOutputToFile(`alleEigenschappen-${PROD ? 'prod' : 'preprod'}`, eigenschappenOverview);
-};
-
-test(`Alle Eigenschappen ${PROD ? 'prod' : 'preprod'}`, async () => {
-  await fetchAllEigenschappenWithZaaktype();
-});
-
-
+  test(`Alle Eigenschappen ${PROD ? 'prod' : 'preprod'}`, async () => {
+    await fetchAllEigenschappenWithZaaktype();
+  });
 
 
 });

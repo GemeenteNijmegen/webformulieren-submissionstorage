@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as xlsx from 'xlsx';
+// eslint-disable-next-line import/no-unresolved
+import * as xlsx from 'xslx';
 import { HandleRxMissionMigration } from './HandleRxMissionMigration';
 
 
@@ -8,13 +9,17 @@ export class RxMissionMigratie {
   private inputFilePath: string;
   private successFilePath: string;
   private failureFilePath: string;
+  private errorLogFilePath: string;
+
 
   constructor(inputFileName: string = 'small-sample.xlsx') {
+
     const outputDir = path.join(__dirname, 'output');
     const timestamp = Date.now(); // Epoch in milliseconds
     this.inputFilePath = path.join(__dirname, 'sensitive-files', inputFileName);
     this.successFilePath = path.resolve(outputDir, `success_${timestamp}.json`);
     this.failureFilePath = path.resolve(outputDir, `failure_${timestamp}.json`);
+    this.errorLogFilePath = path.resolve(outputDir, `errors_${timestamp}.log`);
 
     // Maak mappen en bestanden aan
     if (!fs.existsSync(outputDir)) {
@@ -25,6 +30,9 @@ export class RxMissionMigratie {
     }
     if (!fs.existsSync(this.failureFilePath)) {
       fs.writeFileSync(this.failureFilePath, JSON.stringify([], null, 2), 'utf8');
+    }
+    if (!fs.existsSync(this.errorLogFilePath)) {
+      fs.writeFileSync(this.errorLogFilePath, '', 'utf8');
     }
   }
 
@@ -59,6 +67,15 @@ export class RxMissionMigratie {
   }
 
   /**
+   * Log errors to a separate file.
+   */
+  private logError(message: string): void {
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] ${message}\n`;
+    fs.appendFileSync(this.errorLogFilePath, logMessage, 'utf8'); // Append error message to the file
+  }
+
+  /**
    * Check if a row has already been processed.
    * TODO: also write to a different file
    */
@@ -72,11 +89,11 @@ export class RxMissionMigratie {
    */
   public async migrateData(): Promise<void> {
     const rows = this.readExcelFile();
-    const handleMigration = new HandleRxMissionMigration(); 
+    const handleMigration = new HandleRxMissionMigration();
 
     for (const row of rows) {
       if (this.isRowProcessed(row)) {
-        console.log(`Row already processed: ${row.openwavezaaknummer}`);
+        this.logError(`Row already processed: ${row.openwavezaaknummer}`);
         continue;
       }
 
@@ -85,7 +102,7 @@ export class RxMissionMigratie {
         console.log(`Successfully processed row: ${row.openwavezaaknummer}`);
         this.logSuccess({ openwavezaaknummer: row.openwavezaaknummer, result });
       } catch (error) {
-        console.error(`Failed to process row: ${row.openwavezaaknummer}`, error);
+        this.logError(`Failed to process row: ${row.openwavezaaknummer}. ${error}`);
         this.logFailure(row, error);
       }
     }
@@ -119,7 +136,6 @@ export interface Row {
   oorsprong?: any;
   zaakresultaat?: any;
 }
-
 
 
 /**
