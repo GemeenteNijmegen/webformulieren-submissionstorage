@@ -96,6 +96,37 @@ export class HandleRxMissionMigration {
   }
 
   /**
+   * Zaakeigenschappen
+   * No errors when the calls fail
+   */
+  async addZaakEigenschappen(zaakUrl: string, row: Row): Promise<{openwave: string; corsa: string;}>{
+    let response = { corsa: '', openwave: ''};
+    try{
+      const corsaEigenschap = await this.zgwClient.addZaakEigenschap(
+        zaakUrl, 
+        ZAAK_CONFIG.getZaakEigenschapUrl(this.zaakConfig, 'ZAAKNUMMER_CORSA'), 
+        row.corsazaaknummer
+      );
+      response.corsa = corsaEigenschap.url;
+    }catch(error: any){
+      console.error(`Zaakeigenschap Corsa is niet toegevoegd. Error: ${error}. ${row.openwavezaaknummer} ${row.corsazaaknummer}`);
+    }
+    
+
+    try{
+      const openwaveEigenschap = await this.zgwClient.addZaakEigenschap(
+        zaakUrl, 
+        ZAAK_CONFIG.getZaakEigenschapUrl(this.zaakConfig, 'ZAAKNUMMER_OPENWAVE'), 
+        row.openwavezaaknummer
+      );
+      response.openwave = openwaveEigenschap.url;
+    }catch(error: any){
+      console.error(`Zaakeigenschap Openwave is niet toegevoegd. Error: ${error}. ${row.openwavezaaknummer} ${row.corsazaaknummer}`);
+    }
+    return response;
+  }
+
+  /**
    * Kijken of dit nodig is om op te ruimen en of we uberhaupt rechten hebben.
    */
   async deleteZaak(zaakUrl: string): Promise<void>{

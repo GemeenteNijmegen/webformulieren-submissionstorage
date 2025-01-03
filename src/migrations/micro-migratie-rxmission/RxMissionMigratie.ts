@@ -139,10 +139,15 @@ export class RxMissionMigratie {
         
         // status
         const status: boolean = await handleMigration.addStatus(zaak.url);
-        if(!status){ this.appendToLogFile(LogFileType.ERROR_LOG,`No status added ${zaak.identification} - ${zaak.url}.`); }
+        if(!status){ this.appendToLogFile(LogFileType.ERROR_LOG,`No status added ${zaak.identification} - ${zaak.url}- ${row.openwavezaaknummer}.`); }
+
+        // zaakeigenschappen
+        const eigenschappen = await handleMigration.addZaakEigenschappen(zaak.url, row);
+        if(!eigenschappen.corsa){ this.appendToLogFile(LogFileType.ERROR_LOG,`No eigenschap corsa added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+        if(!eigenschappen.openwave){ this.appendToLogFile(LogFileType.ERROR_LOG,`No eigenschap openwave added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
 
         this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
-        this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer, status: status});
+        this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen});
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
       } catch (error: any) {
         this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error}`);

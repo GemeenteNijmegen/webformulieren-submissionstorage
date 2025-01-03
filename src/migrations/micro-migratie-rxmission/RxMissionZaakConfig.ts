@@ -130,6 +130,20 @@ export function getRolTypeUrl(config: zgwCatalogiConfig): string {
   // Als een INITIATOR bestaat, retourneer de URL daarvan, anders de URL van het eerste roltype
   return initiator?.url || rolTypen[0]?.url || '';
 }
+export function getZaakEigenschapUrl(config: zgwCatalogiConfig, kenmerk: "ZAAKNUMMER_CORSA" | "ZAAKNUMMER_OPENWAVE"): string {
+  const {eigenschappen} = config;
+
+  if(!eigenschappen){
+    console.error('Check de catalogus config van de zaak. Er zijn geen eigenschappen aanwezig!');
+  }
+  const eigenschap = eigenschappen!.find((e) => e.kenmerk === kenmerk);
+
+  if(!eigenschap?.url){
+    console.error(`De catalogus config heeft geen ${kenmerk} eigenschap`);
+  }
+  return eigenschap?.url ||  '';
+
+}
 export function getStatusTypeUrl(config: zgwCatalogiConfig): string {
   const { statusTypen } = config;
   if(!statusTypen){
