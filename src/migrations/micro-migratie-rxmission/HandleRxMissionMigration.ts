@@ -64,7 +64,7 @@ export class HandleRxMissionMigration {
   }
 
   async createZaak(row: Row): Promise<{url: string; identification: string | undefined;}> {
-    const zaakGeometrie = this.geometrieTransformer.processGeometry(row.zaakgeometrie); // Returns undefined on fail
+    const zaakGeometrie = await this.geometrieTransformer.processGeometry(row.zaakgeometrie); // Returns undefined on fail
     // check if row.zaaktype (cases insensitive) contains the word aanvraag
     const product = row.zaaktype && row.zaaktype.toLowerCase().includes('aanvraag') ? [this.producten.vergunning] : [this.producten.melding]; 
     try{

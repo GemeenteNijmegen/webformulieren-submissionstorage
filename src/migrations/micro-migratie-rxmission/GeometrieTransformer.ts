@@ -47,7 +47,7 @@ export class GeometrieTransformer {
    * Only MultiPolygon, Polygon, Point or Multipoint
    * Omitted LineString, MultiLineString and GeometryCollection (not present in migration)
    */
-  private transformCoordinates(coordinates: any): any {
+  private async transformCoordinates(coordinates: any): Promise<any> {
     if (Array.isArray(coordinates[0][0])) {
       // MultiPolygon or Polygon
       return coordinates.map((ring: any) =>
@@ -66,14 +66,14 @@ export class GeometrieTransformer {
   /**
    * Transforms a GeoJSON geometry from EPSG:28992 to EPSG:4326.
    */
-  private transformGeometry(geometry: any): any | undefined {
+  private async transformGeometry(geometry: any): Promise<any | undefined> {
     if (!geometry || !geometry.type || !geometry.coordinates) {
       console.error('Invalid or unsupported geometry format.');
       return undefined;
     }
 
     try {
-      const transformedCoordinates = this.transformCoordinates(geometry.coordinates);
+      const transformedCoordinates = await this.transformCoordinates(geometry.coordinates);
 
       return {
         ...geometry,
@@ -88,7 +88,7 @@ export class GeometrieTransformer {
   /**
    * Full pipeline: Clean, parse, and transform the geometry.
    */
-  public processGeometry(input: string): any | undefined {
+  async processGeometry(input: string): Promise<any | undefined> {
     const parsedGeometry = this.cleanAndParseGeometry(input);
 
     if (!parsedGeometry) {
@@ -96,7 +96,7 @@ export class GeometrieTransformer {
       return undefined;
     }
 
-    const transformedGeometry = this.transformGeometry(parsedGeometry);
+    const transformedGeometry = await this.transformGeometry(parsedGeometry);
 
     if (!transformedGeometry) {
       console.error('Transformation failed. Returning undefined.');

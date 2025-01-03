@@ -114,6 +114,8 @@ export class RxMissionMigratie {
     const handleMigration = new HandleRxMissionMigration();
     const totalRows = rows.length;
     let processedCount = 0;
+    let failedRows = 0;
+    let succeededRows = 0;
   
     console.log(`Starting migration: ${totalRows} rows to process.`);
   
@@ -149,13 +151,24 @@ export class RxMissionMigratie {
         this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
         this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen});
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
+        succeededRows++;
       } catch (error: any) {
         this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error}`);
         this.appendToJsonFile(JsonFileType.FAILURE, { row, error: error.message || error });
+        failedRows++;
       }
     }
   
-    console.log('Migration completed.');
+    console.log(`
+      **************************************************
+      *                                                
+      *  Migration completed                           
+      *  Success: ${succeededRows}                                    
+      *  Failed: ${failedRows}                                     
+      *  Total: ${processedCount}                                      
+      *                                                
+      **************************************************
+      `);
   }
 }
 
@@ -206,7 +219,7 @@ export interface Row {
  * Entry point for the script.
  * one-row.xlsx en small-sample.xlsx voor testen
  */
-export async function runMigration(inputFileName: string = 'one-row.xlsx'): Promise<void> {
+export async function runMigration(inputFileName: string = 'small-sample.xlsx'): Promise<void> {
   const migrator = new RxMissionMigratie(inputFileName);
   await migrator.migrateData();
 }
