@@ -254,8 +254,8 @@ export class HandleRxMissionMigration {
    */
   async deleteZaak(zaakUrl: string): Promise<void> {
     try {
-      const deleted = this.zgwClient.callZaakApi(HttpMethod.Delete, zaakUrl);
-      console.log(`DELETE ${zaakUrl} success ${deleted}`);
+      await this.zgwClient.callZaakApi(HttpMethod.Delete, zaakUrl);
+      console.log(`DELETE ${zaakUrl} success}`);
     } catch (error: any) {
       console.error(`DELETING ZAAK FAILED: ${zaakUrl}`);
       throw Error(`DELETING ZAAK FAILED: ${zaakUrl}`);
