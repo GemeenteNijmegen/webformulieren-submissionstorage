@@ -81,7 +81,7 @@ export async function fetchZaakTypeConfig(
   };
 
   const statusTypen = await fetchDetails(latestZaakType.statustypen, zaakTypeSetup.statusTypen);
-  const resultaatTypen = latestZaakType.resultaatTypen ? await fetchDetails(latestZaakType.resultaattypen, zaakTypeSetup.resultaatTypen|| []) : [];
+  const resultaatTypen = latestZaakType.resultaattypen ? await fetchDetails(latestZaakType.resultaattypen, zaakTypeSetup.resultaatTypen|| []) : [];
   const eigenschappen = latestZaakType.eigenschappen ? await fetchDetails(latestZaakType.eigenschappen, zaakTypeSetup.eigenschappen|| []) : [];
   const informatieObjectTypen = latestZaakType.informatieobjecttypen
     ? await fetchDetails(latestZaakType.informatieobjecttypen, zaakTypeSetup.informatieObjectTypen || [])

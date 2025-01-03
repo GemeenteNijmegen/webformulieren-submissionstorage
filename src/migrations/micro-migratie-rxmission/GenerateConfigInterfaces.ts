@@ -12,8 +12,8 @@ export interface zgwCatalogiConfig {
   zaakTypeUrl?: string; // url for specific zaaktype in that environment
   zaakTypeBeschrijving: string; // Description for human readability
   statusTypen:{ url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
-  resultaatTypen?: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
-  eigenschappen?: { url: string; kenmerk?: string; naam?: string; default?: boolean}[];
+  resultaatTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
+  eigenschappen: { url: string; kenmerk?: string; naam?: string; default?: boolean}[];
   informatieObjectTypen?: { url: string; kenmerk?: string; omschrijving?: string;default?: boolean}[];
   rolTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
 }
@@ -39,10 +39,52 @@ export const schaduwZaakCatalogiSetup: ZgwCatalogiZaakTypeSetup = {
   resultaatTypen: [{
     kenmerk: 'GEWEIGERD',
     omschrijving: 'Geweigerd',
-  }, {
+  },
+  {
     kenmerk: 'VERLEEND',
     omschrijving: 'Verleend',
-  }, {
+  },
+  {
+    kenmerk: 'AFGEBROKEN',
+    omschrijving: 'Afgebroken',
+  },
+  {
+    kenmerk: 'AFGESLOTEN',
+    omschrijving: 'Afgesloten',
+  },
+  {
+    kenmerk: 'BUITEN_BEHANDELING',
+    omschrijving: 'Buiten behandeling',
+  },
+  {
+    kenmerk: 'GEACCEPTEERD',
+    omschrijving: 'Geaccepteerd',
+  },
+  {
+    kenmerk: 'VERLEEND',
+    omschrijving: 'Verleend',
+  },
+  {
+    kenmerk: 'GEDEELTELIJK_VERLEEND',
+    omschrijving: 'Gedeeltelijkverleend',
+  },
+  {
+    kenmerk: 'NIET_GEACCEPTEERD',
+    omschrijving: 'Niet geaccepteerd',
+  },
+  {
+    kenmerk: 'TOEGEKEND',
+    omschrijving: 'Toegekend',
+  },
+  {
+    kenmerk: 'VERGUNNINGSVRIJ',
+    omschrijving: 'VErgunningsvrij',
+  },
+  {
+    kenmerk: 'BESCHIKKING_OP_AANVGRAAG',
+    omschrijving: 'Beschikking op aanvraag',
+  },
+  {
     kenmerk: 'INGETROKKEN',
     omschrijving: 'Ingetrokken',
   }],

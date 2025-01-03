@@ -131,7 +131,7 @@ export class ZgwClient {
       productenOfDiensten: params.productenOfDiensten,
     };
 
-     // Add any additional parameters dynamically without overwriting explicitly defined keys
+    // Add any additional parameters dynamically without overwriting explicitly defined keys
     const finalZaakRequest = { ...params, ...zaakRequest };
     const zaak: ZakenApiZaakResponse = await this.callZaakApi(HttpMethod.Post, 'zaken', finalZaakRequest);
     if (!zaak.url) {

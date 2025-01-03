@@ -1,7 +1,7 @@
 import proj4 from 'proj4';
 
 /**
- * Class cleans the string input from empty spaces, trailing comma's 
+ * Class cleans the string input from empty spaces, trailing comma's
  * Transforms from Rijksdriehoek to GeoJSON fo ZGW api calls
  * Returns undefined if transform fails
  */
@@ -14,8 +14,8 @@ export class GeometrieTransformer {
         `+title=Amersfoort/Amersfoort +proj=sterea 
         +lat_0=52.15616055555555 +lon_0=5.38763888888889 
         +k=0.999908 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +no_defs 
-        +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812`
-      ]
+        +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812`,
+      ],
     ]);
   }
 
@@ -34,7 +34,7 @@ export class GeometrieTransformer {
         .replace(/\\r|\\n/g, '') // Remove carriage returns and newlines if present
         .replace(/\s+/g, '') // Remove all spaces
         .replace(/,\s*$/, '') // Remove trailing commas if present
-        .trim(); 
+        .trim();
       return JSON.parse(cleanedInput);
     } catch (error: any) {
       console.error(`Failed to parse geometry: ${error.message}`);
@@ -52,13 +52,13 @@ export class GeometrieTransformer {
       // MultiPolygon or Polygon
       return coordinates.map((ring: any) =>
         ring.map((coordinate: number[]) =>
-          proj4('EPSG:28992', 'EPSG:4326', coordinate)
-        )
+          proj4('EPSG:28992', 'EPSG:4326', coordinate),
+        ),
       );
     } else {
       // Point or MultiPoint
       return coordinates.map((coordinate: number[]) =>
-        proj4('EPSG:28992', 'EPSG:4326', coordinate)
+        proj4('EPSG:28992', 'EPSG:4326', coordinate),
       );
     }
   }

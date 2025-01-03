@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 import { readFile, utils } from 'xlsx';
 import { HandleRxMissionMigration } from './HandleRxMissionMigration';
-import * as dotenv from 'dotenv';
 /**
  * Load local .env file
  */
@@ -19,6 +19,12 @@ export class RxMissionMigratie {
   private baseOutputDir: string;
 
   constructor(inputFileName: string = 'small-sample.xlsx') {
+    if (process.env.RX_ENV !== 'PREPROD') {
+      throw new Error('Environment is not PREPROD. Operation aborted.');
+    }
+
+    console.log('Environment verified: PREPROD');
+
     const timestamp = Date.now(); // Epoch in milliseconds
     this.baseOutputDir = path.join(__dirname, 'output');
     this.outputDir = path.join(this.baseOutputDir, `migrate_${timestamp}`);
@@ -116,40 +122,48 @@ export class RxMissionMigratie {
     let processedCount = 0;
     let failedRows = 0;
     let succeededRows = 0;
-  
+
     console.log(`Starting migration: ${totalRows} rows to process.`);
-  
+
     for (const row of rows) {
       processedCount++;
-  
+
       console.log(`Processing row ${processedCount} of ${totalRows} (${((processedCount / totalRows) * 100).toFixed(2)}%)`);
-  
+
       if (this.isRowProcessed(row)) {
         this.appendToLogFile(LogFileType.ERROR_LOG, `Row already processed: ${row.openwavezaaknummer}`);
         continue;
       }
-  
+
       try {
-        const zaak: {url: string; identification: string | undefined;} = await handleMigration.createZaak(row);
-        if(!zaak.url){
-          this.appendToLogFile(LogFileType.ERROR_LOG,`zaak url is undefined ${zaak}. Stop and throw error to be caught`);
+        const zaak: {url: string; identification: string | undefined} = await handleMigration.createZaak(row);
+        if (!zaak.url) {
+          this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak}. Stop and throw error to be caught`);
           throw Error('Zaak url is undefined.');
           continue;
         }
         this.appendToJsonFile(JsonFileType.CREATED_ZAAKURLS, zaak.url);
-        // Status, rol, zaakeigenschappen aanmaken
-        
+
         // status
         const status: boolean = await handleMigration.addStatus(zaak.url);
-        if(!status){ this.appendToLogFile(LogFileType.ERROR_LOG,`No status added ${zaak.identification} - ${zaak.url}- ${row.openwavezaaknummer}.`); }
+        if (!status) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No status added ${zaak.identification} - ${zaak.url}- ${row.openwavezaaknummer}.`); }
 
         // zaakeigenschappen
         const eigenschappen = await handleMigration.addZaakEigenschappen(zaak.url, row);
-        if(!eigenschappen.corsa){ this.appendToLogFile(LogFileType.ERROR_LOG,`No eigenschap corsa added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-        if(!eigenschappen.openwave){ this.appendToLogFile(LogFileType.ERROR_LOG,`No eigenschap openwave added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+        if (!eigenschappen.corsa) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No eigenschap corsa added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+        if (!eigenschappen.openwave) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No eigenschap openwave added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+
+        //rol
+        const rol = await handleMigration.addRol(zaak.url, row);
+        if (!rol) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No rol added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+
+        //zaakresultaat
+        const resultaat = await handleMigration.addResultaat(zaak.url, row);
+        if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+
 
         this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
-        this.appendToJsonFile(JsonFileType.SUCCESS, {...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen});
+        this.appendToJsonFile(JsonFileType.SUCCESS, { ...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen, rol, resultaat });
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
         succeededRows++;
       } catch (error: any) {
@@ -158,7 +172,7 @@ export class RxMissionMigratie {
         failedRows++;
       }
     }
-  
+
     console.log(`
       **************************************************
       *                                                
