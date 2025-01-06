@@ -11,10 +11,13 @@ describe('Utils in handlemigration', () => {
 
           let productResult: string[] = [];
           for(const zaaktype of zaaktypesExcel){
-          const product =
-            zaaktype && zaaktype.toLowerCase().includes('aanvraag')
-            ? 'Aanvraag'
-            : 'Melding';
+            const product =
+            zaaktype &&
+            (zaaktype.toLowerCase().includes('aanvraag') ||
+              zaaktype.toLowerCase().includes('besluit') ||
+              zaaktype.toLowerCase().includes('beschik'))
+              ? 'NMG-00012 Kopie verleende vergunning'
+              : 'NMG-00015 Kopie melding';
             productResult.push(`${zaaktype} : ${product}`);
           }
           console.log(productResult);

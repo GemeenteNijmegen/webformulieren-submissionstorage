@@ -85,9 +85,12 @@ export class HandleRxMissionMigration {
     const zaakGeometrie = await this.geometrieTransformer.processGeometry(
       row.zaakgeometrie,
     ); // Returns undefined on fail
-    // check if row.zaaktype (cases insensitive) contains the word aanvraag - util test shows results with excel possibilities
+    // check if row.zaaktype (cases insensitive) contains the word aanvraag, belsuit or beschik - util test shows results with excel possibilities
     const product =
-      row.zaaktype && row.zaaktype.toLowerCase().includes('aanvraag')
+    row.zaaktype &&
+    (row.zaaktype.toLowerCase().includes('aanvraag') ||
+      row.zaaktype.toLowerCase().includes('besluit') ||
+      row.zaaktype.toLowerCase().includes('beschik'))
         ? [this.producten.vergunning]
         : [this.producten.melding];
     
