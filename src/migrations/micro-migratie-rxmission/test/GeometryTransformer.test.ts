@@ -24,20 +24,20 @@ describe('GeometryTransformer utility tests', () => {
   test('transform from excel', async () => {
     const transformer = new GeometrieTransformer();
 
-      let failed: string[] = [];
-      for (const row of rows) {
-        try {
-            const geometry = await transformer.processGeometry(row.zaakgeometrie);
-            if(!geometry)failed.push(row.openwavezaaknummer);
+    let failed: string[] = [];
+    for (const row of rows) {
+      try {
+        const geometry = await transformer.processGeometry(row.zaakgeometrie);
+        if (!geometry)failed.push(row.openwavezaaknummer);
 
-        } catch (error) {
-          console.error(`Error processing row: ${row.openwavezaaknummer}`, error);
-          failed.push(row.openwavezaaknummer);
-        }
+      } catch (error) {
+        console.error(`Error processing row: ${row.openwavezaaknummer}`, error);
+        failed.push(row.openwavezaaknummer);
       }
-      expect(failed.length).toBe(0);
-      if(failed.length !== 0){
-        console.log(`Excel Geometry transformation test has failures: ${failed}`);
-      }
-    });
+    }
+    expect(failed.length).toBe(0);
+    if (failed.length !== 0) {
+      console.log(`Excel Geometry transformation test has failures: ${failed}`);
+    }
+  });
 });

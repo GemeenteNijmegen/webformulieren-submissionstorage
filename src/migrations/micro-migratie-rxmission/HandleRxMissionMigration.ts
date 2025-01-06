@@ -81,7 +81,7 @@ export class HandleRxMissionMigration {
 
   async createZaak(
     row: Row,
-  ): Promise<{ url: string; identification: string | undefined }> {
+  ): Promise<{ url: string; identification: string | undefined; zaakgeometrieAdded: boolean }> {
     const zaakGeometrie = await this.geometrieTransformer.processGeometry(
       row.zaakgeometrie,
     ); // Returns undefined on fail
@@ -91,9 +91,9 @@ export class HandleRxMissionMigration {
     (row.zaaktype.toLowerCase().includes('aanvraag') ||
       row.zaaktype.toLowerCase().includes('besluit') ||
       row.zaaktype.toLowerCase().includes('beschik'))
-        ? [this.producten.vergunning]
-        : [this.producten.melding];
-    
+      ? [this.producten.vergunning]
+      : [this.producten.melding];
+
     const toelichting: string = this.createToelichting(row);
 
     try {
@@ -106,7 +106,7 @@ export class HandleRxMissionMigration {
       console.log(
         `[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`,
       );
-      return { url: zaakResult.url, identification: zaakResult.identificatie };
+      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!zaakGeometrie };
     } catch (error: any) {
       console.error(`CREATING ZAAK FAILED: ${row} ${JSON.stringify(error)}`);
       throw Error(`CREATING ZAAK FAILED: ${row} ${JSON.stringify(error)}`);
@@ -118,16 +118,16 @@ export class HandleRxMissionMigration {
    */
   createToelichting(row: Row): string {
     let toelichting = '';
-    if(row.contactpersoon){ toelichting += `Naam: ${row.contactpersoon},  `;}
-    if(row.email){ toelichting += `Email: ${row.email},   `;}
-    if(row.telefoon){ toelichting += `Tel: ${row.telefoon},   `;}
-    if(row.locatie){ toelichting += `Locatie: ${row.locatie},   `;}
-    if(row.openwavezaaknummer){ toelichting += `Zaaknummers: [ ${row.openwavezaaknummer}, ${row.corsazaaknummer}, ${row.cbopenwavezaaknummer}],   `;}
-    if(row.bsn || row.kvk){ toelichting += `kvk/bsn: ${row.bsn ? 'bsn ' : row.kvk ? 'kvk ' : 'geen'},    `;} // TODO: checken of alsnog bsn/kvk hierbij moet.
-    if(row.zaakomschrijving){ toelichting += `   Omschrijving: ${row.zaakomschrijving},     `;}
-    if(row.producten){ toelichting += `   Producten: ${row.producten},   `;}
-    if(row.urlopenwave){ toelichting += `  UrlOpenWave: ${row.urlopenwave},   `;}
-    if(row.urlcorsa){ toelichting += `  UrlCorsa: ${row.urlcorsa},   `;}
+    if (row.contactpersoon) { toelichting += `Naam: ${row.contactpersoon},  `;}
+    if (row.email) { toelichting += `Email: ${row.email},   `;}
+    if (row.telefoon) { toelichting += `Tel: ${row.telefoon},   `;}
+    if (row.locatie) { toelichting += `Locatie: ${row.locatie},   `;}
+    if (row.openwavezaaknummer) { toelichting += `Zaaknummers: [ ${row.openwavezaaknummer}, ${row.corsazaaknummer}, ${row.cbopenwavezaaknummer}],   `;}
+    if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn ' : row.kvk ? 'kvk ' : 'geen'},    `;} // TODO: checken of alsnog bsn/kvk hierbij moet.
+    if (row.zaakomschrijving) { toelichting += `   Omschrijving: ${row.zaakomschrijving},     `;}
+    if (row.producten) { toelichting += `   Producten: ${row.producten},   `;}
+    if (row.urlopenwave) { toelichting += `  UrlOpenWave: ${row.urlopenwave},   `;}
+    if (row.urlcorsa) { toelichting += `  UrlCorsa: ${row.urlcorsa},   `;}
     // Make sure the char limit is not exceeded
     toelichting = toelichting.length > 999 ? toelichting.substring(0, 999) : toelichting;
     return toelichting;
@@ -231,7 +231,7 @@ export class HandleRxMissionMigration {
       'Ingetrokken': 'INGETROKKEN',
       'Niet geaccepteerd': 'NIET_GEACCEPTEERD',
       'Toegekend': 'TOEGEKEND',
-      'Vergunningvrij': 'TOEGEKEND', // Map "Vergunningvrij" to "TOEGEKEND" if that's correct
+      'Vergunningvrij': 'GEACCEPTEERD', // Map "Vergunningvrij" to "GEACCEPTEERD" if that's correct
       'Verleend': 'VERLEEND',
     };
     const zaakresultaat = row.zaakresultaat?.trim(); // Ensure no trailing spaces

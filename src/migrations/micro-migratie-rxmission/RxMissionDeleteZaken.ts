@@ -101,24 +101,24 @@ export class RxMissionDeleteZaken {
 
       if (!!zaak) {
         // Verwijder rollen, resultaten en eigenschappen voordat de zaak verwijderd wordt
-        try{
-            if(zaak.rollen){
-                for(const rol of zaak.rollen){
-                    await handleMigration.deleteZaakApiObject(rol, 'rol');
-                }
+        try {
+          if (zaak.rollen) {
+            for (const rol of zaak.rollen) {
+              await handleMigration.deleteZaakApiObject(rol, 'rol');
             }
-            if(zaak.eigenschappen){
-                for(const eigenschap of zaak.eigenschappen){
-                    await handleMigration.deleteZaakApiObject(eigenschap, 'eigenschap');
-                }
+          }
+          if (zaak.eigenschappen) {
+            for (const eigenschap of zaak.eigenschappen) {
+              await handleMigration.deleteZaakApiObject(eigenschap, 'eigenschap');
             }
-            if(zaak.resultaten){
-                for(const resultaat of zaak.resultaten){
-                    await handleMigration.deleteZaakApiObject(resultaat, 'resultaat');
-                }
+          }
+          if (zaak.resultaten) {
+            for (const resultaat of zaak.resultaten) {
+              await handleMigration.deleteZaakApiObject(resultaat, 'resultaat');
             }
-        } catch (error: any){
-            console.error(`Failed to rollen and or eigenschappen from zaak ${zaakUrl}: ${error.message}`);
+          }
+        } catch (error: any) {
+          console.error(`Failed to rollen and or eigenschappen from zaak ${zaakUrl}: ${error.message}`);
         }
 
         try {

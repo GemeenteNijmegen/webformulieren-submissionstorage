@@ -136,13 +136,15 @@ export class RxMissionMigratie {
       }
 
       try {
-        const zaak: {url: string; identification: string | undefined} = await handleMigration.createZaak(row);
+        const zaak: {url: string; identification: string | undefined; zaakgeometrieAdded:boolean} = await handleMigration.createZaak(row);
         if (!zaak.url) {
           this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak}. Stop and throw error to be caught`);
           throw Error('Zaak url is undefined.');
           continue;
         }
         this.appendToJsonFile(JsonFileType.CREATED_ZAAKURLS, zaak.url);
+        if (!zaak.zaakgeometrieAdded) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No zaakgeometrie ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+
 
         // status
         const status: boolean = await handleMigration.addStatus(zaak.url);
@@ -232,7 +234,8 @@ export interface Row {
 /**
  * Entry point for the script.
  * one-row.xlsx en small-sample.xlsx voor testen
- * 
+ * openwave-export-20241220.xslx
+ *
  */
 export async function runMigration(inputFileName: string = 'openwave-export-20241220.xlsx'): Promise<void> {
   const migrator = new RxMissionMigratie(inputFileName);
