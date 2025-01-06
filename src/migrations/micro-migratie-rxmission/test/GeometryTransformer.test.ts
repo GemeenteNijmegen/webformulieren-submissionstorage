@@ -18,30 +18,26 @@ describe('GeometryTransformer utility tests', () => {
     },`;
 
     const geojsonOutput = await transformer.processGeometry(rdInput);
-    console.log('GEOJSON: ', geojsonOutput);
-    console.dir(geojsonOutput);
+    expect(geojsonOutput).toBeDefined();
 
   });
   test('transform from excel', async () => {
-
-
     const transformer = new GeometrieTransformer();
 
-    //Process all zaakgeometries and console.log and check if no errors.
-    // Process all rows and log results
-    for (const row of rows) {
-      console.log(`Processing row with OpenWave zaaknummer: ${row.openwavezaaknummer}`);
-      try {
-        const geojsonOutput = await transformer.processGeometry(row.zaakgeometrie);
-        console.log('GEOJSON: ', geojsonOutput);
-        expect(geojsonOutput).toBeDefined(); // Ensure transformation does not return undefined
-      } catch (error) {
-        console.error(`Error processing row: ${row.openwavezaaknummer}`, error);
+      let failed: string[] = [];
+      for (const row of rows) {
+        try {
+            const geometry = await transformer.processGeometry(row.zaakgeometrie);
+            if(!geometry)failed.push(row.openwavezaaknummer);
+
+        } catch (error) {
+          console.error(`Error processing row: ${row.openwavezaaknummer}`, error);
+          failed.push(row.openwavezaaknummer);
+        }
       }
-    }
-
-  });
-  test('coordinates finite check', () => {
-
-  });
+      expect(failed.length).toBe(0);
+      if(failed.length !== 0){
+        console.log(`Excel Geometry transformation test has failures: ${failed}`);
+      }
+    });
 });

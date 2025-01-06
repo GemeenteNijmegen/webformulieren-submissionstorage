@@ -85,17 +85,20 @@ export class HandleRxMissionMigration {
     const zaakGeometrie = await this.geometrieTransformer.processGeometry(
       row.zaakgeometrie,
     ); // Returns undefined on fail
-    // check if row.zaaktype (cases insensitive) contains the word aanvraag
+    // check if row.zaaktype (cases insensitive) contains the word aanvraag - util test shows results with excel possibilities
     const product =
       row.zaaktype && row.zaaktype.toLowerCase().includes('aanvraag')
         ? [this.producten.vergunning]
         : [this.producten.melding];
+    
+    const toelichting: string = this.createToelichting(row);
+
     try {
       const zaakResult: ZakenApiZaakResponse = await this.zgwClient.createZaak({
         productenOfDiensten: product,
-        toelichting: `TESTEN MIGRATIE ${row.openwavezaaknummer}`, // TODO: vullen met rest informatie
+        toelichting: `${toelichting}`,
         zaakgeometrie: zaakGeometrie, // api call works with undefined
-        omschrijving: 'DEVOPS MIGRATIE TESTEN',
+        omschrijving: `Migratie devops ${row.openwavezaaknummer}`,
       } as CreateZaakParameters);
       console.log(
         `[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`,
@@ -106,6 +109,27 @@ export class HandleRxMissionMigration {
       throw Error(`CREATING ZAAK FAILED: ${row} ${JSON.stringify(error)}`);
     }
   }
+  /**
+   * Bundles all fields from migration excel that have no other options to be added to the zaak
+   * Max 1000 chars allowed in toelichting
+   */
+  createToelichting(row: Row): string {
+    let toelichting = '';
+    if(row.contactpersoon){ toelichting += `Naam: ${row.contactpersoon},  `;}
+    if(row.email){ toelichting += `Email: ${row.email},   `;}
+    if(row.telefoon){ toelichting += `Tel: ${row.telefoon},   `;}
+    if(row.locatie){ toelichting += `Locatie: ${row.locatie},   `;}
+    if(row.openwavezaaknummer){ toelichting += `Zaaknummers: [ ${row.openwavezaaknummer}, ${row.corsazaaknummer}, ${row.cbopenwavezaaknummer}],   `;}
+    if(row.bsn || row.kvk){ toelichting += `kvk/bsn: ${row.bsn ? 'bsn ' : row.kvk ? 'kvk ' : 'geen'},    `;} // TODO: checken of alsnog bsn/kvk hierbij moet.
+    if(row.zaakomschrijving){ toelichting += `   Omschrijving: ${row.zaakomschrijving},     `;}
+    if(row.producten){ toelichting += `   Producten: ${row.producten},   `;}
+    if(row.urlopenwave){ toelichting += `  UrlOpenWave: ${row.urlopenwave},   `;}
+    if(row.urlcorsa){ toelichting += `  UrlCorsa: ${row.urlcorsa},   `;}
+    // Make sure the char limit is not exceeded
+    toelichting = toelichting.length > 999 ? toelichting.substring(0, 999) : toelichting;
+    return toelichting;
+  }
+
   /**
    * Levert geen error op
    */
@@ -250,15 +274,15 @@ export class HandleRxMissionMigration {
     return zaak;
   }
   /**
-   * Kijken of dit nodig is om op te ruimen en of we uberhaupt rechten hebben.
+   * Verwijder zaak, rol, eigenschap of iets anders in de zakenapi
    */
-  async deleteZaak(zaakUrl: string): Promise<void> {
+  async deleteZaakApiObject(url: string, type: string = 'zaak'): Promise<void> {
     try {
-      await this.zgwClient.callZaakApi(HttpMethod.Delete, zaakUrl);
-      console.log(`DELETE ${zaakUrl} success}`);
+      await this.zgwClient.callZaakApi(HttpMethod.Delete, url);
+      console.log(`DELETE ${type}:  ${url} success}`);
     } catch (error: any) {
-      console.error(`DELETING ZAAK FAILED: ${zaakUrl}`);
-      throw Error(`DELETING ZAAK FAILED: ${zaakUrl}`);
+      console.error(`DELETING ${type} FAILED: ${url}`);
+      throw Error(`DELETING ${type} FAILED: ${url}`);
     }
   }
 }

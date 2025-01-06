@@ -167,8 +167,8 @@ export class RxMissionMigratie {
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
         succeededRows++;
       } catch (error: any) {
-        this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error}`);
-        this.appendToJsonFile(JsonFileType.FAILURE, { row, error: error.message || error });
+        this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error.message ||error}`);
+        this.appendToJsonFile(JsonFileType.FAILURE, { row, error: error.message ||error });
         failedRows++;
       }
     }
@@ -232,8 +232,9 @@ export interface Row {
 /**
  * Entry point for the script.
  * one-row.xlsx en small-sample.xlsx voor testen
+ * 
  */
-export async function runMigration(inputFileName: string = 'small-sample.xlsx'): Promise<void> {
+export async function runMigration(inputFileName: string = 'zaak_not_created.xlsx'): Promise<void> {
   const migrator = new RxMissionMigratie(inputFileName);
   await migrator.migrateData();
 }

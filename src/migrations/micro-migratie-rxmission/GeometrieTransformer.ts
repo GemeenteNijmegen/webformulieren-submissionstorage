@@ -2,8 +2,9 @@ import proj4 from 'proj4';
 
 /**
  * Class cleans the string input from empty spaces, trailing comma's
- * Transforms from Rijksdriehoek to GeoJSON fo ZGW api calls
- * Returns undefined if transform fails
+ * The cleaning is specific for the input from the migration excel
+ * Transforms from Rijksdriehoek to WSG84 for ZGW api calls
+ * Returns undefined if transform fails to prevent zaak creation
  */
 export class GeometrieTransformer {
   constructor() {
@@ -21,7 +22,7 @@ export class GeometrieTransformer {
 
   /**
    * Cleans and parses the geometry string.
-   * The excel provides a string that cannot be converted without cleaning
+   * The excel provides a string that cannot be converted without cleaning.
    */
   private cleanAndParseGeometry(input: string): any | undefined {
     if (!input) {
@@ -43,37 +44,56 @@ export class GeometrieTransformer {
   }
 
   /**
-   * Transforms coordinates from EPSG:28992 to EPSG:4326.
-   * Only MultiPolygon, Polygon, Point or Multipoint
-   * Omitted LineString, MultiLineString and GeometryCollection (not present in migration)
+   * Transforms coordinates from EPSG:28992 to EPSG:4326 - RD Amersfoort to World Geodetic System 1984 (WGS84).
+   * Only MultiPolygon, Polygon, Point or Multipoint.
+   * Omitted LineString, MultiLineString and GeometryCollection (not present in migration).
    */
-  private async transformCoordinates(coordinates: any): Promise<any> {
-    if (Array.isArray(coordinates[0][0])) {
-      // MultiPolygon or Polygon
-      return coordinates.map((ring: any) =>
-        ring.map((coordinate: number[]) =>
-          proj4('EPSG:28992', 'EPSG:4326', coordinate),
-        ),
-      );
-    } else {
-      // Point or MultiPoint
-      return coordinates.map((coordinate: number[]) =>
-        proj4('EPSG:28992', 'EPSG:4326', coordinate),
-      );
+  async transformCoordinates(coordinates: any, geometryType: string): Promise<any> {
+    switch (geometryType) {
+      case "Point":
+        // Single coordinate pair
+        return proj4('EPSG:28992', 'EPSG:4326', coordinates);
+  
+      case "MultiPoint":
+        // Array of coordinate pairs
+        return coordinates.map((coordinate: number[]) =>
+          proj4('EPSG:28992', 'EPSG:4326', coordinate)
+        );
+  
+      case "Polygon":
+        // Array of rings (each ring is an array of coordinate pairs)
+        return coordinates.map((ring: any) =>
+          ring.map((coordinate: number[]) =>
+            proj4('EPSG:28992', 'EPSG:4326', coordinate)
+          )
+        );
+  
+      case "MultiPolygon":
+        // Array of polygons (each polygon contains rings, and rings contain coordinate pairs)
+        return coordinates.map((polygon: any) =>
+          polygon.map((ring: any) =>
+            ring.map((coordinate: number[]) =>
+              proj4('EPSG:28992', 'EPSG:4326', coordinate)
+            )
+          )
+        );
+  
+      default:
+        throw new Error(`Unsupported geometry type: ${geometryType}`);
     }
   }
 
   /**
    * Transforms a GeoJSON geometry from EPSG:28992 to EPSG:4326.
    */
-  private async transformGeometry(geometry: any): Promise<any | undefined> {
+  async transformGeometry(geometry: any): Promise<any | undefined> {
     if (!geometry || !geometry.type || !geometry.coordinates) {
       console.error('Invalid or unsupported geometry format.');
       return undefined;
     }
 
     try {
-      const transformedCoordinates = await this.transformCoordinates(geometry.coordinates);
+      const transformedCoordinates = await this.transformCoordinates(geometry.coordinates, geometry.type);
 
       return {
         ...geometry,

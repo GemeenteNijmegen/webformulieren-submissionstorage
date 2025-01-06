@@ -84,12 +84,12 @@ export class RxMissionDeleteZaken {
 
       processedCount++;
       console.log(`Processing row ${processedCount} of ${totalZaken} (${((processedCount / totalZaken) * 100).toFixed(2)}%)`);
-      let zaakPresent = false;
+      let zaak: any | undefined = undefined;
 
       try {
-        const zaak = await handleMigration.getSingleZaak(zaakUrl);
-        if (!!zaak) {
-          zaakPresent = true;
+        const singleZaak = await handleMigration.getSingleZaak(zaakUrl);
+        if (!!singleZaak) {
+          zaak = singleZaak;
         }
       } catch (error: any) {
         if (!(error instanceof ZaakNotFoundError)) {
@@ -99,9 +99,30 @@ export class RxMissionDeleteZaken {
         }
       }
 
-      if (zaakPresent) {
+      if (!!zaak) {
+        // Verwijder rollen, resultaten en eigenschappen voordat de zaak verwijderd wordt
+        try{
+            if(zaak.rollen){
+                for(const rol of zaak.rollen){
+                    await handleMigration.deleteZaakApiObject(rol, 'rol');
+                }
+            }
+            if(zaak.eigenschappen){
+                for(const eigenschap of zaak.eigenschappen){
+                    await handleMigration.deleteZaakApiObject(eigenschap, 'eigenschap');
+                }
+            }
+            if(zaak.resultaten){
+                for(const resultaat of zaak.resultaten){
+                    await handleMigration.deleteZaakApiObject(resultaat, 'resultaat');
+                }
+            }
+        } catch (error: any){
+            console.error(`Failed to rollen and or eigenschappen from zaak ${zaakUrl}: ${error.message}`);
+        }
+
         try {
-          await handleMigration.deleteZaak(zaakUrl);
+          await handleMigration.deleteZaakApiObject(zaakUrl);
           deleted++;
         } catch (error: any) {
           console.error(`Failed to delete zaak ${zaakUrl}: ${error.message}`);
