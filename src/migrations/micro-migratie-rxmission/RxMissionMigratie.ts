@@ -122,7 +122,7 @@ export class RxMissionMigratie {
     let processedCount = 0;
     let failedRows = 0;
     let succeededRows = 0;
-
+    
     // Record start time
     const startTime = Date.now();
     console.log(`Starting migration: ${totalRows} rows to process.`);
@@ -184,7 +184,7 @@ export class RxMissionMigratie {
     console.log(`
       **************************************************
       *                                                
-      *  Migration completed                           
+      *  Migration completed for ${process.env.RX_ENV}                          
       *  Success: ${succeededRows}                                    
       *  Failed: ${failedRows}                                     
       *  Total: ${processedCount}

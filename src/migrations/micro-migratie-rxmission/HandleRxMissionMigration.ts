@@ -121,7 +121,7 @@ export class HandleRxMissionMigration {
       console.log(
         `[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`,
       );
-      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!params.zaakGeometrie };
+      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!params.zaakgeometrie };
     } catch (error: any) {
       console.error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
       throw Error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);

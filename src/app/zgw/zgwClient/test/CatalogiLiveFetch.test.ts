@@ -12,8 +12,9 @@ import { HttpMethod, ZgwHttpClient } from '../ZgwHttpClient';
  */
 
 describeIntegration('Live fetch ZGW catalogi config', () => {
-  const PROD: boolean = false; //false is PREPROD
+  const PROD: boolean = process.env.RX_ENV === 'PROD'? true : false ; //false is PREPROD
   const BASE_URL_CATALOGI = PROD ? 'https://catalogi.rx-services.nl/api/v1/' :'https://catalogi.preprod-rx-services.nl/api/v1/';
+  const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: PROD ? process.env.RX_PROD_CLIENT_SECRET! : process.env.RX_PREPROD_CLIENT_SECRET! });
 
   interface ZaakTypeConfig {
     zaakTypeUuid?: string;
@@ -22,7 +23,6 @@ describeIntegration('Live fetch ZGW catalogi config', () => {
   }
 
   const fetchZaakTypeDetails = async (config: ZaakTypeConfig) => {
-    const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
     expect(zgwHttpClient).toBeTruthy(); // Constructs httpclient with local env vars
     let zaakTypeUrl = '';
     let aantalZaakTypes = '';
@@ -143,8 +143,6 @@ describeIntegration('Live fetch ZGW catalogi config', () => {
 
   // Fetch all zaaktypen (paginated API call)
   const fetchAllZaaktypen = async () => {
-    const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
-
     let nextPageUrl: string | null = `${BASE_URL_CATALOGI}zaaktypen/`;
     let allZaaktypen: CatalogiZaaktypeTemp[] = [];
 
@@ -181,8 +179,6 @@ describeIntegration('Live fetch ZGW catalogi config', () => {
 
   // Nieuwe helper functie om eigenschappen te fetchen
   const fetchAllEigenschappenWithZaaktype = async () => {
-    const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: process.env.CLIENT_SECRET! });
-
     let nextPageUrl: string | null = `${BASE_URL_CATALOGI}eigenschappen/`;
     let allEigenschappen: any[] = [];
 
