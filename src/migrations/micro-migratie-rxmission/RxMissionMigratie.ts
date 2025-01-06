@@ -123,6 +123,8 @@ export class RxMissionMigratie {
     let failedRows = 0;
     let succeededRows = 0;
 
+    // Record start time
+    const startTime = Date.now();
     console.log(`Starting migration: ${totalRows} rows to process.`);
 
     for (const row of rows) {
@@ -174,14 +176,20 @@ export class RxMissionMigratie {
         failedRows++;
       }
     }
-
+    const endTime = Date.now();
+    const elapsedMilliseconds = endTime - startTime;
+    const elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
+    const minutes = Math.floor(elapsedSeconds / 60);
+    const seconds = elapsedSeconds % 60;
     console.log(`
       **************************************************
       *                                                
       *  Migration completed                           
       *  Success: ${succeededRows}                                    
       *  Failed: ${failedRows}                                     
-      *  Total: ${processedCount}                                      
+      *  Total: ${processedCount}
+      * 
+      *  ElapsedTime: ${minutes} minutes and ${seconds} seconds.                                       
       *                                                
       **************************************************
       `);
@@ -234,10 +242,10 @@ export interface Row {
 /**
  * Entry point for the script.
  * one-row.xlsx en small-sample.xlsx voor testen
- * openwave-export-20241220.xslx
+ * openwave-export-20241220.xlsx
  *
  */
-export async function runMigration(inputFileName: string = 'zaak_not_created.xlsx'): Promise<void> {
+export async function runMigration(inputFileName: string = 'openwave-export-20241220.xlsx'): Promise<void> {
   const migrator = new RxMissionMigratie(inputFileName);
   await migrator.migrateData();
 }
