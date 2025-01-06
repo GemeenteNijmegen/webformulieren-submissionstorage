@@ -95,21 +95,36 @@ export class HandleRxMissionMigration {
       : [this.producten.melding];
 
     const toelichting: string = this.createToelichting(row);
-
+    let retryWithoutGeometry: boolean = false;
+    const zaakParams: CreateZaakParameters = {
+      productenOfDiensten: product,
+      toelichting: `${toelichting}`,
+      zaakgeometrie: zaakGeometrie, // api call works with undefined
+      omschrijving: `Migratie devops ${row.openwavezaaknummer}`,
+    };
     try {
-      const zaakResult: ZakenApiZaakResponse = await this.zgwClient.createZaak({
-        productenOfDiensten: product,
-        toelichting: `${toelichting}`,
-        zaakgeometrie: zaakGeometrie, // api call works with undefined
-        omschrijving: `Migratie devops ${row.openwavezaaknummer}`,
-      } as CreateZaakParameters);
+      return await this.callCreateZaak(zaakParams, row);
+    } catch (error: any) {
+      if (!retryWithoutGeometry) {
+        retryWithoutGeometry = true;
+        console.error(`Retry create zaak without zaakgeometrie ${row.openwavezaaknummer}`);
+        return this.callCreateZaak({ ...zaakParams, zaakgeometrie: undefined, toelichting: `GEEN LOCATIE OP KAART MOGELIJK. ${toelichting}` }, row);
+      } else {
+        throw Error(`CREATING ZAAK ON RETRY FAILED: ${row.openwavezaaknummer}`);
+      }
+    }
+
+  }
+  async callCreateZaak(params: CreateZaakParameters, row: Row) {
+    try {
+      const zaakResult: ZakenApiZaakResponse = await this.zgwClient.createZaak(params);
       console.log(
         `[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`,
       );
-      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!zaakGeometrie };
+      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!params.zaakGeometrie };
     } catch (error: any) {
-      console.error(`CREATING ZAAK FAILED: ${row} ${JSON.stringify(error)}`);
-      throw Error(`CREATING ZAAK FAILED: ${row} ${JSON.stringify(error)}`);
+      console.error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
+      throw Error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
     }
   }
   /**
@@ -231,7 +246,7 @@ export class HandleRxMissionMigration {
       'Ingetrokken': 'INGETROKKEN',
       'Niet geaccepteerd': 'NIET_GEACCEPTEERD',
       'Toegekend': 'TOEGEKEND',
-      'Vergunningvrij': 'GEACCEPTEERD', // Map "Vergunningvrij" to "GEACCEPTEERD" if that's correct
+      'Vergunningvrij': 'VERGUNNINGSVRIJ', // Map "Vergunningvrij" to "GEACCEPTEERD" if that's correct
       'Verleend': 'VERLEEND',
     };
     const zaakresultaat = row.zaakresultaat?.trim(); // Ensure no trailing spaces

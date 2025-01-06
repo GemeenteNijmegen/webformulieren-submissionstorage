@@ -40,4 +40,22 @@ describe('GeometryTransformer utility tests', () => {
       console.log(`Excel Geometry transformation test has failures: ${failed}`);
     }
   });
+  test('geometries seen as bad input in api call', async () => {
+    const transformer = new GeometrieTransformer();
+
+    let geometries: {[key:string]: any}[] = [];
+    for (const row of rows) {
+      if (parseInt(row.openwavezaaknummer) > 13) {
+        try {
+          const geometry = await transformer.processGeometry(row.zaakgeometrie);
+          if (geometry)geometries.push({ [row.openwavezaaknummer]: { original: row.zaakgeometrie, transformed: geometry } });
+
+        } catch (error) {
+          console.error(`Error processing row: ${row.openwavezaaknummer}`, error);
+
+        }
+      }
+    }
+    console.dir(geometries, { depth: null, colors: true, compact: false });
+  });
 });

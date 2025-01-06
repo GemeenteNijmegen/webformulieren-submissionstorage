@@ -237,7 +237,7 @@ export interface Row {
  * openwave-export-20241220.xslx
  *
  */
-export async function runMigration(inputFileName: string = 'openwave-export-20241220.xlsx'): Promise<void> {
+export async function runMigration(inputFileName: string = 'zaak_not_created.xlsx'): Promise<void> {
   const migrator = new RxMissionMigratie(inputFileName);
   await migrator.migrateData();
 }

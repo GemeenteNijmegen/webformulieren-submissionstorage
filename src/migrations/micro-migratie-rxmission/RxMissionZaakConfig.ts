@@ -77,6 +77,12 @@ export const schaduwzaakPreProd: zgwCatalogiConfig = {
       omschrijving: 'Toegekend',
       default: false,
     },
+    {
+      url: 'https://catalogi.preprod-rx-services.nl/api/v1/resultaattypen/e59743d1-7a22-444a-940f-589aa31103c3',
+      kenmerk: 'VERGUNNINGSVRIJ',
+      omschrijving: 'Vergunningsvrij',
+      default: false,
+    },
   ],
   eigenschappen: [
     {

@@ -78,7 +78,7 @@ export const schaduwZaakCatalogiSetup: ZgwCatalogiZaakTypeSetup = {
   },
   {
     kenmerk: 'VERGUNNINGSVRIJ',
-    omschrijving: 'VErgunningsvrij',
+    omschrijving: 'Vergunningsvrij',
   },
   {
     kenmerk: 'BESCHIKKING_OP_AANVGRAAG',
