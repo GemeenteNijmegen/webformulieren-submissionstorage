@@ -111,50 +111,112 @@ export const schaduwzaakPreProd: zgwCatalogiConfig = {
 
 
 export const schaduwzaakProd: zgwCatalogiConfig = {
-  branch: 'development',
-  environment: 'PREPROD',
-  version: '2024-09-12',
-  versionStartDate: '2024-09-12',
-  zaakTypeIdentificatie: 'NMG-schaduwzaak',
-  zaakTypeUrl:
-    'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/2662aef5-bfab-441a-8c34-81362a454549',
-  zaakTypeBeschrijving: 'Schaduwzaak ODRN',
-  statusTypen: [
+  "branch": "development",
+  "environment": "PROD",
+  "version": "2025-01-06",
+  "versionStartDate": "2025-01-06",
+  "zaakTypeIdentificatie": "NMG-schaduwzaak",
+  "zaakTypeUrl": "https://catalogi.rx-services.nl/api/v1/zaaktypen/85b485b8-4d31-4dd4-9204-9ecbf95ae44e",
+  "zaakTypeBeschrijving": "Schaduwzaak ODRN",
+  "statusTypen": [
     {
-      url:
-        'https://catalogi.preprod-rx-services.nl/api/v1/statustypen/98c676f4-c5ec-468d-984a-94561dd2c19f',
-      kenmerk: 'START',
-      omschrijving: 'Zaak gestart',
-      default: true,
-    },
+      "url": "https://catalogi.rx-services.nl/api/v1/statustypen/c4f9774c-4d30-4817-bcb9-14edaaf44546",
+      "kenmerk": "START",
+      "omschrijving": "Zaak gestart",
+      "default": true
+    }
   ],
-  resultaatTypen: [],
-  eigenschappen: [
+  "resultaatTypen": [
     {
-      url:
-        'https://catalogi.preprod-rx-services.nl/api/v1/eigenschappen/68eb4bd0-ef05-4d0e-a4b7-c6a91cedf2a6',
-      kenmerk: 'ZAAKNUMMER_OPENWAVE',
-      naam: 'Zaaknummer OpenWave',
-      default: false,
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/04a67be9-c5c8-41a2-a870-3a78f07a8f8f",
+      "kenmerk": "INGETROKKEN",
+      "omschrijving": "Ingetrokken",
+      "default": false
     },
     {
-      url:
-        'https://catalogi.preprod-rx-services.nl/api/v1/eigenschappen/3afb18f8-3a36-4170-bde1-e28d2b58d4f2',
-      kenmerk: 'ZAAKNUMMER_CORSA',
-      naam: 'Zaaknummer Corsa',
-      default: false,
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/c94a9d27-a64d-4738-97e3-ad248c85833c",
+      "kenmerk": "TOEGEKEND",
+      "omschrijving": "Toegekend",
+      "default": false
     },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/fff32a3f-3afe-4d8d-95bf-9a4d546a2551",
+      "kenmerk": "NIET_GEACCEPTEERD",
+      "omschrijving": "Niet geaccepteerd",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/5bc131a7-5527-4f91-9405-e4a4e6f55527",
+      "kenmerk": "GEACCEPTEERD",
+      "omschrijving": "Geaccepteerd",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/9fc3148a-aa83-42a8-9acc-0e3a1c08c83e",
+      "kenmerk": "GEWEIGERD",
+      "omschrijving": "Geweigerd",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/1a4660ad-5bc5-42fe-a750-7b92666a0a03",
+      "kenmerk": "VERGUNNINGSVRIJ",
+      "omschrijving": "Vergunningsvrij",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/19ee0604-6825-4aeb-9832-51b958d061d7",
+      "kenmerk": "GEDEELTELIJK_VERLEEND",
+      "omschrijving": "Gedeeltelijkverleend",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/f4516691-884b-492c-a04e-e52dfa07439f",
+      "kenmerk": "BUITEN_BEHANDELING",
+      "omschrijving": "Buiten behandeling",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/05eb4a1a-c09a-4bce-973e-53f92f5f6c85",
+      "kenmerk": "AFGEBROKEN",
+      "omschrijving": "Afgebroken",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/1d885624-9b2f-46bf-b3f0-1f90343dc6a8",
+      "kenmerk": "VERLEEND",
+      "omschrijving": "Verleend",
+      "default": false
+    },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/resultaattypen/b8fa8b7c-5a9c-4ef8-9546-0871012e3482",
+      "kenmerk": "AFGESLOTEN",
+      "omschrijving": "Afgesloten",
+      "default": false
+    }
   ],
-  informatieObjectTypen: [],
-  rolTypen: [
+  "eigenschappen": [
     {
-      url:
-        'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/631fcf75-73fc-4333-8acb-23f80788f181',
-      kenmerk: 'INITIATOR',
-      omschrijving: 'Initiator',
-      default: true,
+      "url": "https://catalogi.rx-services.nl/api/v1/eigenschappen/82cc8568-da2f-48a4-a90d-90b06cce16d5",
+      "kenmerk": "ZAAKNUMMER_OPENWAVE",
+      "naam": "Zaaknummer OpenWave",
+      "default": false
     },
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/eigenschappen/9ae50317-1a23-484a-83dd-b2c2d3d5259e",
+      "kenmerk": "ZAAKNUMMER_CORSA",
+      "naam": "Zaaknummer Corsa",
+      "default": false
+    }
   ],
+  "informatieObjectTypen": [],
+  "rolTypen": [
+    {
+      "url": "https://catalogi.rx-services.nl/api/v1/roltypen/e1a7733e-bc9b-4898-9ee7-060b14296a02",
+      "kenmerk": "INITIATOR",
+      "omschrijving": "Initiator",
+      "default": true
+    }
+  ]
 };
 
 

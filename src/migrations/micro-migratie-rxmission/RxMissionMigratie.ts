@@ -1,3 +1,4 @@
+import * as readline from 'readline';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
@@ -20,10 +21,9 @@ export class RxMissionMigratie {
 
   constructor(inputFileName: string = 'small-sample.xlsx') {
     if (process.env.RX_ENV !== 'PREPROD') {
-      throw new Error('Environment is not PREPROD. Operation aborted.');
+      // throw new Error('Environment is not PREPROD. Operation aborted.');
+      console.log('Running on PROD: ', process.env.RX_ENV );
     }
-
-    console.log('Environment verified: PREPROD');
 
     const timestamp = Date.now(); // Epoch in milliseconds
     this.baseOutputDir = path.join(__dirname, 'output');
@@ -117,7 +117,7 @@ export class RxMissionMigratie {
    */
   public async migrateData(): Promise<void> {
     const rows = this.readExcelFile();
-    const handleMigration = new HandleRxMissionMigration();
+    const handleMigration = new HandleRxMissionMigration(process.env.RX_ENV === 'PROD');
     const totalRows = rows.length;
     let processedCount = 0;
     let failedRows = 0;
@@ -245,9 +245,38 @@ export interface Row {
  * openwave-export-20241220.xlsx
  *
  */
-export async function runMigration(inputFileName: string = 'openwave-export-20241220.xlsx'): Promise<void> {
+export async function runMigration(inputFileName: string = 'one-row.xlsx'): Promise<void> {
+  const confirm = await confirmProdEnvironment(inputFileName);
+  if (!confirm) {
+    console.log('Migration aborted.');
+    process.exit(0);
+  }
   const migrator = new RxMissionMigratie(inputFileName);
   await migrator.migrateData();
+}
+
+/**
+ * Prompt user for confirmation when running on PROD
+ */
+async function confirmProdEnvironment(fileName: string): Promise<boolean> {
+  if (process.env.RX_ENV !== 'PROD') {
+    return true; // Skip confirmation if not PROD
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) => {
+    rl.question(
+      `WARNING: You are about to run the migration ${fileName} on PROD. Are you sure you want to proceed? (yes/no): `,
+      (answer) => {
+        rl.close();
+        resolve(answer.toLowerCase() === 'yes');
+      }
+    );
+  });
 }
 
 if (require.main === module) {
