@@ -15,6 +15,11 @@ Met name checken: zaaktype, zaakresultaat, zaakgeometrie en velden die de rol aa
 - Info zaaktype, rol, status, product, etc...
 - Commando om uit te voeren staat boven RxMissionMigratie class en RxMissionDeleteZaken class.
 
+Specifieke projenrc libraries nodig hiervoor. 
+- xlsx met specifieke versie, anders pakt projen een versie boven 1 die onjuist is
+- proj4 voor conversie zaakgeometrie
+- ts-node voor lokaal uitvoeren van script
+
 ### Doel
 1200 records vanuit de excel middels api calls naar RxMission zetten. Later volgt nog een andere migratie/excel.
 

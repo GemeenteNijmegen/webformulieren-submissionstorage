@@ -20,6 +20,6 @@ describe('Utils in handlemigration', () => {
               : 'NMG-00015 Kopie melding';
       productResult.push(`${zaaktype} : ${product}`);
     }
-    console.log(productResult);
+    console.debug(productResult);
   });
 });

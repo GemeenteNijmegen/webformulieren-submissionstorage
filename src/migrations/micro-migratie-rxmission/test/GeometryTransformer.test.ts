@@ -37,7 +37,7 @@ describe('GeometryTransformer utility tests', () => {
     }
     expect(failed.length).toBe(0);
     if (failed.length !== 0) {
-      console.log(`Excel Geometry transformation test has failures: ${failed}`);
+      console.debug(`Excel Geometry transformation test has failures: ${failed}`);
     }
   });
   test('geometries seen as bad input in api call', async () => {
@@ -56,6 +56,8 @@ describe('GeometryTransformer utility tests', () => {
         }
       }
     }
-    console.dir(geometries, { depth: null, colors: true, compact: false });
+    if (process.env.DEBUG) {
+      console.dir(geometries, { depth: null, colors: true, compact: false });
+    }
   });
 });
