@@ -81,12 +81,15 @@ export class RxMissionDeleteZaken {
     let notFound = 0;
     let deleted = 0;
 
-    console.log(`Starting migration: ${totalZaken} rows to process.`);
+    // Record start time
+    const startTime = Date.now();
+    console.log(`Starting delete: ${totalZaken} rows to process.`);
 
     for (const zaakUrl of this.zaakurls) {
 
       processedCount++;
       console.log(`Processing row ${processedCount} of ${totalZaken} (${((processedCount / totalZaken) * 100).toFixed(2)}%)`);
+      await new Promise(resolve => setTimeout(resolve, 500)); // To prevent Rate Limit error
       let zaak: any | undefined = undefined;
 
       try {
@@ -132,13 +135,20 @@ export class RxMissionDeleteZaken {
         }
       }
     }
+    const endTime = Date.now();
+    const elapsedMilliseconds = endTime - startTime;
+    const elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
+    const minutes = Math.floor(elapsedSeconds / 60);
+    const seconds = elapsedSeconds % 60;
 
     console.log(`
       **************************************************
-      *  Delete completed                              
+      *  Delete completed on ${process.env.RX_ENV}                              
       *  NotFound: ${notFound}                         
       *  Deleted: ${deleted}                           
-      *  Total Processed: ${processedCount}            
+      *  Total Processed: ${processedCount}     
+      * 
+      *  ElapsedTime: ${minutes} minutes and ${seconds} seconds.          
       **************************************************
     `);
   }
