@@ -20,9 +20,11 @@ export class HandleRxMissionMigration {
   private zaakConfig: ZgwCatalogiConfig;
   private producten: { melding: string; vergunning: string };
   private geometrieTransformer: GeometrieTransformer;
+  private envProd: boolean;
 
   // Default PREPROD
   constructor(PROD: boolean = false) {
+    this.envProd = PROD; 
     if (PROD) {
       // This line prevents execution on production. Please comment to execute on prod.
       // One of the many fail-safes to make sure you are dealing with prod.
@@ -136,12 +138,19 @@ export class HandleRxMissionMigration {
     if (row.email) { toelichting += `Email: ${row.email},   `;}
     if (row.telefoon) { toelichting += `Tel: ${row.telefoon},   `;}
     if (row.locatie) { toelichting += `Locatie: ${row.locatie},   `;}
-    if (row.openwavezaaknummer) { toelichting += `Zaaknummers: [ ${row.openwavezaaknummer}, ${row.corsazaaknummer}, ${row.cbopenwavezaaknummer}],   `;}
-    if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn ' : row.kvk ? 'kvk ' : 'geen'},    `;} // TODO: checken of alsnog bsn/kvk hierbij moet.
+    // Only add bsn or kvk in PROD
+    if(this.envProd){
+      if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn: ' + row.bsn : row.kvk ? 'kvk: ' + row.kvk : 'geen'},    `;}
+    }
+    else {
+      if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn: ' : row.kvk ? 'kvk: ' : 'geen'},    `;}
+    }
     if (row.zaakomschrijving) { toelichting += `   Omschrijving: ${row.zaakomschrijving},     `;}
     if (row.producten) { toelichting += `   Producten: ${row.producten},   `;}
-    if (row.urlopenwave) { toelichting += `  UrlOpenWave: ${row.urlopenwave},   `;}
     if (row.urlcorsa) { toelichting += `  UrlCorsa: ${row.urlcorsa},   `;}
+    if (row.urlopenwave) { toelichting += `  UrlOpenWave: ${row.urlopenwave},   `;}
+    if (row.openwavezaaknummer) { toelichting += `Zaaknummers: [ openwave: ${row.openwavezaaknummer}, corsa: ${row.corsazaaknummer}, cb_openwave: ${row.cbopenwavezaaknummer}],   `;}
+
     // Make sure the char limit is not exceeded
     toelichting = toelichting.length > 999 ? toelichting.substring(0, 999) : toelichting;
     return toelichting;
