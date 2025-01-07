@@ -4,7 +4,7 @@ import proj4 from 'proj4';
  * Class cleans the string input from empty spaces, trailing comma's
  * The cleaning is specific for the input from the migration excel
  * Transforms from Rijksdriehoek to WSG84 for ZGW api calls
- * Returns undefined if transform fails to prevent zaak creation
+ * Returns undefined if transform fails to prevent failed zaak creation
  */
 export class GeometrieTransformer {
   constructor() {

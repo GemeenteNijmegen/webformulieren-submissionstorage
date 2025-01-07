@@ -14,7 +14,10 @@ import { HttpMethod, ZgwHttpClient } from '../ZgwHttpClient';
 describeIntegration('Live fetch ZGW catalogi config', () => {
   const PROD: boolean = process.env.RX_ENV === 'PROD'? true : false ; //false is PREPROD
   const BASE_URL_CATALOGI = PROD ? 'https://catalogi.rx-services.nl/api/v1/' :'https://catalogi.preprod-rx-services.nl/api/v1/';
-  const zgwHttpClient = new ZgwHttpClient({ clientId: process.env.CLIENT_ID!, clientSecret: PROD ? process.env.RX_PROD_CLIENT_SECRET! : process.env.RX_PREPROD_CLIENT_SECRET! });
+  const zgwHttpClient = new ZgwHttpClient({
+    clientId: process.env.CLIENT_ID!,
+    clientSecret: PROD ? process.env.RX_PROD_CLIENT_SECRET! : process.env.RX_PREPROD_CLIENT_SECRET!,
+  });
 
   interface ZaakTypeConfig {
     zaakTypeUuid?: string;

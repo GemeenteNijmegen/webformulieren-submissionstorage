@@ -1,43 +1,62 @@
 #### RxMission Migration
-Handig om bij de mirgatie de nieuwe zaaknummers in RxMission te koppelen aan de excel rijen (of op zijn minst openwave casenummer).
-De map src/migrations/micro-migratie-rxmission/sensitive-files is in gitignore uitgesloten. Hier kunnen eventueel lokaal bestanden geplaats worden.
+De scripts kunnen lokaal uitgevoerd worden. Niks hoeft gedeployed te worden.
+
+De map src/migrations/micro-migratie-rxmission/sensitive-files is in gitignore uitgesloten. 
+Hier kunnen de excels geplaatst worden die gemigreerd moeten worden.
+De huidige setup is specifiek voor die migratie excel. Gebaseerd op de kolomnamen en mappings met mogelijke velden (zaaktype en zaakresultaat).
+Bij hergebruik moet dus goed gekeken worden of de kolommen en inhoud ervan nog overeen komen.
+Met name checken: zaaktype, zaakresultaat, zaakgeometrie en velden die de rol aanmaken.
 
 ### Tools en benodigdheden
 - Postman RxMission Collectie met RxMission preprod en prod environment
-- Lokale .env file met id en secrets (gitignored)
+- Lokale .env file met id en secrets (gitignored) bij teamgenoot verkrijgen of met Postman settings invullen. Kijk in env.example voor benodigdheden.
 - Excels met data om te migreren (originele excel heeft kolomnamen die moeilijk te verwerken zijn. Nieuwe kolomnamen in interface Row in ./RxMissionMigratie.ts)
-- Prettig om toegang te hebben tot RxMission op preprod (via functioneel beheer)
+- Prettig om toegang te hebben tot RxMission op preprod (via functioneel beheer) om te kunnen checken of ze goed landen
 - Info zaaktype, rol, status, product, etc...
+- Commando om uit te voeren staat boven RxMissionMigratie class en RxMissionDeleteZaken class.
 
 ### Doel
-
 1200 records vanuit de excel middels api calls naar RxMission zetten. Later volgt nog een andere migratie/excel.
+
+### Veiligheid productie
+Om er zeker van te zijn dat de migratie niet lukraak op productie uitgevoerd wordt zijn er wat extra checks ingevoerd.
+- .env moet naar PROD wijzen in RX_ENV
+- In HandleRxMissionMigration staat een standaard error die gegooid wordt als prod gebruikt wordt. Comment deze.
+- Er volgt een prompt waarbij je met yes moet antwoorden als je op prod uit wil voeren.
+
+### Delete
+De Delete kan in principe niet uitgevoerd worden op productie. Hier zijn geen rechten voor.
+De RxMissionDeleteZaken is gemaakt om bij het testen snel alle gemaakte zaken op preprod te kunnen verwijderen. 
+En als backup om op prod een fout te herstellen indien nodig, maar dan moeten eerst Delete rechten toegekend worden.
+Commanda staat boven de class RxMissionDeleteZaken
 
 #### Opzet
 Er wordt gebruik gemaakt van de bestaande code die in ./webformulieren-submissionstorage/src/app/zgw/rxMissionZgwHandler staat.
 ZgwClient kan hergebruikt worden voor deze eenmalige migratie.
-Begin gemaakt in src/migrations/micro-migratie-rxmission
+
 
 #### Zaak
 1. Zaaktype: Overal hetzelfde zaaktype ODRN Schaduwzaak
 
 2. Product
 Twee soorten afhankelijk van zaaktype. 
-Zodra het woord "aanvraag" in de excel kolom Zaaktype (case sensisitivity) staat: product NMG-000012 Kopie verleende vergunning
+Zodra het woord "aanvraag", "besluit" of "beschik" in de excel kolom Zaaktype (case sensisitivity) staat: product NMG-000012 Kopie verleende vergunning
 Zodra het woord "melding" in de excel kolom Zaaktype staat: product NMG-000015 Kopie melding
 
 3. Zaakgeometrie
-Proberen om te zetten naar zaakgeometrie indien mogelijk. Is Geojson formaat in excel en post Zaak
+Proberen om te zetten naar zaakgeometrie indien mogelijk. RD naar WSG84 conversie.
+- Indien de conversie faalt wordt undefined teruggegeven
+- Indien de api call createzaak faalt, dan wordt nog een poging gedaan zonder zaakgeometrie (conversie kan goed gegaan, maar api call daarna niet)
+- Indien zaakgeometrie undefined is, zal dit gemeld worden in de error log
 
 4. Toelichting
 Het veld toelichting is de enige die genoeg tekens toestaat om extra informatie in te plaatsen.
 Voor gemak hier onderdelen uit de excel toevoegen om snel te kunnen verwerken: 
 - email, telefoon, naam (want rol wil niet altijd goed werken hiermee)
-- adres
-- eventueel activiteiten als het mogelijk is (niet te veel tijd aan besteden als het niet past of moeilijk doet)
-Niet: url's
-
-Corsa en openwave zaaknummers gaan in eigenschappen
+- locatie
+- andere velden uit de excel
+- doet een check of er meer dan 1000 chars zijn en haalt alles weg na die 1000. Zet te belangrijkste velden dus aan het begin.
+- geen bsn of kvk nummer, alleen of deze aanwezig is
 
 #### Status
 Zaak gestart
@@ -81,7 +100,7 @@ Niet nodig (G) – 1 jaar
 
 
 #### Producten
-Producten komen niet uit de api, wij kunnen alleen bij preprod via de applicatie network calls. Producten uit productie moet door functioneel beheer of RxMission gegeven worden.
+Producten komen niet uit de api, wij kunnen alleen bij preprod via de applicatie network calls (browser developer tools Network Call product op de juiste omgeving). Producten uit productie moet door functioneel beheer of RxMission gegeven worden.
   {
     "url": "https://producten.preprod-rx-services.nl/api/v1/product/fe7c825a-4a8c-4f11-18e1-08dcce4a3fa1",
     "id": "fe7c825a-4a8c-4f11-18e1-08dcce4a3fa1",

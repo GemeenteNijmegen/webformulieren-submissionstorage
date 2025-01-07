@@ -11,6 +11,9 @@ dotenv.config({ path: './.env' });
 
 /**
  * Run with npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionDeleteZaken.ts
+ * Deletes all zaken in all files in the `folderName` with default ztobedeleted
+ * Expects an array of zaakUrls in the files - which the migration creates in createdzaakurls.json
+ * If the zaak is not found it will not delete. You can place as many files in the folder, even if they already have been deleted.
  */
 export class RxMissionDeleteZaken {
   private deleteFolder: string;
@@ -118,7 +121,7 @@ export class RxMissionDeleteZaken {
             }
           }
         } catch (error: any) {
-          console.error(`Failed to rollen and or eigenschappen from zaak ${zaakUrl}: ${error.message}`);
+          console.error(`Failed to delete rollen, resultaten and or eigenschappen from zaak ${zaakUrl}: ${error.message}`);
         }
 
         try {

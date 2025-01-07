@@ -3,7 +3,7 @@
  * Make sure you have client id and secret set in .env file
  */
 
-export interface zgwCatalogiConfig {
+export interface ZgwCatalogiConfig {
   branch?: 'development'|'acceptance'|'main'; // On which brqanch was it generated
   environment?: 'PREPROD'|'PROD'; // Which environment for RxMission
   version?: string; // Version ZaakType based on versiedatum

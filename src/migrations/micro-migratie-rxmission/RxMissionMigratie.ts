@@ -1,6 +1,6 @@
-import * as readline from 'readline';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as readline from 'readline';
 import * as dotenv from 'dotenv';
 import { readFile, utils } from 'xlsx';
 import { HandleRxMissionMigration } from './HandleRxMissionMigration';
@@ -122,7 +122,7 @@ export class RxMissionMigratie {
     let processedCount = 0;
     let failedRows = 0;
     let succeededRows = 0;
-    
+
     // Record start time
     const startTime = Date.now();
     console.log(`Starting migration: ${totalRows} rows to process.`);
@@ -274,7 +274,7 @@ async function confirmProdEnvironment(fileName: string): Promise<boolean> {
       (answer) => {
         rl.close();
         resolve(answer.toLowerCase() === 'yes');
-      }
+      },
     );
   });
 }

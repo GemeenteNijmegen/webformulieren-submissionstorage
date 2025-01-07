@@ -1,4 +1,4 @@
-import { zgwCatalogiConfig } from './GenerateConfigInterfaces';
+import { ZgwCatalogiConfig } from './GenerateConfigInterfaces';
 import { GeometrieTransformer } from './GeometrieTransformer';
 import { Row } from './RxMissionMigratie';
 import * as ZAAK_CONFIG from './RxMissionZaakConfig';
@@ -12,46 +12,45 @@ import {
 import { HttpMethod } from '../../app/zgw/zgwClient/ZgwHttpClient';
 
 export class HandleRxMissionMigration {
-  // Rol
-  // Zaakeigenschappen
-  // Status
-  // Zaakresultaat
 
   // Eenmalig ZgwClient aanmaken
   private zgwClient: ZgwClient;
   private zakenBaseUrl: string;
   private documentenBaseUrl: string;
-  private zaakConfig: zgwCatalogiConfig;
+  private zaakConfig: ZgwCatalogiConfig;
   private producten: { melding: string; vergunning: string };
   private geometrieTransformer: GeometrieTransformer;
 
-  // Nu PROD hard op false, later in eindfase toevoegen om PROD te kunnen kiezen
+  // Default PREPROD
   constructor(PROD: boolean = false) {
     if (PROD) {
+      // This line prevents execution on production. Please comment to execute on prod.
+      // One of the many fail-safes to make sure you are dealing with prod.
       throw new Error(
         'Environment is PREPROD. Operation aborted. Delete this check once you are ready to migrate.',
       );
     }
-
-    console.log('Environment verified: PREPROD');
     if (PROD) {
       console.log(`
         **************************************************
-        *                                                *
-        *  WAARSCHUWING: MIGRATIE WORDT UITGEVOERD IN PROD  *
-        *                                                *
+        *                                                
+        *  WAARSCHUWING: MIGRATIE WORDT UITGEVOERD IN PROD  
+        *                                                
         **************************************************
         `);
     }
     if (!process.env.RX_CLIENT_ID) {
       console.log(`
         **************************************************
-        *                                                *
-        *  WAARSCHUWING: GEEN WAARDE GEVONDEN IN .ENV  *
-        *                                                *
+        *                                                
+        *  WAARSCHUWING: GEEN WAARDE GEVONDEN IN .ENV  
+        *                                                
         **************************************************
         `);
     }
+    /**
+     * Basic setup of the client, geometryTransformer and zaakconfig based on the environment
+     */
     const BASE_URL = PROD
       ? process.env.RX_PROD_BASE_URL
       : process.env.RX_PREPROD_BASE_URL;
@@ -85,7 +84,7 @@ export class HandleRxMissionMigration {
     const zaakGeometrie = await this.geometrieTransformer.processGeometry(
       row.zaakgeometrie,
     ); // Returns undefined on fail
-    // check if row.zaaktype (cases insensitive) contains the word aanvraag, belsuit or beschik - util test shows results with excel possibilities
+    // check if row.zaaktype in excel (cases insensitive) contains the word aanvraag, besluit or beschik - util test shows results with excel possibilities
     const product =
     row.zaaktype &&
     (row.zaaktype.toLowerCase().includes('aanvraag') ||
@@ -203,6 +202,7 @@ export class HandleRxMissionMigration {
 
   /**
    * Rol toevoegen indien mogelijk
+   * No errors on fail, but undefined returned
    */
   async addRol(zaakUrl: string, row: Row): Promise<string | undefined> {
     if (!row.typecontact || (!row.bsn && !row.kvk)) {
@@ -234,6 +234,10 @@ export class HandleRxMissionMigration {
     }
   }
 
+  /**
+   * Resultaat mapping specific for migration excel
+   * Returns undefined, no error on fail
+   */
   async addResultaat(zaakUrl: string, row: Row) {
     // Map row.zaakresultaat values to config `kenmerk` values
     const resultaatMapping: Record<string, string> = {
@@ -246,7 +250,7 @@ export class HandleRxMissionMigration {
       'Ingetrokken': 'INGETROKKEN',
       'Niet geaccepteerd': 'NIET_GEACCEPTEERD',
       'Toegekend': 'TOEGEKEND',
-      'Vergunningvrij': 'VERGUNNINGSVRIJ', // Map "Vergunningvrij" to "GEACCEPTEERD" if that's correct
+      'Vergunningvrij': 'VERGUNNINGSVRIJ',
       'Verleend': 'VERLEEND',
     };
     const zaakresultaat = row.zaakresultaat?.trim(); // Ensure no trailing spaces
@@ -282,7 +286,7 @@ export class HandleRxMissionMigration {
   }
 
   /**
-   * get zaak om te checken of de delete gewerkt heeft
+   * Get zaak to check if a zaak has been deleted
    */
   async getSingleZaak(zaakUrl: string) {
     const zaak = await this.zgwClient.callZaakApi(HttpMethod.Get, zaakUrl);
@@ -292,7 +296,8 @@ export class HandleRxMissionMigration {
     return zaak;
   }
   /**
-   * Verwijder zaak, rol, eigenschap of iets anders in de zakenapi
+   * Verwijder zaak, rol, resultaat, status, eigenschap of iets anders in de zakenapi.
+   * Geef het type mee om duidelijke foutmeldingen te krijgen.
    */
   async deleteZaakApiObject(url: string, type: string = 'zaak'): Promise<void> {
     try {

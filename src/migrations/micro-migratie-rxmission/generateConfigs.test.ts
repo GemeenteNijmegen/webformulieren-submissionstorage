@@ -1,14 +1,19 @@
 import fs from 'fs';
 import path from 'path';
-import { ZgwCatalogiZaakTypeSetup, aanvraagBeschikkingZaakCatalogiSetup, schaduwZaakCatalogiSetup, zgwCatalogiConfig } from './GenerateConfigInterfaces';
+import { ZgwCatalogiZaakTypeSetup, aanvraagBeschikkingZaakCatalogiSetup, schaduwZaakCatalogiSetup, ZgwCatalogiConfig } from './GenerateConfigInterfaces';
 import { describeIntegration } from '../../app/test-utils/describeIntegration';
 import { HttpMethod, ZgwHttpClient } from '../../app/zgw/zgwClient/ZgwHttpClient';
 
-
+/**
+ * This test generates the config for a zaak from the zgw catalogi
+ * Retrieves the latest version of the zaak
+ * Retrieves statustypen, roltypen, eiegenschappen en resultaattypen op basis van de ZgwCatalogiZaakTypeSetup
+ * Returns a ZgwCatalogiConfig in a file in ./output (untracked) with the zaak name and a timestamp
+ */
 const PROD: boolean = process.env.RX_ENV == 'PROD' ? true : false; // false is PREPROD
 const BASE_URL_CATALOGI = PROD
-  ? 'https://catalogi.rx-services.nl/api/v1/'
-  : 'https://catalogi.preprod-rx-services.nl/api/v1/';
+  ? `https://catalogi.${process.env.RX_PREPROD_BASE_URL}/api/v1/`
+  : `https://catalogi.${process.env.RX_PROD_BASE_URL}/api/v1/`;
 
 const zgwHttpClient = new ZgwHttpClient({
   clientId: process.env.RX_CLIENT_ID!,
@@ -18,7 +23,7 @@ const zgwHttpClient = new ZgwHttpClient({
 export async function fetchZaakTypeConfig(
   zaaktypeIdentificatie: string,
   zaakTypeSetup: ZgwCatalogiZaakTypeSetup,
-): Promise<zgwCatalogiConfig> {
+): Promise<ZgwCatalogiConfig> {
   // Haal zaaktypen op, kunnen er meerdere zijn in verschillende versies
   const zaaktypenResponse = await zgwHttpClient.request(HttpMethod.Get,
     `${BASE_URL_CATALOGI}zaaktypen?identificatie=${zaaktypeIdentificatie}`,
@@ -88,8 +93,7 @@ export async function fetchZaakTypeConfig(
     : [];
   const rolTypen = await fetchDetails(latestZaakType.roltypen, zaakTypeSetup.rolTypen);
 
-  // Stap 5: Bouw de configuratie op
-  const config: zgwCatalogiConfig = {
+  const config: ZgwCatalogiConfig = {
     branch: 'development', // Of 'acceptance' / 'main' afhankelijk van je omgeving
     environment: PROD ? 'PROD' : 'PREPROD',
     version: latestZaakType.versiedatum,
