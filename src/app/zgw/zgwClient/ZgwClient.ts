@@ -126,11 +126,14 @@ export class ZgwClient {
       // Can be undefined, which auto-creates zaakidentificatie
       identificatie: params.identificatie,
       zaaktype: params.zaaktype ?? this.options.zaaktype,
-      omschrijving: params.formulier, //Nog vervangen voor omschrijving en ergens de formulierkey in verstoppen
+      omschrijving: params.omschrijving ?? params.formulier,
       toelichting: params.toelichting ?? `Formulierinzending: "${params.formulier}" met kenmerk ${params.formulierKey}.`,
       productenOfDiensten: params.productenOfDiensten,
     };
-    const zaak: ZakenApiZaakResponse = await this.callZaakApi(HttpMethod.Post, 'zaken', zaakRequest);
+
+    // Add any additional parameters dynamically without overwriting explicitly defined keys
+    const finalZaakRequest = { ...params, ...zaakRequest };
+    const zaak: ZakenApiZaakResponse = await this.callZaakApi(HttpMethod.Post, 'zaken', finalZaakRequest);
     if (!zaak.url) {
       throw Error(`Creating zaak with identificatie ${params.identificatie} failed. Expected object with url.`);
     }
@@ -283,9 +286,8 @@ export class ZgwClient {
     return token;
   }
 
-  private async callZaakApi(method: HttpMethod, pathOrUrl: string, data?: any) {
+  async callZaakApi(method: HttpMethod, pathOrUrl: string, data?: any) {
     this.checkConfiguration();
-
     let url = pathOrUrl;
     if (!pathOrUrl.startsWith('https://')) {
       url = this.joinUrl(this.options.zakenApiUrl, pathOrUrl);
@@ -370,6 +372,7 @@ export interface CreateZaakParameters {
   toelichting?: string;
   omschrijving?: string;
   productenOfDiensten?: string[];
+  [key: string]: any; // Allow additional unknown properties
 }
 
 export interface AddZaakStatusParameters {
