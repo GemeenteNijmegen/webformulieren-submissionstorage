@@ -24,7 +24,7 @@ export class HandleRxMissionMigration {
 
   // Default PREPROD
   constructor(PROD: boolean = false) {
-    this.envProd = PROD; 
+    this.envProd = PROD;
     if (PROD) {
       // This line prevents execution on production. Please comment to execute on prod.
       // One of the many fail-safes to make sure you are dealing with prod.
@@ -139,10 +139,9 @@ export class HandleRxMissionMigration {
     if (row.telefoon) { toelichting += `Tel: ${row.telefoon},   `;}
     if (row.locatie) { toelichting += `Locatie: ${row.locatie},   `;}
     // Only add bsn or kvk in PROD
-    if(this.envProd){
+    if (this.envProd) {
       if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn: ' + row.bsn : row.kvk ? 'kvk: ' + row.kvk : 'geen'},    `;}
-    }
-    else {
+    } else {
       if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn: ' : row.kvk ? 'kvk: ' : 'geen'},    `;}
     }
     if (row.zaakomschrijving) { toelichting += `   Omschrijving: ${row.zaakomschrijving},     `;}
