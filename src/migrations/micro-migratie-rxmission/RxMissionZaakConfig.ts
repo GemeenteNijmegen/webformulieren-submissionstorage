@@ -106,6 +106,12 @@ export const schaduwzaakPreProd: ZgwCatalogiConfig = {
       omschrijving: 'Initiator',
       default: true,
     },
+    {
+      url: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/7d033373-5187-4a5e-a7ba-04a232aaa608',
+      kenmerk: 'BELANGHEBBENDE',
+      omschrijving: 'Belanghebbende',
+      default: false,
+    },
   ],
 };
 
@@ -216,6 +222,12 @@ export const schaduwzaakProd: ZgwCatalogiConfig = {
       omschrijving: 'Initiator',
       default: true,
     },
+    {
+      url: 'https://catalogi.rx-services.nl/api/v1/roltypen/48991045-063c-4ad4-8c2c-4f47c4ff6845',
+      kenmerk: 'BELANGHEBBENDE',
+      omschrijving: 'Belanghebbende',
+      default: false,
+    },
   ],
 };
 
@@ -223,14 +235,17 @@ export const schaduwzaakProd: ZgwCatalogiConfig = {
 /**
  * Producten zijn apart opgenomen, aangezien deze niet uit de catalogus gehaald kunnen worden
  */
-export const schaduwzaakPreProdProducten: {melding: string; vergunning: string} = {
+export interface SchaduwZaakProducten {melding: string; vergunning: string; toezicht: string}
+export const schaduwzaakPreProdProducten: SchaduwZaakProducten = {
   melding: 'https://producten.preprod-rx-services.nl/api/v1/product/e55f1af2-f1f1-45b2-18e3-08dcce4a3fa1',
   vergunning: 'https://producten.preprod-rx-services.nl/api/v1/product/fe7c825a-4a8c-4f11-18e1-08dcce4a3fa1',
+  toezicht: 'https://producten.preprod-rx-services.nl/api/v1/product/43af9ea6-95ae-4c6a-bd44-08dcd0bf97b7',
 };
 // Met functioneel opgehaald op 03-01-2024
-export const schaduwzaakProdProducten: {melding: string; vergunning: string} = {
-  melding: 'https://producten.rx-services.nl/api/v1/product/4831e7a5-0887-400d-3c9f-08dcf73ae7ca', // NMG-00015 Kopie melding
-  vergunning: 'https://producten.rx-services.nl/api/v1/product/b9fc2e5f-b181-49b2-3c9c-08dcf73ae7ca', // NMG-00012 Kopie verleende vergunning
+export const schaduwzaakProdProducten: SchaduwZaakProducten= {
+  melding: 'https://producten.rx-services.nl/api/v1/product/4831e7a5-0887-400d-3c9f-08dcf73ae7ca', // NMG-00015 Kopie melding - Lijst 1
+  vergunning: 'https://producten.rx-services.nl/api/v1/product/b9fc2e5f-b181-49b2-3c9c-08dcf73ae7ca', // NMG-00012 Kopie verleende vergunning Lijst 1
+  toezicht: 'https://producten.rx-services.nl/api/v1/product/3d28d057-a2ec-408f-3c9d-08dcf73ae7ca', //NMG-00013 Kopie toezichtzaak - Lijst 2
 };
 
 
@@ -239,7 +254,7 @@ export const schaduwzaakProdProducten: {melding: string; vergunning: string} = {
  */
 
 
-export function getRolTypeUrl(config: ZgwCatalogiConfig): string {
+export function getInitiatorRolTypeUrl(config: ZgwCatalogiConfig): string {
   const { rolTypen } = config;
   if (!rolTypen) {
     console.error('Check de catalogus config van de zaak. Er zijn geen roltypen aanwezig!');
@@ -253,6 +268,22 @@ export function getRolTypeUrl(config: ZgwCatalogiConfig): string {
   // Als een INITIATOR bestaat, retourneer de URL daarvan, anders de URL van het eerste roltype
   return initiator?.url || rolTypen[0]?.url || '';
 }
+
+export function getBelanghebbendeRolTypeUrl(config: ZgwCatalogiConfig): string {
+  const { rolTypen } = config;
+  if (!rolTypen) {
+    console.error('Check de catalogus config van de zaak. Er zijn geen roltypen aanwezig!');
+  }
+  // Zoek naar een roltype met kenmerk 'BELANGHEBBENDE'
+  const belanghebbende = rolTypen.find((rol) => rol.kenmerk === 'BELANGHEBBENDE');
+
+  if (!belanghebbende?.url) {
+    console.error('De catalogus config heeft geen BELANGHEBBENDE ROL');
+  }
+  // Als een BELANGHEBBENDE bestaat, retourneer de URL daarvan, anders de URL van het eerste roltype
+  return belanghebbende?.url || rolTypen[0]?.url || '';
+}
+
 export function getZaakEigenschapUrl(config: ZgwCatalogiConfig, kenmerk: 'ZAAKNUMMER_CORSA' | 'ZAAKNUMMER_OPENWAVE'): string {
   const { eigenschappen } = config;
 

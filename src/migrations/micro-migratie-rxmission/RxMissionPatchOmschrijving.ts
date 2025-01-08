@@ -107,9 +107,9 @@ export class RxMissionPatchOmschrijving {
   /**
    * Read zakenFile as json
    */
- private readZakenFile(): any[] {
-     return JSON.parse(fs.readFileSync(this.inputZakenFilePath, 'utf8'));
- }
+  private readZakenFile(): any[] {
+    return JSON.parse(fs.readFileSync(this.inputZakenFilePath, 'utf8'));
+  }
 
   /**
    * Check if a row has already been processed.
@@ -150,15 +150,15 @@ export class RxMissionPatchOmschrijving {
 
       try {
         const successJson: any[] = this.readZakenFile();
-        const foundZaak = successJson.find((record) =>  row.openwavezaaknummer === record.row);
-        if(!foundZaak || !foundZaak.url){
-            this.appendToLogFile(LogFileType.ERROR_LOG, `no zaak found in successjson ${row.openwavezaaknummer}. Stop and throw error to be caught`);
-            throw Error(`Successjson does not have the row with ${row.openwavezaaknummer}.`);
-            continue;
+        const foundZaak = successJson.find((record) => row.openwavezaaknummer === record.row);
+        if (!foundZaak || !foundZaak.url) {
+          this.appendToLogFile(LogFileType.ERROR_LOG, `no zaak found in successjson ${row.openwavezaaknummer}. Stop and throw error to be caught`);
+          throw Error(`Successjson does not have the row with ${row.openwavezaaknummer}.`);
+          continue;
         }
         const zaakurl = foundZaak.url;
         // PATCH omschrijving
-        const zaak: {url: string; identification: string | undefined;} = await handleMigration.patchOmschrijvingZaak(zaakurl, row.zaakomschrijving);
+        const zaak: {url: string; identification: string | undefined} = await handleMigration.patchOmschrijvingZaak(zaakurl, row.zaakomschrijving);
         if (!zaak.url) {
           this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak} - ${row.openwavezaaknummer}. Stop and throw error to be caught`);
           throw Error('Zaak url is undefined.');
@@ -166,7 +166,7 @@ export class RxMissionPatchOmschrijving {
         }
         this.appendToJsonFile(JsonFileTypePatch.PATCHED_ZAAKURLS, zaak.url);
         this.appendToJsonFile(JsonFileTypePatch.PROCESSED_ROWS, row.openwavezaaknummer);
-        this.appendToJsonFile(JsonFileTypePatch.SUCCESS, { ...zaak, row: row.openwavezaaknummer, });
+        this.appendToJsonFile(JsonFileTypePatch.SUCCESS, { ...zaak, row: row.openwavezaaknummer });
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed patch row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
         succeededRows++;
       } catch (error: any) {

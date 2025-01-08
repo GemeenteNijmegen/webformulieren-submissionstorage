@@ -1,6 +1,6 @@
 import { ZgwCatalogiConfig } from './GenerateConfigInterfaces';
 import { GeometrieTransformer } from './GeometrieTransformer';
-import { Row } from './RxMissionMigratie';
+import { MigratieType, Row } from './RxMissionMigratie';
 import * as ZAAK_CONFIG from './RxMissionZaakConfig';
 import { ZakenApiZaakResponse } from '../../app/zgw/zgwClient/model/ZakenApiZaak.model';
 import {
@@ -18,13 +18,16 @@ export class HandleRxMissionMigration {
   private zakenBaseUrl: string;
   private documentenBaseUrl: string;
   private zaakConfig: ZgwCatalogiConfig;
-  private producten: { melding: string; vergunning: string };
+  private producten: ZAAK_CONFIG.SchaduwZaakProducten;
   private geometrieTransformer: GeometrieTransformer;
   private envProd: boolean;
+  private migratieType: MigratieType;
 
   // Default PREPROD
-  constructor(PROD: boolean = false) {
+  constructor(PROD: boolean = false, migratieType: MigratieType = MigratieType.LIJST_1) {
     this.envProd = PROD;
+    this.migratieType = migratieType;
+
     if (PROD) {
       // This line prevents execution on production. Please comment to execute on prod.
       // One of the many fail-safes to make sure you are dealing with prod.
@@ -75,7 +78,7 @@ export class HandleRxMissionMigration {
       documentenApiUrl: this.documentenBaseUrl,
       name: 'Migration_RxMission',
       zaaktype: ZAAK_CONFIG.getZaakTypeUrl(this.zaakConfig),
-      roltype: ZAAK_CONFIG.getRolTypeUrl(this.zaakConfig),
+      roltype: ZAAK_CONFIG.getInitiatorRolTypeUrl(this.zaakConfig),
     });
     this.geometrieTransformer = new GeometrieTransformer();
   }
@@ -86,23 +89,20 @@ export class HandleRxMissionMigration {
     const zaakGeometrie = await this.geometrieTransformer.processGeometry(
       row.zaakgeometrie,
     ); // Returns undefined on fail
-    // check if row.zaaktype in excel (cases insensitive) contains the word aanvraag, besluit or beschik - util test shows results with excel possibilities
-    const product =
-    row.zaaktype &&
-    (row.zaaktype.toLowerCase().includes('aanvraag') ||
-      row.zaaktype.toLowerCase().includes('besluit') ||
-      row.zaaktype.toLowerCase().includes('beschik'))
-      ? [this.producten.vergunning]
-      : [this.producten.melding];
 
+    // Create product and toelichting based on migratieType
+    const product = this.getProduct(row);
     const toelichting: string = this.createToelichting(row);
-    let retryWithoutGeometry: boolean = false;
+
+
     const zaakParams: CreateZaakParameters = {
       productenOfDiensten: product,
       toelichting: `${toelichting}`,
       zaakgeometrie: zaakGeometrie, // api call works with undefined
-      omschrijving: `${row.zaakomschrijving.substring(0,79)}`,
+      omschrijving: `${row.zaakomschrijving.substring(0, 79)}`,
     };
+
+    let retryWithoutGeometry: boolean = false;
     try {
       return await this.callCreateZaak(zaakParams, row);
     } catch (error: any) {
@@ -116,18 +116,24 @@ export class HandleRxMissionMigration {
     }
 
   }
-  async callCreateZaak(params: CreateZaakParameters, row: Row) {
-    try {
-      const zaakResult: ZakenApiZaakResponse = await this.zgwClient.createZaak(params);
-      console.log(
-        `[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`,
-      );
-      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!params.zaakgeometrie };
-    } catch (error: any) {
-      console.error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
-      throw Error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
+  private getProduct(row: Row): string[] {
+    switch (this.migratieType) {
+      case MigratieType.LIJST_1:
+        return row.zaaktype &&
+        (row.zaaktype.toLowerCase().includes('aanvraag') ||
+          row.zaaktype.toLowerCase().includes('besluit') ||
+          row.zaaktype.toLowerCase().includes('beschik'))
+          ? [this.producten.vergunning]
+          : [this.producten.melding];
+        break;
+      case MigratieType.LIJST_2:
+        return [this.producten.toezicht];
+        break;
+      default:
+        throw new Error('Unsupported MigratieType: No product will be returned.');
     }
   }
+
   /**
    * Bundles all fields from migration excel that have no other options to be added to the zaak
    * Max 1000 chars allowed in toelichting
@@ -145,15 +151,45 @@ export class HandleRxMissionMigration {
       if (row.bsn || row.kvk) { toelichting += `kvk/bsn: ${row.bsn ? 'bsn: ' : row.kvk ? 'kvk: ' : 'geen'},    `;}
     }
     if (row.zaakomschrijving) { toelichting += `   Omschrijving: ${row.zaakomschrijving},     `;}
+
+    switch (this.migratieType) {
+      case MigratieType.LIJST_1:
+
+        break;
+      case MigratieType.LIJST_2:
+        if (row.activiteiten) { toelichting += `   Activiteiten: ${row.activiteiten},     `;}
+        if (row.rol) { toelichting += `   Rol: ${row.rol},     `;}
+        if (row.zakengroep) { toelichting += `   Zakengroep: ${row.zakengroep},     `;}
+        if (row.bagrelevant) { toelichting += `   Bagrelevant: ${row.bagrelevant},     `;}
+        if (row.notities) { toelichting += `   Notities: ${row.notities},     `;}
+        // Geen inspectiemomenten, bagrelevent, afgehandelde adviezen of openstaande adviezen, behandelaar of briks medeverantwoordelijke
+        break;
+      default:
+        throw new Error('Unsupported MigratieType: Toelichting cannot be formated correctly');
+    }
+
     if (row.producten) { toelichting += `   Producten: ${row.producten},   `;}
     if (row.urlcorsa) { toelichting += `  UrlCorsa: ${row.urlcorsa},   `;}
     if (row.urlopenwave) { toelichting += `  UrlOpenWave: ${row.urlopenwave},   `;}
-    if (row.openwavezaaknummer) { toelichting += `Zaaknummers: [ openwave: ${row.openwavezaaknummer}, corsa: ${row.corsazaaknummer}, cb_openwave: ${row.cbopenwavezaaknummer}],   `;}
 
     // Make sure the char limit is not exceeded
     toelichting = toelichting.length > 999 ? toelichting.substring(0, 999) : toelichting;
     return toelichting;
   }
+
+  async callCreateZaak(params: CreateZaakParameters, row: Row) {
+    try {
+      const zaakResult: ZakenApiZaakResponse = await this.zgwClient.createZaak(params);
+      console.log(
+        `[HandleMigration createZaak] ${zaakResult.identificatie} ${zaakResult.url}. Succesvol aangemaakt.`,
+      );
+      return { url: zaakResult.url, identification: zaakResult.identificatie, zaakgeometrieAdded: !!params.zaakgeometrie };
+    } catch (error: any) {
+      console.error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
+      throw Error(`CREATING ZAAK FAILED: ${row.openwavezaaknummer} ${JSON.stringify(error.message)}`);
+    }
+  }
+
 
   /**
    * Levert geen error op
@@ -212,7 +248,19 @@ export class HandleRxMissionMigration {
    * Rol toevoegen indien mogelijk
    * No errors on fail, but undefined returned
    */
-  async addRol(zaakUrl: string, row: Row): Promise<string | undefined> {
+  async addRol(zaakUrl: string, row: Row, rolType: 'INITIATOR' | 'BELANGHEBBENDE'): Promise<string | undefined> {
+    let rolTypeUrl: string = '';
+    switch (rolType) {
+      case 'INITIATOR':
+        rolTypeUrl = ZAAK_CONFIG.getInitiatorRolTypeUrl(this.zaakConfig);
+        break;
+      case 'BELANGHEBBENDE':
+        rolTypeUrl = ZAAK_CONFIG.getBelanghebbendeRolTypeUrl(this.zaakConfig);
+        break;
+      default:
+        return undefined;
+    }
+
     if (!row.typecontact || (!row.bsn && !row.kvk)) {
       console.error(
         `No Rol added because no typeContact or no bsn/kvk ${row.openwavezaaknummer}`,
@@ -220,13 +268,13 @@ export class HandleRxMissionMigration {
       return undefined;
     }
     const userType =
-      row.typecontact.toLowerCase().trim() === 'natuurlijk persoon'
-        ? 'natuurlijk_persoon'
-        : 'niet_natuurlijk_persoon';
+        row.typecontact.toLowerCase().trim() === 'natuurlijk persoon'
+          ? 'natuurlijk_persoon'
+          : 'niet_natuurlijk_persoon';
     try {
       const createdRol = await this.zgwClient.createRol({
         zaak: zaakUrl,
-        rolType: ZAAK_CONFIG.getRolTypeUrl(this.zaakConfig),
+        rolType: rolTypeUrl,
         userType: userType,
         identifier: row.bsn ?? row.kvk,
         name: row.contactpersoon ?? 'unknown name', //required for contactpersoonrol
@@ -248,6 +296,9 @@ export class HandleRxMissionMigration {
    */
   async addResultaat(zaakUrl: string, row: Row) {
     // Map row.zaakresultaat values to config `kenmerk` values
+    if (!row.zaakresultaat) return undefined;
+
+    // Lijst_1 mapping
     const resultaatMapping: Record<string, string> = {
       'Afgebroken': 'AFGEBROKEN',
       'Afgesloten': 'AFGESLOTEN',
@@ -261,8 +312,19 @@ export class HandleRxMissionMigration {
       'Vergunningvrij': 'VERGUNNINGSVRIJ',
       'Verleend': 'VERLEEND',
     };
+
     const zaakresultaat = row.zaakresultaat?.trim(); // Ensure no trailing spaces
-    const kenmerk = resultaatMapping[zaakresultaat];
+    let kenmerk: any = undefined;
+    switch (this.migratieType) {
+      case MigratieType.LIJST_1:
+        kenmerk = resultaatMapping[zaakresultaat];
+        break;
+      case MigratieType.LIJST_2:
+        kenmerk = 'AFGESLOTEN'; // TODO: dit moet wellicht gewijzigd worden
+        break;
+      default:
+        kenmerk = undefined;
+    }
 
     if (!kenmerk) {
       console.error(
@@ -320,12 +382,12 @@ export class HandleRxMissionMigration {
   /**
    * Patch omschrijving zaak
    */
-  async patchOmschrijvingZaak(url: string, omschrijving: string): Promise<{url: string; identification: string | undefined;}>{
-    const cappedOmschrijving = omschrijving.substring(0,79);
+  async patchOmschrijvingZaak(url: string, omschrijving: string): Promise<{url: string; identification: string | undefined}> {
+    const cappedOmschrijving = omschrijving.substring(0, 79);
     try {
       const patchedZaak = await this.zgwClient.callZaakApi(HttpMethod.Patch, url, { omschrijving: cappedOmschrijving });
       console.log(`PATCH:  ${url} success ${omschrijving}`);
-      return {url: patchedZaak.url, identification: patchedZaak.identificatie}
+      return { url: patchedZaak.url, identification: patchedZaak.identificatie };
     } catch (error: any) {
       console.error(`PATCH FAILED: ${url} ${omschrijving}`);
       throw Error(`PATCH FAILED: ${url} ${omschrijving}`);
