@@ -12,8 +12,10 @@ import { HttpMethod, ZgwHttpClient } from '../../app/zgw/zgwClient/ZgwHttpClient
  */
 const PROD: boolean = process.env.RX_ENV == 'PROD' ? true : false; // false is PREPROD
 const BASE_URL_CATALOGI = PROD
-  ? `https://catalogi.${process.env.RX_PREPROD_BASE_URL}/api/v1/`
-  : `https://catalogi.${process.env.RX_PROD_BASE_URL}/api/v1/`;
+  ? `https://catalogi.${process.env.RX_PROD_BASE_URL}/api/v1/`
+  : `https://catalogi.${process.env.RX_PREPROD_BASE_URL}/api/v1/`;
+
+console.log(`PROD? ${PROD}. ${BASE_URL_CATALOGI}`);
 
 const zgwHttpClient = new ZgwHttpClient({
   clientId: process.env.RX_CLIENT_ID!,
@@ -116,7 +118,7 @@ describeIntegration('generateConfig with latest version zaakType', () => {
   test('SchaduwZaak', async() => {
     try {
       const config = await fetchZaakTypeConfig('NMG-schaduwzaak', schaduwZaakCatalogiSetup);
-      writeOutputToFile('schaduwzaak', config);
+      writeOutputToFile(`schaduwzaak-${process.env.RX_ENV}`, config);
       console.log('Generated Config: Schaduwzaak');
     } catch (error) {
       console.error('Error fetching zaaktype config:', error);

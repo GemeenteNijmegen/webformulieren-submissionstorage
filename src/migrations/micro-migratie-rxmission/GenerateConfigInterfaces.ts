@@ -97,6 +97,10 @@ export const schaduwZaakCatalogiSetup: ZgwCatalogiZaakTypeSetup = {
     naam: 'Zaaknummer Corsa',
   }],
   rolTypen: [{
+    kenmerk: 'BELANGHEBBENDE',
+    omschrijving: 'Belanghebbende',
+  },
+  {
     kenmerk: 'INITIATOR',
     omschrijving: 'Initiator',
     default: true,

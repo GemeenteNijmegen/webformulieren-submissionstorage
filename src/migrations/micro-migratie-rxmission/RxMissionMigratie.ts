@@ -18,16 +18,21 @@ export class RxMissionMigratie {
   private jsonFilePaths: { [key in JsonFileType]: string };
   private logFilePaths: { [key in LogFileType]: string };
   private baseOutputDir: string;
+  private migratieType: MigratieType;
+  private fullDateTimeNow: string;
 
-  constructor(inputFileName: string = 'small-sample.xlsx') {
+  constructor(inputFileName: string = 'small-sample-lijst1.xlsx', migratieType: MigratieType = MigratieType.LIJST_1) {
     if (process.env.RX_ENV !== 'PREPROD') {
-      // throw new Error('Environment is not PREPROD. Operation aborted.');
+      throw new Error('Environment is not PREPROD. Operation aborted.');
       console.log('Running on PROD: ', process.env.RX_ENV );
     }
 
+    this.migratieType = migratieType;
+    this.fullDateTimeNow = new Date().toLocaleString('nl-NL');
+
     const timestamp = Date.now(); // Epoch in milliseconds
     this.baseOutputDir = path.join(__dirname, 'output');
-    this.outputDir = path.join(this.baseOutputDir, `migrate_${timestamp}`);
+    this.outputDir = path.join(this.baseOutputDir, `migrate_${process.env.RX_ENV}_${this.migratieType}_${timestamp}`);
     this.inputFilePath = path.join(__dirname, 'sensitive-files', inputFileName);
 
     // Create output directory
@@ -44,8 +49,8 @@ export class RxMissionMigratie {
     };
 
     this.logFilePaths = {
-      [LogFileType.ERROR_LOG]: this.initLogFile(LogFileType.ERROR_LOG, 'ERROR-LOG-FILE-TITLE \n'),
-      [LogFileType.LOGS]: this.initLogFile(LogFileType.LOGS, 'GENERAL LOGS \n'),
+      [LogFileType.ERROR_LOG]: this.initLogFile(LogFileType.ERROR_LOG, `ERROR LOG ${this.migratieType} ${process.env.RX_ENV} ${this.fullDateTimeNow} \n`),
+      [LogFileType.LOGS]: this.initLogFile(LogFileType.LOGS, `GENERAL LOGS ${this.migratieType} ${process.env.RX_ENV} ${this.fullDateTimeNow}\n`),
     };
   }
 
@@ -105,11 +110,11 @@ export class RxMissionMigratie {
    * Check if a row has already been processed.
    * If you want to use the file from a previous migration, just put the particular PROCESSED_ROWS in output and uncomment the first lines
    */
-  private isRowProcessed(row: Row): boolean {
+  private isRowProcessed(uniqueID: string): boolean {
     //const filePath = path.resolve(this.baseOutputDir, JsonFileType.PROCESSED_ROWS);
     //const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.PROCESSED_ROWS], 'utf8'));
     const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.PROCESSED_ROWS], 'utf8'));
-    return processedValues.includes(row.openwavezaaknummer);
+    return processedValues.includes(uniqueID);
   }
 
   /**
@@ -117,7 +122,7 @@ export class RxMissionMigratie {
    */
   public async migrateData(): Promise<void> {
     const rows = this.readExcelFile();
-    const handleMigration = new HandleRxMissionMigration(process.env.RX_ENV === 'PROD');
+    const handleMigration = new HandleRxMissionMigration(process.env.RX_ENV === 'PROD', this.migratieType);
     const totalRows = rows.length;
     let processedCount = 0;
     let failedRows = 0;
@@ -125,19 +130,21 @@ export class RxMissionMigratie {
 
     // Record start time
     const startTime = Date.now();
-    console.log(`Starting migration: ${totalRows} rows to process.`);
+    console.log(`Starting migration ${this.migratieType}: ${totalRows} rows to process.`);
 
     for (const row of rows) {
       processedCount++;
 
       console.log(`Processing row ${processedCount} of ${totalRows} (${((processedCount / totalRows) * 100).toFixed(2)}%)`);
+      await new Promise(resolve => setTimeout(resolve, 500)); // To prevent Rate Limit error
 
-      if (this.isRowProcessed(row)) {
+      if (this.isRowProcessed(`${processedCount.toString()}${row.openwavezaaknummer}`)) {
         this.appendToLogFile(LogFileType.ERROR_LOG, `Row already processed: ${row.openwavezaaknummer}`);
         continue;
       }
 
       try {
+        const successLog: any = {}; // add properties to the successlog
         const zaak: {url: string; identification: string | undefined; zaakgeometrieAdded:boolean} = await handleMigration.createZaak(row);
         if (!zaak.url) {
           this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak}. Stop and throw error to be caught`);
@@ -158,16 +165,29 @@ export class RxMissionMigratie {
         if (!eigenschappen.openwave) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No eigenschap openwave added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
 
         //rol
-        const rol = await handleMigration.addRol(zaak.url, row);
+        let rol: any = undefined;
+        switch (this.migratieType) {
+          case MigratieType.LIJST_1:
+            rol = await handleMigration.addRol(zaak.url, row, 'INITIATOR');
+            break;
+          case MigratieType.LIJST_2:
+            rol = await handleMigration.addRol(zaak.url, row, 'BELANGHEBBENDE');
+            break;
+          default:
+            rol = undefined;
+        }
         if (!rol) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No rol added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
 
-        //zaakresultaat
-        const resultaat = await handleMigration.addResultaat(zaak.url, row);
-        if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+        // TODO: nu wordt er geen resultaat toegevoegd
+        if (this.migratieType === MigratieType.LIJST_1) {
+          //zaakresultaat
+          const resultaat = await handleMigration.addResultaat(zaak.url, row);
+          if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+          successLog.resultaat = resultaat;
+        }
 
-
-        this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
-        this.appendToJsonFile(JsonFileType.SUCCESS, { ...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen, rol, resultaat });
+        this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, `${processedCount.toString()}${row.openwavezaaknummer}`);
+        this.appendToJsonFile(JsonFileType.SUCCESS, { ...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen, rol, ...successLog });
         this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
         succeededRows++;
       } catch (error: any) {
@@ -181,19 +201,86 @@ export class RxMissionMigratie {
     const elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
     const minutes = Math.floor(elapsedSeconds / 60);
     const seconds = elapsedSeconds % 60;
-    console.log(`
+    const summary = `
       **************************************************
       *                                                
-      *  Migration completed for ${process.env.RX_ENV}                          
+      *  Migration ${this.migratieType} completed for ${process.env.RX_ENV}                          
       *  Success: ${succeededRows}                                    
       *  Failed: ${failedRows}                                     
       *  Total: ${processedCount}
-      * 
+      *  
+      *  Started: ${this.fullDateTimeNow}
       *  ElapsedTime: ${minutes} minutes and ${seconds} seconds.                                       
       *                                                
       **************************************************
-      `);
+      `;
+    console.log(summary);
+    this.appendToLogFile(LogFileType.LOGS, summary);
+
+    const success = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.SUCCESS], 'utf8'));
+    const report = generateMissingOverviewWithCounts(success);
+    this.appendToLogFile(LogFileType.LOGS, report);
   }
+}
+
+/**
+ * Maak een rapport
+ */
+
+interface SuccessItem {
+  identification: string;
+  row: string;
+  zaakgeometrieAdded?: boolean;
+  corsa?: string;
+  rol?: string;
+}
+
+export function generateMissingOverviewWithCounts(data: SuccessItem[]): string {
+  const missingZaakgeometrie: { identification: string; row: string }[] = [];
+  const missingRol: { identification: string; row: string }[] = [];
+  const missingCorsa: { identification: string; row: string }[] = [];
+
+  data.forEach((item) => {
+    if (!item.zaakgeometrieAdded) {
+      missingZaakgeometrie.push({ identification: item.identification, row: item.row });
+    }
+    if (!item.rol) {
+      missingRol.push({ identification: item.identification, row: item.row });
+    }
+    if (!item.corsa) {
+      missingCorsa.push({ identification: item.identification, row: item.row });
+    }
+  });
+
+  let report = 'Missing Overview:\n\n';
+
+  if (missingZaakgeometrie.length > 0) {
+    report += `Geen Zaakgeometrie (${missingZaakgeometrie.length}):\n`;
+    missingZaakgeometrie.forEach((item) => {
+      report += `- ${item.identification} - ${item.row}\n`;
+    });
+  }
+
+  if (missingRol.length > 0) {
+    report += `\nGeen Rol (${missingRol.length}):\n`;
+    missingRol.forEach((item) => {
+      report += `- ${item.identification} - ${item.row}\n`;
+    });
+  }
+
+  if (missingCorsa.length > 0) {
+    report += `\nGeen Corsa (${missingCorsa.length}):\n`;
+    missingCorsa.forEach((item) => {
+      report += `- ${item.identification} - ${item.row}\n`;
+    });
+  }
+
+  report += '\nTotaal ontbrekende onderdelen:\n';
+  report += `- Geen Zaakgeometrie: ${missingZaakgeometrie.length}\n`;
+  report += `- Geen Rol: ${missingRol.length}\n`;
+  report += `- Geen Corsa: ${missingCorsa.length}\n`;
+
+  return report;
 }
 
 /**
@@ -214,21 +301,21 @@ export enum LogFileType {
   LOGS = 'general_logs.log'
 }
 
+
 /**
  * Row interface for Excel data.
  */
 export interface Row {
   openwavezaaknummer?: any;
   corsazaaknummer?: any;
-  cbopenwavezaaknummer?: any;
-  zaakomschrijving?: any;
+  zaakomschrijving: any;
   zaaktype?: any;
   bsn?: any;
   kvk?: any;
   contactpersoon?: any;
   email?: any;
   telefoon?: any;
-  typecontact?: any;
+  typecontact?: 'Niet-natuurlijk persoon' | 'Natuurlijk persoon' | '';
   urlopenwave?: any;
   urlcorsa?: any;
   locatie?: any;
@@ -236,22 +323,47 @@ export interface Row {
   activiteiten?: any;
   producten?: any;
   oorsprong?: any;
+
+  // Lijst_1
+  cbopenwavezaaknummer?: any;
   zaakresultaat?: any;
+
+  // Lijst_2
+  rol?: any;
+  behandelaar?: any;
+  medezaakverantwoordelijke?: any;
+  notities?: any;
+  bagrelevant?: any;
+  zakengroep?: any;
+  openstaandeadviezen?: any;
+  afgehandeldeadviezen?: any;
 }
+
+
+/**
+ * De migraties kunnen verschillen afhankelijk van de geexporteerde lijst.
+ * Op basis daarvan wordt de zaak anders aangemaakt. Bijvoorbeeld een ander product, verschillende rollen en resultaat.
+ * Deze type lijsten kunnen later weer terugkomen, dus onderscheid wordt gemaakt door deze enum waar nodig.
+ */
+export enum MigratieType {
+  LIJST_1 = 'LIJST_1',
+  LIJST_2 = 'LIJST_2',
+};
 
 /**
  * Entry point for the script.
- * one-row.xlsx en small-sample.xlsx voor testen
- * openwave-export-20241220.xlsx
+ * one-row-lijst1.xlsx en small-sample-lijst1.xlsx voor testen
+ * openwave-export-20241220-lijst-1.xlsx
  *
+ * npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionMigratie.ts
  */
-export async function runMigration(inputFileName: string = 'one-row.xlsx'): Promise<void> {
+export async function runMigration(inputFileName: string = 'openwave-export-20250108-lijst2.xlsx', migratieType: MigratieType = MigratieType.LIJST_2): Promise<void> {
   const confirm = await confirmProdEnvironment(inputFileName);
   if (!confirm) {
     console.log('Migration aborted.');
     process.exit(0);
   }
-  const migrator = new RxMissionMigratie(inputFileName);
+  const migrator = new RxMissionMigratie(inputFileName, migratieType);
   await migrator.migrateData();
 }
 
