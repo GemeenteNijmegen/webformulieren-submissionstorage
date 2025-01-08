@@ -10,16 +10,17 @@ import { HandleRxMissionMigration } from './HandleRxMissionMigration';
 dotenv.config({ path: './.env' });
 
 /**
- * Run with npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionMigratie.ts
+ * Run with npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionPatchOmschrijving.ts
  */
-export class RxMissionMigratie {
+export class RxMissionPatchOmschrijving {
   private inputFilePath: string;
+  private inputZakenFilePath: string;
   private outputDir: string;
-  private jsonFilePaths: { [key in JsonFileType]: string };
+  private jsonFilePaths: { [key in JsonFileTypePatch]: string };
   private logFilePaths: { [key in LogFileType]: string };
   private baseOutputDir: string;
 
-  constructor(inputFileName: string = 'small-sample.xlsx') {
+  constructor(inputFileName: string = 'small-sample.xlsx', zaakFile: string = 'success.json') {
     if (process.env.RX_ENV !== 'PREPROD') {
       throw new Error('Environment is not PREPROD. Operation aborted.');
       console.log('Running on PROD: ', process.env.RX_ENV );
@@ -27,8 +28,9 @@ export class RxMissionMigratie {
 
     const timestamp = Date.now(); // Epoch in milliseconds
     this.baseOutputDir = path.join(__dirname, 'output');
-    this.outputDir = path.join(this.baseOutputDir, `migrate_${process.env.RX_ENV}_${timestamp}`);
+    this.outputDir = path.join(this.baseOutputDir, `patch_${process.env.RX_ENV}_${timestamp}`);
     this.inputFilePath = path.join(__dirname, 'sensitive-files', inputFileName);
+    this.inputZakenFilePath = path.join(__dirname, 'sensitive-files', zaakFile);
 
     // Create output directory
     if (!fs.existsSync(this.outputDir)) {
@@ -37,10 +39,11 @@ export class RxMissionMigratie {
 
     // Initialize JSON and log files
     this.jsonFilePaths = {
-      [JsonFileType.SUCCESS]: this.initJsonFile(JsonFileType.SUCCESS, []),
-      [JsonFileType.FAILURE]: this.initJsonFile(JsonFileType.FAILURE, []),
-      [JsonFileType.PROCESSED_ROWS]: this.initJsonFile(JsonFileType.PROCESSED_ROWS, []), // Can be used to start processing from a certain row if interrupted
-      [JsonFileType.CREATED_ZAAKURLS]: this.initJsonFile(JsonFileType.CREATED_ZAAKURLS, []), // Can be used to delete all created zaken
+      [JsonFileTypePatch.SUCCESS]: this.initJsonFile(JsonFileTypePatch.SUCCESS, []),
+      [JsonFileTypePatch.FAILURE]: this.initJsonFile(JsonFileTypePatch.FAILURE, []),
+      [JsonFileTypePatch.TO_PATCH]: this.initJsonFile(JsonFileTypePatch.TO_PATCH, []),
+      [JsonFileTypePatch.PROCESSED_ROWS]: this.initJsonFile(JsonFileTypePatch.PROCESSED_ROWS, []), // Can be used to start processing from a certain row if interrupted
+      [JsonFileTypePatch.PATCHED_ZAAKURLS]: this.initJsonFile(JsonFileTypePatch.PATCHED_ZAAKURLS, []), // Can be used to delete all created zaken
     };
 
     this.logFilePaths = {
@@ -52,7 +55,7 @@ export class RxMissionMigratie {
   /**
    * Initialize a JSON file with a default array value.
    */
-  private initJsonFile(fileType: JsonFileType, defaultValue: any): string {
+  private initJsonFile(fileType: JsonFileTypePatch, defaultValue: any): string {
     const filePath = path.resolve(this.outputDir, fileType);
     if (!fs.existsSync(filePath)) {
       fs.writeFileSync(filePath, JSON.stringify(defaultValue, null, 2), 'utf8');
@@ -74,7 +77,7 @@ export class RxMissionMigratie {
   /**
    * Append data to a JSON file.
    */
-  private appendToJsonFile(fileType: JsonFileType, data: any): void {
+  private appendToJsonFile(fileType: JsonFileTypePatch, data: any): void {
     const filePath = this.jsonFilePaths[fileType];
     const existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     existingData.push(data);
@@ -102,20 +105,27 @@ export class RxMissionMigratie {
   }
 
   /**
+   * Read zakenFile as json
+   */
+ private readZakenFile(): any[] {
+     return JSON.parse(fs.readFileSync(this.inputZakenFilePath, 'utf8'));
+ }
+
+  /**
    * Check if a row has already been processed.
    * If you want to use the file from a previous migration, just put the particular PROCESSED_ROWS in output and uncomment the first lines
    */
   private isRowProcessed(row: Row): boolean {
-    //const filePath = path.resolve(this.baseOutputDir, JsonFileType.PROCESSED_ROWS);
-    //const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.PROCESSED_ROWS], 'utf8'));
-    const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileType.PROCESSED_ROWS], 'utf8'));
+    //const filePath = path.resolve(this.baseOutputDir, JsonFileTypePatch.PROCESSED_ROWS);
+    //const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileTypePatch.PROCESSED_ROWS], 'utf8'));
+    const processedValues = JSON.parse(fs.readFileSync(this.jsonFilePaths[JsonFileTypePatch.PROCESSED_ROWS], 'utf8'));
     return processedValues.includes(row.openwavezaaknummer);
   }
 
   /**
    * Main migration process.
    */
-  public async migrateData(): Promise<void> {
+  public async patchOmschrijving(): Promise<void> {
     const rows = this.readExcelFile();
     const handleMigration = new HandleRxMissionMigration(process.env.RX_ENV === 'PROD');
     const totalRows = rows.length;
@@ -139,41 +149,29 @@ export class RxMissionMigratie {
       }
 
       try {
-        const zaak: {url: string; identification: string | undefined; zaakgeometrieAdded:boolean} = await handleMigration.createZaak(row);
+        const successJson: any[] = this.readZakenFile();
+        const foundZaak = successJson.find((record) =>  row.openwavezaaknummer === record.row);
+        if(!foundZaak || !foundZaak.url){
+            this.appendToLogFile(LogFileType.ERROR_LOG, `no zaak found in successjson ${row.openwavezaaknummer}. Stop and throw error to be caught`);
+            throw Error(`Successjson does not have the row with ${row.openwavezaaknummer}.`);
+            continue;
+        }
+        const zaakurl = foundZaak.url;
+        // PATCH omschrijving
+        const zaak: {url: string; identification: string | undefined;} = await handleMigration.patchOmschrijvingZaak(zaakurl, row.zaakomschrijving);
         if (!zaak.url) {
-          this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak}. Stop and throw error to be caught`);
+          this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak} - ${row.openwavezaaknummer}. Stop and throw error to be caught`);
           throw Error('Zaak url is undefined.');
           continue;
         }
-        this.appendToJsonFile(JsonFileType.CREATED_ZAAKURLS, zaak.url);
-        if (!zaak.zaakgeometrieAdded) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No zaakgeometrie ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-
-
-        // status
-        const status: boolean = await handleMigration.addStatus(zaak.url);
-        if (!status) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No status added ${zaak.identification} - ${zaak.url}- ${row.openwavezaaknummer}.`); }
-
-        // zaakeigenschappen
-        const eigenschappen = await handleMigration.addZaakEigenschappen(zaak.url, row);
-        if (!eigenschappen.corsa) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No eigenschap corsa added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-        if (!eigenschappen.openwave) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No eigenschap openwave added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-
-        //rol
-        const rol = await handleMigration.addRol(zaak.url, row);
-        if (!rol) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No rol added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-
-        //zaakresultaat
-        const resultaat = await handleMigration.addResultaat(zaak.url, row);
-        if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-
-
-        this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, row.openwavezaaknummer);
-        this.appendToJsonFile(JsonFileType.SUCCESS, { ...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen, rol, resultaat });
-        this.appendToLogFile(LogFileType.LOGS, `Successfully processed row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
+        this.appendToJsonFile(JsonFileTypePatch.PATCHED_ZAAKURLS, zaak.url);
+        this.appendToJsonFile(JsonFileTypePatch.PROCESSED_ROWS, row.openwavezaaknummer);
+        this.appendToJsonFile(JsonFileTypePatch.SUCCESS, { ...zaak, row: row.openwavezaaknummer, });
+        this.appendToLogFile(LogFileType.LOGS, `Successfully processed patch row ${processedCount}: ${row.openwavezaaknummer}. Zaak: ${zaak.identification}, ${zaak.url}.`);
         succeededRows++;
       } catch (error: any) {
-        this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process row ${processedCount}: ${row.openwavezaaknummer}. ${error.message ||error}`);
-        this.appendToJsonFile(JsonFileType.FAILURE, { row, error: error.message ||error });
+        this.appendToLogFile(LogFileType.ERROR_LOG, `Failed to process patch row ${processedCount}: ${row.openwavezaaknummer}. ${error.message ||error}`);
+        this.appendToJsonFile(JsonFileTypePatch.FAILURE, { row, error: error.message ||error });
         failedRows++;
       }
     }
@@ -185,7 +183,7 @@ export class RxMissionMigratie {
     console.log(`
       **************************************************
       *                                                
-      *  Migration completed for ${process.env.RX_ENV}                          
+      *  Patch completed for ${process.env.RX_ENV}                          
       *  Success: ${succeededRows}                                    
       *  Failed: ${failedRows}                                     
       *  Total: ${processedCount}
@@ -200,11 +198,12 @@ export class RxMissionMigratie {
 /**
  * Enums for JSON file types.
  */
-export enum JsonFileType {
+export enum JsonFileTypePatch {
   SUCCESS = 'success.json',
   FAILURE = 'failure.json',
-  CREATED_ZAAKURLS = 'createdzaakurls.json',
+  PATCHED_ZAAKURLS = 'patchedzaakurls.json',
   PROCESSED_ROWS = 'processedrows.json',
+  TO_PATCH = 'to_patch.json'
 }
 
 /**
@@ -244,16 +243,17 @@ export interface Row {
  * Entry point for the script.
  * one-row.xlsx en small-sample.xlsx voor testen
  * openwave-export-20241220-lijst-1.xlsx
+ * npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionPatchOmschrijving.ts
  *
  */
-export async function runMigration(inputFileName: string = 'openwave-export-20241220-lijst-1.xlsx'): Promise<void> {
+export async function runPatch(inputFileName: string = 'openwave-export-20241220-lijst-1.xlsx', zaakFile: string = 'success_prod_lijst1.json'): Promise<void> {
   const confirm = await confirmProdEnvironment(inputFileName);
   if (!confirm) {
     console.log('Migration aborted.');
     process.exit(0);
   }
-  const migrator = new RxMissionMigratie(inputFileName);
-  await migrator.migrateData();
+  const migrator = new RxMissionPatchOmschrijving(inputFileName, zaakFile);
+  await migrator.patchOmschrijving();
 }
 
 /**
@@ -281,7 +281,7 @@ async function confirmProdEnvironment(fileName: string): Promise<boolean> {
 }
 
 if (require.main === module) {
-  runMigration()
+  runPatch()
     .then(() => console.log('Migration finished!'))
     .catch((error) => {
       console.error('Migration failed:', error);

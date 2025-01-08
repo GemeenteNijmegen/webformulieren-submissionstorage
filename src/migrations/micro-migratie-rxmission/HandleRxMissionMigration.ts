@@ -28,9 +28,9 @@ export class HandleRxMissionMigration {
     if (PROD) {
       // This line prevents execution on production. Please comment to execute on prod.
       // One of the many fail-safes to make sure you are dealing with prod.
-      throw new Error(
-        'Environment is PREPROD. Operation aborted. Delete this check once you are ready to migrate.',
-      );
+      // throw new Error(
+      //   'Environment is PREPROD. Operation aborted. Delete this check once you are ready to migrate.',
+      // );
     }
     if (PROD) {
       console.log(`
@@ -101,7 +101,7 @@ export class HandleRxMissionMigration {
       productenOfDiensten: product,
       toelichting: `${toelichting}`,
       zaakgeometrie: zaakGeometrie, // api call works with undefined
-      omschrijving: `Migratie devops ${row.openwavezaaknummer}`,
+      omschrijving: `Migratie devops Geen zaaknummer`,
     };
     try {
       return await this.callCreateZaak(zaakParams, row);
@@ -315,6 +315,21 @@ export class HandleRxMissionMigration {
     } catch (error: any) {
       console.error(`DELETING ${type} FAILED: ${url}`);
       throw Error(`DELETING ${type} FAILED: ${url}`);
+    }
+  }
+
+  /**
+   * Patch omschrijving zaak
+   */
+  async patchOmschrijvingZaak(url: string, omschrijving: string): Promise<{url: string; identification: string | undefined;}>{
+    const cappedOmschrijving = omschrijving.substring(0,79);
+    try {
+      const patchedZaak = await this.zgwClient.callZaakApi(HttpMethod.Patch, url, { omschrijving: cappedOmschrijving });
+      console.log(`PATCH:  ${url} success ${omschrijving}`);
+      return {url: patchedZaak.url, identification: patchedZaak.identificatie}
+    } catch (error: any) {
+      console.error(`PATCH FAILED: ${url} ${omschrijving}`);
+      throw Error(`PATCH FAILED: ${url} ${omschrijving}`);
     }
   }
 }
