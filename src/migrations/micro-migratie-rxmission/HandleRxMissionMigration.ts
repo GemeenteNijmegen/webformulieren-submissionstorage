@@ -101,7 +101,7 @@ export class HandleRxMissionMigration {
       productenOfDiensten: product,
       toelichting: `${toelichting}`,
       zaakgeometrie: zaakGeometrie, // api call works with undefined
-      omschrijving: `Migratie devops Geen zaaknummer`,
+      omschrijving: `${row.zaakomschrijving.substring(0,79)}`,
     };
     try {
       return await this.callCreateZaak(zaakParams, row);
