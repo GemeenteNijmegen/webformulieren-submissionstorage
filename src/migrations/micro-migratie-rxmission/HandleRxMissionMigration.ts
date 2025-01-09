@@ -295,9 +295,12 @@ export class HandleRxMissionMigration {
    * Returns undefined, no error on fail
    */
   async addResultaat(zaakUrl: string, row: Row) {
-    // Map row.zaakresultaat values to config `kenmerk` values
-    if (!row.zaakresultaat) return undefined;
 
+    // Only map for Lijst 1
+    // Map row.zaakresultaat values to config `kenmerk` values
+    if (this.migratieType === MigratieType.LIJST_1) {
+      if (!row.zaakresultaat) return undefined;
+    }
     // Lijst_1 mapping
     const resultaatMapping: Record<string, string> = {
       'Afgebroken': 'AFGEBROKEN',
@@ -320,7 +323,7 @@ export class HandleRxMissionMigration {
         kenmerk = resultaatMapping[zaakresultaat];
         break;
       case MigratieType.LIJST_2:
-        kenmerk = 'AFGESLOTEN'; // TODO: dit moet wellicht gewijzigd worden
+        kenmerk = 'AFGEBROKEN';
         break;
       default:
         kenmerk = undefined;
