@@ -177,12 +177,12 @@ export class RxMissionMigratie {
             rol = undefined;
         }
         if (!rol) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No rol added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-        
+
         //zaakresultaat
         const resultaat = await handleMigration.addResultaat(zaak.url, row);
         if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
         successLog.resultaat = resultaat;
-        
+
 
         this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, `${processedCount.toString()}${row.openwavezaaknummer}`);
         this.appendToJsonFile(JsonFileType.SUCCESS, { ...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen, rol, ...successLog });

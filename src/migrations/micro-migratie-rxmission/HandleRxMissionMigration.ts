@@ -298,9 +298,9 @@ export class HandleRxMissionMigration {
 
     // Only map for Lijst 1
     // Map row.zaakresultaat values to config `kenmerk` values
-    if(this.migratieType === MigratieType.LIJST_1){
+    if (this.migratieType === MigratieType.LIJST_1) {
       if (!row.zaakresultaat) return undefined;
-    }  
+    }
     // Lijst_1 mapping
     const resultaatMapping: Record<string, string> = {
       'Afgebroken': 'AFGEBROKEN',
@@ -323,7 +323,7 @@ export class HandleRxMissionMigration {
         kenmerk = resultaatMapping[zaakresultaat];
         break;
       case MigratieType.LIJST_2:
-        kenmerk = 'AFGEBROKEN'; 
+        kenmerk = 'AFGEBROKEN';
         break;
       default:
         kenmerk = undefined;
