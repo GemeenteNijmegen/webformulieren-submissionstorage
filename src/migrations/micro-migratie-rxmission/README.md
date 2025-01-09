@@ -1,11 +1,17 @@
-#### RxMission Migration
+## RxMission Migratie
 De scripts kunnen lokaal uitgevoerd worden. Niks hoeft gedeployed te worden.
 
 De map src/migrations/micro-migratie-rxmission/sensitive-files is in gitignore uitgesloten. 
 Hier kunnen de excels geplaatst worden die gemigreerd moeten worden.
-De huidige setup is specifiek voor die migratie excel. Gebaseerd op de kolomnamen en mappings met mogelijke velden (zaaktype en zaakresultaat).
-Bij hergebruik moet dus goed gekeken worden of de kolommen en inhoud ervan nog overeen komen.
-Met name checken: zaaktype, zaakresultaat, zaakgeometrie en velden die de rol aanmaken.
+De huidige setup is specifiek voor twee type migratie excels - Lijst 1 en Lijst 2. Gebaseerd op de kolomnamen en mappings met mogelijke velden (zaaktype en zaakresultaat).
+Bij hergebruik moet dus goed gekeken worden of de kolommen en inhoud ervan nog overeen komen en eventueel een nieuw migratietype toegevoegd worden.
+Met name checken: zaaktype, product, zaakresultaat, zaakgeometrie en velden die de rol aanmaken.
+
+### Locatie code
+Deze repo is niet perse logisch voor deze code. Nu gedaan omdat de ZGWClient in deze repo al ingericht was.
+Afspraak om het geheel te verhuizen indien er na 1 april nog meer migraties op de planning staan.
+In dat geval is aan te raden om werk te steken in een goede auto-generated ZGW-client module die hergebruikt kan worden op meerdere plekken.
+En natuurlijk een plek voor de migratie, in een aparte repo of een scripts repo. Aparte repo maakt archiveren gemakkelijker.
 
 ### Tools en benodigdheden
 - Postman RxMission Collectie met RxMission preprod en prod environment
@@ -21,7 +27,8 @@ Specifieke projenrc libraries nodig hiervoor.
 - ts-node voor lokaal uitvoeren van script
 
 ### Doel
-1200 records vanuit de excel middels api calls naar RxMission zetten. Later volgt nog een andere migratie/excel.
+Migraties vanuit excel uit kunnen voeren naar RxMission.
+Momenteel zijn dat twee type lijsten. 
 
 ### Veiligheid productie
 Om er zeker van te zijn dat de migratie niet lukraak op productie uitgevoerd wordt zijn er wat extra checks ingevoerd.
@@ -44,9 +51,11 @@ ZgwClient kan hergebruikt worden voor deze eenmalige migratie.
 1. Zaaktype: Overal hetzelfde zaaktype ODRN Schaduwzaak
 
 2. Product
-Twee soorten afhankelijk van zaaktype. 
+Twee soorten afhankelijk van zaaktype bij lijst 1 
 Zodra het woord "aanvraag", "besluit" of "beschik" in de excel kolom Zaaktype (case sensisitivity) staat: product NMG-000012 Kopie verleende vergunning
 Zodra het woord "melding" in de excel kolom Zaaktype staat: product NMG-000015 Kopie melding
+
+Bij lijst 2 is het product toezicht //NMG-00013 Kopie toezichtzaak - Lijst 2
 
 3. Zaakgeometrie
 Proberen om te zetten naar zaakgeometrie indien mogelijk. RD naar WSG84 conversie.
@@ -63,12 +72,15 @@ Voor gemak hier onderdelen uit de excel toevoegen om snel te kunnen verwerken:
 - doet een check of er meer dan 1000 chars zijn en haalt alles weg na die 1000. Zet te belangrijkste velden dus aan het begin.
 - geen bsn of kvk nummer, alleen of deze aanwezig is
 
+Lijst 2 heeft meer velden die te vinden zijn in de method createToelichting.
+
 #### Status
 Zaak gestart
 
 #### Rol
-Initiator en waar mogelijk ingevuld met bsn/kvk en contactgegevens.
-Zie ook zaak: toelichting
+Lijst 1: Initiator 
+Lijst 2: Belanghebbende
+En waar mogelijk ingevuld met bsn/kvk en contactgegevens. Zie ook zaak: toelichting
 
 #### Eigenschappen
 
@@ -76,6 +88,10 @@ Zie ook zaak: toelichting
 - Corsa zaaknummer
 
 #### Resultaattypen
+** Voor lijst 2
+Afgebroken
+
+** Voor lijst 1
 Uit kolom zaakresultaat. Hier is BRIKS functioneel beheer nog mee bezig.
 
 Afgebroken
@@ -106,6 +122,7 @@ Niet nodig (G) – 1 jaar
 
 #### Producten
 Producten komen niet uit de api, wij kunnen alleen bij preprod via de applicatie network calls (browser developer tools Network Call product op de juiste omgeving). Producten uit productie moet door functioneel beheer of RxMission gegeven worden.
+Bijvoorbeeld:
   {
     "url": "https://producten.preprod-rx-services.nl/api/v1/product/fe7c825a-4a8c-4f11-18e1-08dcce4a3fa1",
     "id": "fe7c825a-4a8c-4f11-18e1-08dcce4a3fa1",
