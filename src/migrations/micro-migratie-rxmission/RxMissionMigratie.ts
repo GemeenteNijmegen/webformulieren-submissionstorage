@@ -177,14 +177,12 @@ export class RxMissionMigratie {
             rol = undefined;
         }
         if (!rol) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No rol added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-
-        // TODO: nu wordt er geen resultaat toegevoegd
-        if (this.migratieType === MigratieType.LIJST_1) {
-          //zaakresultaat
-          const resultaat = await handleMigration.addResultaat(zaak.url, row);
-          if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
-          successLog.resultaat = resultaat;
-        }
+        
+        //zaakresultaat
+        const resultaat = await handleMigration.addResultaat(zaak.url, row);
+        if (!resultaat) { this.appendToLogFile(LogFileType.ERROR_LOG, `${processedCount}: No resultaat added ${zaak.identification} - ${zaak.url} - ${row.openwavezaaknummer}.`); }
+        successLog.resultaat = resultaat;
+        
 
         this.appendToJsonFile(JsonFileType.PROCESSED_ROWS, `${processedCount.toString()}${row.openwavezaaknummer}`);
         this.appendToJsonFile(JsonFileType.SUCCESS, { ...zaak, row: row.openwavezaaknummer, status: status, ...eigenschappen, rol, ...successLog });
@@ -357,7 +355,7 @@ export enum MigratieType {
  *
  * npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionMigratie.ts
  */
-export async function runMigration(inputFileName: string = 'openwave-export-20250108-lijst2.xlsx', migratieType: MigratieType = MigratieType.LIJST_2): Promise<void> {
+export async function runMigration(inputFileName: string = 'small-sample-lijst2.xlsx', migratieType: MigratieType = MigratieType.LIJST_2): Promise<void> {
   const confirm = await confirmProdEnvironment(inputFileName);
   if (!confirm) {
     console.log('Migration aborted.');
