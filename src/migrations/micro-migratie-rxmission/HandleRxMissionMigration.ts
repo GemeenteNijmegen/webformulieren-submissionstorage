@@ -31,9 +31,9 @@ export class HandleRxMissionMigration {
     if (PROD) {
       // This line prevents execution on production. Please comment to execute on prod.
       // One of the many fail-safes to make sure you are dealing with prod.
-      // throw new Error(
-      //   'Environment is PREPROD. Operation aborted. Delete this check once you are ready to migrate.',
-      // );
+      throw new Error(
+        'Environment is PREPROD. Operation aborted. Delete this check once you are ready to migrate.',
+      );
     }
     if (PROD) {
       console.log(`
