@@ -30,6 +30,10 @@
       "type": "build"
     },
     {
+      "name": "@types/proj4",
+      "type": "build"
+    },
+    {
       "name": "@types/sns-validator",
       "type": "build"
     },
@@ -178,7 +182,20 @@
       "type": "runtime"
     },
     {
+      "name": "proj4",
+      "type": "runtime"
+    },
+    {
       "name": "sns-validator",
+      "type": "runtime"
+    },
+    {
+      "name": "ts-node",
+      "type": "runtime"
+    },
+    {
+      "name": "xlsx",
+      "version": "0.18.5",
       "type": "runtime"
     },
     {
