@@ -21,10 +21,10 @@ export class RxMissionDeleteZaken {
   private zaakurls: string[];
 
   constructor(folderName = 'ztobedeleted') {
-    // Ensure the environment is PREPROD
-    // if (process.env.RX_ENV !== 'PREPROD') {
-    //   throw new Error('Environment is not PREPROD. Operation aborted.');
-    // }
+    //Ensure the environment is PREPROD
+    if (process.env.RX_ENV !== 'PREPROD') {
+      throw new Error('Environment is not PREPROD. Operation aborted.');
+    }
 
     console.log('Environment verified: PREPROD');
 
