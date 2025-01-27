@@ -22,9 +22,9 @@ export class RxMissionDeleteZaken {
 
   constructor(folderName = 'ztobedeleted') {
     // Ensure the environment is PREPROD
-    if (process.env.RX_ENV !== 'PREPROD') {
-      throw new Error('Environment is not PREPROD. Operation aborted.');
-    }
+    // if (process.env.RX_ENV !== 'PREPROD') {
+    //   throw new Error('Environment is not PREPROD. Operation aborted.');
+    // }
 
     console.log('Environment verified: PREPROD');
 
@@ -75,7 +75,7 @@ export class RxMissionDeleteZaken {
    * Delete all zaken in the loaded zaakurls
    */
   public async deleteZaken() {
-    const handleMigration = new HandleRxMissionMigration();
+    const handleMigration = new HandleRxMissionMigration(process.env.RX_ENV === "PROD");
     const totalZaken = this.zaakurls.length; // Total number of zaakUrls
     let processedCount = 0;
     let notFound = 0;
