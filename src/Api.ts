@@ -253,7 +253,7 @@ export class Api extends Construct {
     new Rule(this, 'submitted-cronjob', {
       description: 'Weekly submitted forms creation',
       schedule: Schedule.cron({
-        weekDay: '1', // Every Monday
+        weekDay: 'MON', // Every Monday https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html
         hour: '4',
         minute: '1',
       }),
