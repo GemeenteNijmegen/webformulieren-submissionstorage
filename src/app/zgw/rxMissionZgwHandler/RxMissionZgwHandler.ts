@@ -132,12 +132,15 @@ export class RxMissionZgwHandler {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
     const bytes = await inhoud?.Body?.transformToByteArray();
+    const mimeType: string | undefined = inhoud?.ContentType;
+    console.debug(`Mimetype retrieved from S3: ${mimeType} for ${attachmentKey}`);
     if (!bytes) {
       throw Error('error converting file');
     }
     const blob = new Blob([bytes]);
     const document = new RXMissionDocument({
       fileName: attachment,
+      mimeType: mimeType,
       informatieObjectType: informatieObjectType,
       zgwClient: this.zgwClient,
       contents: blob,
