@@ -9,6 +9,7 @@ interface RXMissionDocumentConfig {
   fileName: string;
   filePath?: string;
   contents?: Blob;
+  mimeType?: string | undefined;
   informatieObjectType: string;
   informatieObjectProperties?: any;
 }
@@ -28,6 +29,7 @@ export class RXMissionDocument {
   private lock?: string;
   private fileName: string;
   private contents: Blob;
+  private mimeType: string;
   private identificatie?: string;
 
   constructor(config: RXMissionDocumentConfig) {
@@ -36,6 +38,7 @@ export class RXMissionDocument {
     this.informatieObjectProperties = config.informatieObjectProperties;
     this.identificatie = config.identificatie;
     this.fileName = config.fileName;
+    this.mimeType = config.mimeType ?? 'application/pdf';
     if (config.filePath) {
       this.contents = new Blob([this.getFile(config.filePath)]);
     } else if (config.contents) {
@@ -119,7 +122,7 @@ export class RXMissionDocument {
       vertrouwelijkheidaanduiding: 'openbaar',
       auteur: 'Devops Nijmegen',
       status: '',
-      formaat: 'application/pdf',
+      formaat: this.mimeType,
       taal: 'nld',
       bestandsnaam: this.fileName,
       inhoud: null,
