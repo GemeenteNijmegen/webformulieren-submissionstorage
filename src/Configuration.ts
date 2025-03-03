@@ -1,3 +1,4 @@
+import { Criticality } from '@gemeentenijmegen/aws-constructs';
 import { Environment as CdkEnvironment } from 'aws-cdk-lib';
 import { Statics } from './statics';
 
@@ -82,6 +83,10 @@ export interface Configuration {
    * @default false
    */
   readonly debug?: boolean;
+  /**
+   * Criticality for alarms
+   */
+  criticality: Criticality;
 }
 
 export function getConfiguration(branchName: string): Configuration {
@@ -112,6 +117,7 @@ const configurations: { [name: string] : Configuration } = {
     forwardToZgw: true,
     enableRxMissionZwgHandler: true,
     debug: true,
+    criticality: new Criticality('low'),
   },
   acceptance: {
     branchName: 'acceptance',
@@ -127,6 +133,7 @@ const configurations: { [name: string] : Configuration } = {
     ],
     useGatewayAuthorizer: false,
     enableRxMissionZwgHandler: false,
+    criticality: new Criticality('low'),
   },
   production: {
     branchName: 'main',
@@ -143,5 +150,6 @@ const configurations: { [name: string] : Configuration } = {
     useDnsSec: true,
     useGatewayAuthorizer: false,
     enableRxMissionZwgHandler: true,
+    criticality: new Criticality('high'),
   },
 };
