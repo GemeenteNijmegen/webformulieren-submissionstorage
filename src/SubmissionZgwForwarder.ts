@@ -1,3 +1,4 @@
+import { ErrorMonitoringAlarm } from '@gemeentenijmegen/aws-constructs';
 import { Duration } from 'aws-cdk-lib';
 import { AttributeType, BillingMode, ITable, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule } from 'aws-cdk-lib/aws-events';
@@ -44,8 +45,20 @@ export class SubmissionZgwForwarder extends Construct {
       const zaakIdentifierMappingTable = this.zaakIdentifierMappingTable(key);
 
       const rxMissionZgwLambda = this.createRxMissionZgwHandlerLambda(storageBucket, table, zaakIdentifierMappingTable);
+      this.setLambdaErrorAlarm(rxMissionZgwLambda);
       this.addRxMissionEventSubscription(rxMissionZgwLambda);
     }
+  }
+  setLambdaErrorAlarm( rxMissionZgwLambda: RxmissionZgwFunction) {
+    new ErrorMonitoringAlarm(this, 'rxmission-zgw-lambda-alarm', {
+      criticality: this.props.configuration.criticality.toString(),
+      lambda: rxMissionZgwLambda,
+      errorRateProps: {
+        alarmThreshold: 1,
+        alarmEvaluationPeriods: 1,
+        alarmEvaluationPeriod: Duration.minutes(15),
+      },
+    });
   }
 
 

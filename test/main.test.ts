@@ -1,3 +1,4 @@
+import { Criticality } from '@gemeentenijmegen/aws-constructs';
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { ApiStack } from '../src/ApiStack';
@@ -15,6 +16,7 @@ const configuration: Configuration = {
     region: 'eu-central-1',
   },
   includePipelineValidationChecks: false,
+  criticality: new Criticality('low'),
 };
 
 test('Snapshot', () => {

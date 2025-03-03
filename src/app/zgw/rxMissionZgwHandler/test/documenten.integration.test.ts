@@ -6,7 +6,6 @@ import { RXMissionDocument } from '../RXMissionDocument';
 
 const sampleFilePath = path.resolve(__dirname, 'samples/test.pdf');
 
-
 describe('Document upload test', () => {
   const originalEnv = process.env;
   beforeEach(() => {
@@ -19,8 +18,7 @@ describe('Document upload test', () => {
     process.env = originalEnv;
   });
 
-
-  test('Can create document in ZGW store', async() => {
+  test('Can create document in ZGW store', async () => {
     const env = environmentVariables(['INFORMATIEOBJECTTYPE']);
     const zgwClient = zgwTestClient();
     setFetchMockResponse({
@@ -37,14 +35,52 @@ describe('Document upload test', () => {
     });
     await document.addToZaak('https://zaak-test/zaak');
     console.debug(spyOnFetch.mock.calls);
-    expect(spyOnFetch.mock.calls[0][0]).toBe('https://documenten-api/enkelvoudiginformatieobjecten');
+    expect(spyOnFetch.mock.calls[0][0]).toBe(
+      'https://documenten-api/enkelvoudiginformatieobjecten',
+    );
+    // No mimetype provided defaults to application/pdf
+    expect(spyOnFetch).toHaveBeenNthCalledWith(
+      1,
+      expect.any(String),
+      expect.objectContaining({
+        body: expect.stringContaining('"formaat":"application/pdf"'),
+      }),
+    );
+  });
+  test('Creates a document with the provided mimetype', async () => {
+    const env = environmentVariables(['INFORMATIEOBJECTTYPE']);
+    const zgwClient = zgwTestClient();
+    setFetchMockResponse({
+      url: 'http://someurl',
+      statusCode: 204, //hacky, some requests expect a url, some a statuscode
+    });
+    const spyOnFetch = jest.spyOn(global, 'fetch');
+    const document = new RXMissionDocument({
+      zgwClient: zgwClient,
+      informatieObjectType: env.INFORMATIEOBJECTTYPE,
+      fileName: 'testfile',
+      mimeType: 'image/png',
+      filePath: sampleFilePath,
+      identificatie: 'TEST1',
+    });
+    await document.addToZaak('https://zaak-test/zaak');
+    console.debug(spyOnFetch.mock.calls);
+    expect(spyOnFetch.mock.calls[0][0]).toBe(
+      'https://documenten-api/enkelvoudiginformatieobjecten',
+    );
+    // Mimetype provided
+    expect(spyOnFetch).toHaveBeenNthCalledWith(
+      1,
+      expect.any(String),
+      expect.objectContaining({
+        body: expect.stringContaining('"formaat":"image/png"'),
+      }),
+    );
   });
 });
 
-
 describeIntegration('Live document upload test', () => {
-
-  test('Can create document in ZGW store', async() => {
+  test('Can create document in ZGW store', async () => {
     const env = environmentVariables(['INFORMATIEOBJECTTYPE']);
     const zgwClient = liveTestZgwClient();
     const spyOnFetch = jest.spyOn(global, 'fetch');
@@ -56,14 +92,15 @@ describeIntegration('Live document upload test', () => {
         filePath: sampleFilePath,
         identificatie: 'TEST1',
       });
-      await document.addToZaak('https://zaken.preprod-rx-services.nl/api/v1/zaken/bf8e1c72-b6be-403b-bfb7-406c8408ab91');
+      await document.addToZaak(
+        'https://zaken.preprod-rx-services.nl/api/v1/zaken/bf8e1c72-b6be-403b-bfb7-406c8408ab91',
+      );
     } catch (error) {
       console.error(error);
     }
     console.debug(spyOnFetch.mock.calls);
   });
 });
-
 
 function zgwTestClient() {
   const client = new ZgwClient({
@@ -138,5 +175,3 @@ function setFetchMockResponse(response: any) {
     });
   }) as jest.Mock;
 }
-
-
