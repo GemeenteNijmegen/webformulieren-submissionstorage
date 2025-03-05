@@ -88,7 +88,7 @@ export class RXMissionDocument {
     }
     await this.unlock();
     await this.relateToZaak(zaakUrl);
-
+    console.log(`Informatieobject toegevoegd aan zaak ${this.identificatie}. Soort ${this.mimeType}`);
   }
 
   private async uploadFile(bestandsDeelUrl: any) {
