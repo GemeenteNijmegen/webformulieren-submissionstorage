@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.758.0",
-    "@gemeentenijmegen/projen-project-type": "^1.9.0",
+    "@gemeentenijmegen/projen-project-type": "^1.10.0",
     "@stylistic/eslint-plugin": "^2",
     "@testcontainers/localstack": "^10.19.0",
     "@types/jest": "^29.5.14",
@@ -93,7 +93,7 @@
     "@gemeentenijmegen/utils": "^0.0.26",
     "@types/aws-lambda": "^8.10.147",
     "aws-cdk-lib": "^2.1.0",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "cdk-remote-stack": "^2.1.0",
     "constructs": "^10.0.5",
     "dotenv": "^16.4.7",
