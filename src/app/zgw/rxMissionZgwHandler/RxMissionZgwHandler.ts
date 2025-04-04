@@ -132,8 +132,12 @@ export class RxMissionZgwHandler {
     const attachmentKey = `${key}/${attachment}`;
     const inhoud = await this.storage.get(attachmentKey);
     const bytes = await inhoud?.Body?.transformToByteArray();
-    const mimeType: string | undefined = inhoud?.ContentType;
-    console.debug(`Mimetype retrieved from S3: ${mimeType} for ${attachmentKey}`);
+    const mimeTypeFromExtension = this.getMimeTypeFromExtension(attachment);
+    const mimeType = inhoud?.ContentType === 'application/octet-stream' || !inhoud?.ContentType
+      ? mimeTypeFromExtension
+      : inhoud.ContentType;
+
+    console.debug(`Resolved MIME type: ${mimeType} for ${attachmentKey}. Original contentype ${inhoud?.ContentType}`);
     if (!bytes) {
       throw Error('error converting file');
     }
@@ -148,4 +152,28 @@ export class RxMissionZgwHandler {
     });
     return document.addToZaak(zaak);
   }
+  /**
+   * Util to get the mimetype from the filename
+   * Forms only allow jpg, jpeg, png and pdf
+   * ConentType does not seem to return the correct type
+   * @param fileName
+   * @returns
+   */
+  getMimeTypeFromExtension(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      default:
+        console.warn(`[getMimeTypeFromExtension] Unable to retrieve mimetype, default to octet ${fileName}`);
+        return 'application/octet-stream';
+    }
+  }
+
+
 }
