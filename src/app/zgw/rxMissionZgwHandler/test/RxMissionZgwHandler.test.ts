@@ -4,13 +4,22 @@ import path from 'path';
 // @ts-ignore: Ignoring unused import
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 // @ts-ignore: Ignoring unused import
-import { AWS, Bsn, environmentVariables, S3Storage } from '@gemeentenijmegen/utils';
+import {
+  AWS,
+  Bsn,
+  environmentVariables,
+  S3Storage,
+} from '@gemeentenijmegen/utils';
 import { mockClient } from 'aws-sdk-client-mock';
 import { MockRxMissionSubmission } from './mocks/RxMissionSubmission.mock';
 // @ts-ignore: Ignoring unused import
 import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
-import { getRxMissionZgwConfiguration, getSubmissionPropsForFormWithBranch, getSubmissionPropsFromAppIdOrFormName } from '../RxMissionZgwConfiguration';
+import {
+  getRxMissionZgwConfiguration,
+  getSubmissionPropsForFormWithBranch,
+  getSubmissionPropsFromAppIdOrFormName,
+} from '../RxMissionZgwConfiguration';
 import { RxMissionZgwHandler } from '../RxMissionZgwHandler';
 
 // The ZgwHttpClient still uses process env
@@ -29,13 +38,14 @@ process.env = {
   BUCKET_NAME: 'testBucket',
   TABLE_NAME: 'testTable',
   ZAAKREFERENCE_TABLE_NAME: 'testReferenceTable',
-  ZAAKTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
-  ROLTYPE: 'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
+  ZAAKTYPE:
+    'https://catalogi.preprod-rx-services.nl/api/v1/zaaktypen/07fea148-1ede-4f39-bd2a-d5f43855e707',
+  ROLTYPE:
+    'https://catalogi.preprod-rx-services.nl/api/v1/roltypen/5ecbff9a-767b-4684-b158-c2217418054e',
   ZAKEN_API_URL: 'https://zaken.preprod-rx-services.nl/api/v1/',
   DOCUMENTEN_API_URL: 'https://documenten.preprod-rx-services.nl/api/v1/',
   BRANCH: 'development',
 };
-
 
 let mockDBGetSubmission = jest.fn().mockResolvedValue({});
 mockClient(DynamoDBClient);
@@ -59,41 +69,57 @@ jest.mock('@gemeentenijmegen/utils', () => {
       return {
         get: mockS3Get,
       };
-    },
-    ),
+    }),
     AWS: {
       getSecret: jest.fn().mockResolvedValue('mockedSecretValue'),
     },
   };
 });
 
-
 describe('RxMissionZgwHandler', () => {
   test('Kamerverhuur Aanvraag', async () => {
-    const mockSubmission = new MockRxMissionSubmission('KamerverhuurVergunning');
+    const mockSubmission = new MockRxMissionSubmission(
+      'KamerverhuurVergunning',
+    );
     mockSubmission.debugLogMockInfo();
     const rxMissionZgwConfig = getRxMissionZgwConfiguration('development');
 
     // Get data from database
-    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
+    mockDBGetSubmission = jest
+      .fn()
+      .mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
     // Get submission json and attachment
-    mockS3Get = jest.fn()
+    mockS3Get = jest
+      .fn()
       .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
       .mockResolvedValue(mockSubmission.getMockStorageBlob());
 
     // Please check the matchers if it fails, not foolproof right now WIP
     const fetchMock: any = getFetchMockImplementation(fetchMockMatchers);
-    const spyOnFetch = jest.spyOn(global, 'fetch').mockImplementation(fetchMock);
+    const spyOnFetch = jest
+      .spyOn(global, 'fetch')
+      .mockImplementation(fetchMock);
 
     // Does not return anything with the get right now, which means getZaakByUrl is not called. Check matcher if you add something here and it fails
 
-    const config = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfig, { appId: mockSubmission.getAppId() });
-    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
+    const config = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfig, {
+      appId: mockSubmission.getAppId(),
+    });
+    const rxMissionZgwHandler = new RxMissionZgwHandler(
+      getRxMissionZgwConfiguration('development'),
+      getSubmissionPropsForFormWithBranch('development', {
+        appId: mockSubmission.getAppId(),
+      }),
+    );
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
     await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
 
-    const create_zaak_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}zaken`);
-    const create_status_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}statussen`);
+    const create_zaak_call = spyOnFetch.mock.calls.find(
+      (call) => call[0] == `${process.env.ZAKEN_API_URL}zaken`,
+    );
+    const create_status_call = spyOnFetch.mock.calls.find(
+      (call) => call[0] == `${process.env.ZAKEN_API_URL}statussen`,
+    );
 
     expectfetchCallBodyToContain(create_zaak_call, config.productType);
     expectfetchCallBodyToContain(create_status_call, config.statusType);
@@ -107,23 +133,32 @@ describe('RxMissionZgwHandler', () => {
     //const rxMissionZgwConfig = getRxMissionZgwConfiguration('development');
 
     // Get data from database
-    mockDBGetSubmission = jest.fn().mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
+    mockDBGetSubmission = jest
+      .fn()
+      .mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
     // Get submission json and attachment
-    mockS3Get = jest.fn()
+    mockS3Get = jest
+      .fn()
       .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
       .mockResolvedValue(mockSubmission.getMockStorageBlob()); // Laatste calls zijn altijd nepfiles
     // All Zgw API calls
 
     // Please check the matchers if it fails, not foolproof right now WIP
     const fetchMock: any = getFetchMockImplementation(fetchMockMatchers);
-    const spyOnFetch = jest.spyOn(global, 'fetch').mockImplementation(fetchMock);
+    const spyOnFetch = jest
+      .spyOn(global, 'fetch')
+      .mockImplementation(fetchMock);
 
     //const config = getSubmissionPropsFromAppIdOrFormName(rxMissionZgwConfig, { appId: mockSubmission.getAppId() });
 
-    const rxMissionZgwHandler = new RxMissionZgwHandler(getRxMissionZgwConfiguration('development'), getSubmissionPropsForFormWithBranch('development', { appId: mockSubmission.getAppId() }));
+    const rxMissionZgwHandler = new RxMissionZgwHandler(
+      getRxMissionZgwConfiguration('development'),
+      getSubmissionPropsForFormWithBranch('development', {
+        appId: mockSubmission.getAppId(),
+      }),
+    );
     const { key, userId, userType } = mockSubmission.getSubmissionParameters();
     await rxMissionZgwHandler.sendSubmissionToRxMission(key, userId, userType);
-
 
     // const create_zaak_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}zaken`);
     // const create_status_call = spyOnFetch.mock.calls.find(call => call[0] == `${process.env.ZAKEN_API_URL}statussen`);
@@ -131,6 +166,51 @@ describe('RxMissionZgwHandler', () => {
     // expectfetchCallBodyToContain(create_status_call, config.statusType);
     writeOutputToFile('hadgeenbetrokkene', spyOnFetch.mock.calls);
   });
+
+  test('getMimeTypeFromExtension returns correct MIME types', () => {
+    //Build mockinformation based on a specific json from a form
+    const mockSubmission = new MockRxMissionSubmission('HadGeenBetrokkene');
+    mockSubmission.debugLogMockInfo();
+    //const rxMissionZgwConfig = getRxMissionZgwConfiguration('development');
+
+    // Get data from database
+    mockDBGetSubmission = jest
+      .fn()
+      .mockResolvedValue(mockSubmission.mockedDatabaseGetSubmission());
+    // Get submission json and attachment
+    mockS3Get = jest
+      .fn()
+      .mockResolvedValueOnce(mockSubmission.getMockStorageSubmission())
+      .mockResolvedValue(mockSubmission.getMockStorageBlob()); // Laatste calls zijn altijd nepfiles
+    // All Zgw API calls
+
+    // Please check the matchers if it fails, not foolproof right now WIP
+    const fetchMock: any = getFetchMockImplementation(fetchMockMatchers);
+    jest.spyOn(global, 'fetch').mockImplementation(fetchMock);
+    const rxMissionZgwHandler = new RxMissionZgwHandler(
+      getRxMissionZgwConfiguration('development'),
+      getSubmissionPropsForFormWithBranch('development', {
+        appId: mockSubmission.getAppId(),
+      }),
+    );
+
+    expect(rxMissionZgwHandler.getMimeTypeFromExtension('document.pdf')).toBe(
+      'application/pdf',
+    );
+    expect(rxMissionZgwHandler.getMimeTypeFromExtension('image.JPG')).toBe(
+      'image/jpeg',
+    );
+    expect(rxMissionZgwHandler.getMimeTypeFromExtension('image.jpeg')).toBe(
+      'image/jpeg',
+    );
+    expect(rxMissionZgwHandler.getMimeTypeFromExtension('photo.png')).toBe(
+      'image/png',
+    );
+    expect(
+      rxMissionZgwHandler.getMimeTypeFromExtension('unknownfile.bin'),
+    ).toBe('application/octet-stream');
+  });
+
 });
 
 /**
@@ -175,9 +255,16 @@ interface FetchMockMatcher {
   response: any;
 }
 
-export function getFetchMockImplementation(fetchMockMatchers: FetchMockMatcher[]) {
+export function getFetchMockImplementation(
+  fetchMockMatchers: FetchMockMatcher[],
+) {
   return async (input: string | URL | Request, options?: RequestInit) => {
-    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    const url =
+      typeof input === 'string'
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
     const method = options?.method?.toUpperCase() || 'GET';
 
     // Extract the relevant full path from the URL
@@ -186,7 +273,9 @@ export function getFetchMockImplementation(fetchMockMatchers: FetchMockMatcher[]
     const fullPath = match ? match[1] : '/'; // Full path, including query params
 
     // Sort matchers: prioritize longer and more specific matches first
-    const sortedMatchers = fetchMockMatchers.sort((a, b) => b.urlPathMatch.length - a.urlPathMatch.length);
+    const sortedMatchers = fetchMockMatchers.sort(
+      (a, b) => b.urlPathMatch.length - a.urlPathMatch.length,
+    );
 
     // Find the first matching mock
     const matcher = sortedMatchers.find((mock) => {
@@ -203,7 +292,9 @@ export function getFetchMockImplementation(fetchMockMatchers: FetchMockMatcher[]
     }
 
     // If no match is found, throw an error or return a default response
-    return Promise.reject(new Error(`No mock found for ${method} ${fullPath} and ${input}`));
+    return Promise.reject(
+      new Error(`No mock found for ${method} ${fullPath} and ${input}`),
+    );
   };
 }
 
@@ -211,7 +302,11 @@ const fetchMockMatchers = [
   {
     method: ['POST'],
     urlPathMatch: '/zaken',
-    response: { url: 'https://someurl', zaakinformatieobjecten: [], rollen: [] }, // createZaak
+    response: {
+      url: 'https://someurl',
+      zaakinformatieobjecten: [],
+      rollen: [],
+    }, // createZaak
   },
   {
     method: ['GET'],
@@ -245,7 +340,10 @@ const fetchMockMatchers = [
   {
     method: ['PUT'],
     urlPathMatch: '/bestandsdeelurl',
-    response: { statusCode: 204, url: 'https://somebasedomain.nl/uploadresult' }, // unlock
+    response: {
+      statusCode: 204,
+      url: 'https://somebasedomain.nl/uploadresult',
+    }, // unlock
   },
   {
     method: ['POST'],

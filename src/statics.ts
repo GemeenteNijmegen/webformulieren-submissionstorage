@@ -4,8 +4,8 @@ export abstract class Statics {
   static readonly repository: string = 'webformulieren-submissionstorage';
 
   /**
-   * Environments (in new lz)
-   */
+     * Environments (in new lz)
+     */
   static readonly gnBuildEnvironment = {
     account: '836443378780',
     region: 'eu-central-1',
