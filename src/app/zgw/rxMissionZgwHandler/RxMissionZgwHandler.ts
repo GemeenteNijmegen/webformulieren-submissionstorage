@@ -144,6 +144,7 @@ export class RxMissionZgwHandler {
       informatieObjectType: informatieObjectType,
       zgwClient: this.zgwClient,
       contents: blob,
+      identificatie: key,
     });
     return document.addToZaak(zaak);
   }
