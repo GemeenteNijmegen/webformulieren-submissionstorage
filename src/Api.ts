@@ -115,6 +115,7 @@ export class Api extends Construct {
       const parameters = new RemoteParameters(this, 'hostedzone-params', {
         path: `${Statics.ssmZonePath}/`,
         region: 'us-east-1',
+        timeout: Duration.seconds(10),
       });
       const zoneName = parameters.get(Statics.ssmZoneName);
       const hostedZoneId = parameters.get(Statics.ssmZoneId);
@@ -356,6 +357,7 @@ export class Api extends Construct {
     const parameters = new RemoteParameters(this, 'params', {
       path: `${Statics.certificatePath}/`,
       region: 'us-east-1',
+      timeout: Duration.seconds(10),
     });
     const certificateArn = parameters.get(Statics.certificateArn);
     const certificate = Certificate.fromCertificateArn(this, 'cert', certificateArn);
