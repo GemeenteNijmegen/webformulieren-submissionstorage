@@ -115,7 +115,6 @@ export class RXMissionDocument {
 
   private async createInformatieObject(informatieobjecttype: string, fileSize: number) {
     const doc = {
-      identificatie: this.identificatie, //Combi moet uniek zijn met bronorganisatie
       bronorganisatie: '001479179', //Combi moet uniek zijn met identificatie
       creatiedatum: new Date().toISOString().substring(0, 'YYYY-MM-DD'.length),
       titel: this.fileName,
