@@ -76,7 +76,7 @@
     "jest-junit": "^16",
     "projen": "^0.91.20",
     "testcontainers": "^10.24.2",
-    "ts-jest": "^29.3.1",
+    "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
