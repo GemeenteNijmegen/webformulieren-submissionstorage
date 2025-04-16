@@ -1,13 +1,13 @@
-import { Storage } from '@gemeentenijmegen/utils';
 import { z } from 'zod';
+import { dateArrayToDate } from '../../utils/dateArrayToDate';
+import { UserType } from '../shared/UserType';
 import { Database } from './Database';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
 import { getHashedUserId, HashedUserId } from './hash';
 import { s3Object } from './s3Object';
-import { SubmissionPaymentSchema, SubmissionSchema, s3ObjectSchema } from './SubmissionSchema';
-import { dateArrayToDate } from '../../utils/dateArrayToDate';
-import { UserType } from '../shared/UserType';
+import { Storage } from './Storage';
+import { s3ObjectSchema, SubmissionPaymentSchema, SubmissionSchema } from './SubmissionSchema';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
