@@ -93,7 +93,9 @@ export class S3Storage implements Storage {
     console.debug(
       `copying ${sourceKey} in ${sourceRegion} to ${destinationKey}`,
     );
-    if (this.clients.default.region == sourceRegion) {
+    const currentRegion = this.clients.default.region ?? process.env.AWS_REGION;
+    console.debug('regions:', currentRegion, sourceRegion);
+    if (currentRegion == sourceRegion) {
       console.debug(
         'Same region, use more efficiënt copy command',
       );
