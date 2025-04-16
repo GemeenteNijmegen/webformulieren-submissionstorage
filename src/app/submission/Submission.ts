@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { dateArrayToDate } from '../../utils/dateArrayToDate';
-import { UserType } from '../shared/UserType';
 import { Database } from './Database';
 import { FormConnector } from './FormConnector';
 import { getSubObjectsWithKey } from './getSubObjectsWithKey';
@@ -8,6 +6,8 @@ import { getHashedUserId, HashedUserId } from './hash';
 import { s3Object } from './s3Object';
 import { Storage } from './Storage';
 import { s3ObjectSchema, SubmissionPaymentSchema, SubmissionSchema } from './SubmissionSchema';
+import { dateArrayToDate } from '../../utils/dateArrayToDate';
+import { UserType } from '../shared/UserType';
 
 type ParsedSubmission = z.infer<typeof SubmissionSchema>;
 
