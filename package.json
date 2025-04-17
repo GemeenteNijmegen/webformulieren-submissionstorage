@@ -83,7 +83,7 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.18.0",
     "@aws-sdk/client-dynamodb": "^3.788.0",
-    "@aws-sdk/client-eventbridge": "^3.787.0",
+    "@aws-sdk/client-eventbridge": "^3.790.0",
     "@aws-sdk/client-s3": "^3.787.0",
     "@aws-sdk/client-ssm": "^3.787.0",
     "@aws-sdk/s3-request-presigner": "^3.787.0",
@@ -103,7 +103,7 @@
     "sns-validator": "^0.3.5",
     "ts-node": "^10.9.2",
     "xlsx": "0.18.5",
-    "zod": "^3.24.2"
+    "zod": "^3.24.3"
   },
   "license": "EUPL-1.2",
   "publishConfig": {
