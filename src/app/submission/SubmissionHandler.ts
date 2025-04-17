@@ -1,5 +1,5 @@
 import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
-import { S3Storage, Storage, AWS } from '@gemeentenijmegen/utils';
+import { AWS, S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
 import { Submission } from './Submission';

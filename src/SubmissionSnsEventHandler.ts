@@ -1,7 +1,7 @@
 import { Duration } from 'aws-cdk-lib';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { EventBus } from 'aws-cdk-lib/aws-events';
-import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Function } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -70,7 +70,17 @@ export class SubmissionSnsEventHandler extends Construct {
       timeout: Duration.minutes(5),
     });
     bucket.grantWrite(submissionLambda);
+    bucket.addToResourcePolicy(new PolicyStatement({
+      actions: ['s3:PutObjectTagging'],
+      resources: [`${bucket.bucketArn}/*`],
+      principals: [this.lambdaRole().grantPrincipal],
+    }));
     sourceBucket.grantRead(submissionLambda);
+    sourceBucket.addToResourcePolicy(new PolicyStatement({
+      actions: ['s3:GetObjectTagging'],
+      resources: [`${sourceBucket.bucketArn}/*`],
+      principals: [this.lambdaRole().grantPrincipal],
+    }));
     table.grantReadWriteData(submissionLambda);
     secret.grantRead(submissionLambda);
     const key = Key.fromKeyArn(this, 'sourceBucketKey', StringParameter.valueForStringParameter(this, Statics.ssmSourceKeyArn));
