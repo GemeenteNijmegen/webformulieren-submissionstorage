@@ -1,10 +1,9 @@
 import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
-import { AWS } from '@gemeentenijmegen/utils';
+import { AWS, S3Storage, Storage } from '@gemeentenijmegen/utils';
+import { ZgwForwardEventDetail } from '../zgw/shared/zgwForwardEvent.model';
 import { DynamoDBDatabase } from './Database';
 import { FormIoFormConnector } from './FormConnector';
-import { S3Storage, Storage } from './Storage';
 import { Submission } from './Submission';
-import { ZgwForwardEventDetail } from '../zgw/shared/zgwForwardEvent.model';
 
 
 export class SubmissionHandler {
