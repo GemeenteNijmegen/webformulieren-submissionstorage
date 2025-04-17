@@ -1498,10 +1498,10 @@
   resolved "https://registry.yarnpkg.com/@gemeentenijmegen/projen-project-type/-/projen-project-type-1.10.1.tgz#5ed9db1a0c2b3ab394de2173df84f219e9a7255b"
   integrity sha512-p9VWa+g3pXCsjyc0jswj2qFV/NyA3WwIzEqno06bLRBZFBy1dueBRMuVui0vdDJLiNJeuRY8mFVPsHjD6GGW6A==
 
-"@gemeentenijmegen/utils@^0.0.29":
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/@gemeentenijmegen/utils/-/utils-0.0.29.tgz#e0916e6edae6d627ee6508c4a40dacdcf839a41d"
-  integrity sha512-3CzYhDOtttIbg3pnb/pcBDmRcs6cj+SujO90zB9NPMeaM0s0jU8J7C+pphX10ekLfuhSfZNPqfpLl9tNtugoaQ==
+"@gemeentenijmegen/utils@^0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@gemeentenijmegen/utils/-/utils-0.0.30.tgz#8b822142f54e1c9956117f7d63359b5514894281"
+  integrity sha512-zPCvAX/Ku4W6tYt0BOfAL6mTJZX4Z2TvxbqAWnBT/8iz4JtZsPSDAQak2P36WFnCp5NJ+LN1ueWkBgW4p/5MsA==
   dependencies:
     "@aws-sdk/client-s3" "^3.779.0"
     "@aws-sdk/client-secrets-manager" "^3.777.0"
