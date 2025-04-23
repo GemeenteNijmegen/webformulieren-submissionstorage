@@ -92,7 +92,7 @@
       "description": "Create a JavaScript bundle from src/app/download/download.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -101,7 +101,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/download/download.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/download/download.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/download/download.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -110,7 +110,7 @@
       "description": "Create a JavaScript bundle from src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -119,7 +119,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/formOverview/authorizer/JwtAuthorizer.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/authorizer/JwtAuthorizer.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -128,7 +128,7 @@
       "description": "Create a JavaScript bundle from src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormCount/getFormCountExpired.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormCount/getFormCountExpired.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -137,7 +137,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormCount/getFormCountExpired.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/formOverview/getFormCount/getFormCountExpired.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormCount/getFormCountExpired.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -146,7 +146,7 @@
       "description": "Create a JavaScript bundle from src/app/formOverview/getFormOverview/getFormOverview.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/getFormOverview/getFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormOverview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/formOverview/getFormOverview/getFormOverview.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormOverview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -155,7 +155,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/formOverview/getFormOverview/getFormOverview.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/getFormOverview/getFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormOverview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/formOverview/getFormOverview/getFormOverview.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/getFormOverview/getFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -164,7 +164,7 @@
       "description": "Create a JavaScript bundle from src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/listFormOverviews/listFormOverviews.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/listFormOverviews/listFormOverviews.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -173,7 +173,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/listFormOverviews/listFormOverviews.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/formOverview/listFormOverviews/listFormOverviews.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/listFormOverviews/listFormOverviews.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -182,7 +182,7 @@
       "description": "Create a JavaScript bundle from src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/submittedFormOverview/submittedFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/submittedFormOverview/submittedFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -191,7 +191,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/formOverview/submittedFormOverview/submittedFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/formOverview/submittedFormOverview/submittedFormOverview.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/formOverview/submittedFormOverview/submittedFormOverview.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -200,7 +200,7 @@
       "description": "Create a JavaScript bundle from src/app/listSubmissions/listSubmissions.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -209,7 +209,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/listSubmissions/listSubmissions.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/listSubmissions/listSubmissions.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/listSubmissions/listSubmissions.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -218,7 +218,7 @@
       "description": "Create a JavaScript bundle from src/app/submission/submission.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -227,7 +227,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/submission/submission.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/submission/submission.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/submission/submission.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -236,7 +236,7 @@
       "description": "Create a JavaScript bundle from src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -245,7 +245,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -254,7 +254,7 @@
       "description": "Create a JavaScript bundle from src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -263,7 +263,7 @@
       "description": "Continuously update the JavaScript bundle from src/app/zgw/zgwForwardingHandler/zgw.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/app/zgw/zgwForwardingHandler/zgw.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/app/zgw/zgwForwardingHandler/zgw.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -272,7 +272,7 @@
       "description": "Create a JavaScript bundle from src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -281,7 +281,7 @@
       "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-02-06-enrich-table.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/migrations/migration-2024-02-06-enrich-table.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-02-06-enrich-table.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -290,7 +290,7 @@
       "description": "Create a JavaScript bundle from src/migrations/migration-2024-11-06-fix-kvk.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -299,7 +299,7 @@
       "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-11-06-fix-kvk.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-06-fix-kvk.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-06-fix-kvk.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
@@ -308,7 +308,7 @@
       "description": "Create a JavaScript bundle from src/migrations/migration-2024-11-18-add-userType.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-11-18-add-userType.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-18-add-userType.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-18-add-userType.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-18-add-userType.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/*"
         }
       ]
     },
@@ -317,7 +317,7 @@
       "description": "Continuously update the JavaScript bundle from src/migrations/migration-2024-11-18-add-userType.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/migrations/migration-2024-11-18-add-userType.lambda.ts --target=\"node20\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-18-add-userType.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
+          "exec": "esbuild --bundle src/migrations/migration-2024-11-18-add-userType.lambda.ts --target=\"node22\" --platform=\"node\" --outfile=\"assets/migrations/migration-2024-11-18-add-userType.lambda/index.js\" --tsconfig=\"tsconfig.dev.json\" --external:@aws-sdk/* --watch"
         }
       ]
     },
