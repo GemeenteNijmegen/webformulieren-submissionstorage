@@ -17,7 +17,7 @@ export class Migration20241106FixKvkFunction extends lambda.Function {
     super(scope, id, {
       description: 'src/migrations/migration-2024-11-06-fix-kvk.lambda.ts',
       ...props,
-      runtime: new lambda.Runtime('nodejs20.x', lambda.RuntimeFamily.NODEJS),
+      runtime: new lambda.Runtime('nodejs22.x', lambda.RuntimeFamily.NODEJS),
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../assets/migrations/migration-2024-11-06-fix-kvk.lambda')),
     });

@@ -72,13 +72,20 @@ export class ZgwHttpClient {
   }
 
   private createToken() {
-    const token = jwt.sign({
-      iss: this.clientId,
-      iat: Date.now(),
-      client_id: this.clientId,
-      user_id: this.clientId,
-      user_representation: this.clientId,
-    }, this.clientSecret);
+
+    const token = jwt.sign(
+      {
+        iss: this.clientId,
+        iat: Date.now(),
+        client_id: this.clientId,
+        user_id: this.clientId,
+        user_representation: this.clientId,
+      },
+      this.clientSecret,
+      {
+        expiresIn: '12h',
+      },
+    );
     return token;
   }
 
