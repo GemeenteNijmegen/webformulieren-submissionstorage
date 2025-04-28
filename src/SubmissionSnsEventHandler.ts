@@ -61,6 +61,7 @@ export class SubmissionSnsEventHandler extends Construct {
     const submissionLambda = new SubmissionFunction(this, 'submission', {
       role: this.lambdaRole(),
       logRetention: RetentionDays.SIX_MONTHS,
+      memorySize: 512,
       environment: {
         BUCKET_NAME: bucket.bucketName,
         TABLE_NAME: table.tableName,
