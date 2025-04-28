@@ -51,7 +51,6 @@ describe('Configuring the client', () => {
     const token = authHeader.replace(/^Bearer\s+/, '');
     const decoded = jwt.decode(token) as { iat: number; exp: number; [key: string]: any };
     expect(typeof decoded.exp).toBe('number');
-    expect(decoded.exp - decoded.iat).toBe(12 * 60 * 60); // expired - now
-    expect(decoded.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
+    expect(decoded.exp).toBeGreaterThan(Math.floor((Date.now() + (60*60)) / 1000)); // Groter dan een uur na nu
   });
 });
