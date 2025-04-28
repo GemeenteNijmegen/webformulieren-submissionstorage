@@ -72,19 +72,17 @@ export class ZgwHttpClient {
   }
 
   private createToken() {
-
+    const exp = Math.floor(Date.now() + (12 * 60 * 60))/1000; // 12 uur
     const token = jwt.sign(
       {
         iss: this.clientId,
-        iat: Date.now(),
+        iat: Math.floor(Date.now() / 1000),
+        exp: exp,
         client_id: this.clientId,
         user_id: this.clientId,
         user_representation: this.clientId,
       },
       this.clientSecret,
-      {
-        expiresIn: '12h',
-      },
     );
     return token;
   }

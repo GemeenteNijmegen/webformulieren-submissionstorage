@@ -355,7 +355,7 @@ export enum MigratieType {
  *
  * npx ts-node ./src/migrations/micro-migratie-rxmission/RxMissionMigratie.ts
  */
-export async function runMigration(inputFileName: string = 'small-sample-lijst2.xlsx', migratieType: MigratieType = MigratieType.LIJST_2): Promise<void> {
+export async function runMigration(inputFileName: string = 'one-row-lijst2.xlsx', migratieType: MigratieType = MigratieType.LIJST_2): Promise<void> {
   const confirm = await confirmProdEnvironment(inputFileName);
   if (!confirm) {
     console.log('Migration aborted.');
