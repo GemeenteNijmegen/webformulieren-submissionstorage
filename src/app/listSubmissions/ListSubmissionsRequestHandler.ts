@@ -1,4 +1,4 @@
-import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { ApiGatewayV1Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V1/Response';
 import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 
@@ -33,7 +33,7 @@ export class ListSubmissionsRequestHandler {
     ];
   }
 
-  async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
+  async handleRequest(parameters: EventParameters): Promise<ApiGatewayV1Response> {
     let results;
     if (parameters.key) {
       results = await this.database.getSubmission({ userId: parameters.userId, userType: parameters.userType, key: parameters.key });
