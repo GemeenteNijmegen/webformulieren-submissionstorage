@@ -1,4 +1,4 @@
-import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { ApiGatewayV1Response } from '@gemeentenijmegen/apigateway-http/lib/V1/Response';
 import { S3Storage } from '@gemeentenijmegen/utils';
 import { DynamoDBDatabase, SubmissionData } from '../../../submission/Database';
 import * as formDefinitionMockSportAanmelden from '../formDefinition/test/mockFormDefinitionAanmeldenSport.json';
@@ -85,7 +85,7 @@ describe('FormOverviewRequestHandler Tests', () => {
           statusCode: 200,
           body: expect.stringMatching(new RegExp('Csv has been saved in bucket as FormOverview-[0-9]*-aanmeldenSportactiviteit.csv')),
           headers: { 'Content-type': 'application/json' },
-        } as ApiGatewayV2Response);
+        } as ApiGatewayV1Response);
         expect(mockS3Store).toHaveBeenCalledWith(expect.stringContaining('aanmeldenSportactiviteit.csv'), expect.stringContaining('een volwassene (18 jaar of ouder);;;;;;;TestVoornaam01'));
         expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Number of processed rows: 1.'));
         expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Number of failed submission transformations: 0.'));
@@ -97,7 +97,7 @@ describe('FormOverviewRequestHandler Tests', () => {
       test('should return 204 no content without database results', async () => {
         mockDBGetSubmissionsByFormName.mockResolvedValue([] as SubmissionData[]);
         const formOverviewRequestHandler = new FormOverviewRequestHandler();
-        await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).resolves.toStrictEqual({ statusCode: 204 } as ApiGatewayV2Response);
+        await expect(formOverviewRequestHandler.handleRequest({ formuliernaam: 'formuliernaam' })).resolves.toStrictEqual({ statusCode: 204 } as ApiGatewayV1Response);
 
       });
       test('should throw error when databaseresult is false', async () => {

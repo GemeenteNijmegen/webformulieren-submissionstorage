@@ -1,5 +1,5 @@
 import { ApiGatewayV2Response } from '@gemeentenijmegen/apigateway-http';
-import { Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { Response } from '@gemeentenijmegen/apigateway-http/lib/V1/Response';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { FormOverviewRequestHandler } from './getFormOverviewRequestHandler';
 import { parsedEvent } from './parsedEvent';
