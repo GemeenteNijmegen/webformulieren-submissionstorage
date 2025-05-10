@@ -145,7 +145,7 @@ export class RxMissionMigratie {
 
       try {
         const successLog: any = {}; // add properties to the successlog
-        const zaak: {url: string; identification: string | undefined; zaakgeometrieAdded:boolean} = await handleMigration.createZaak(row);
+        const zaak: { url: string; identification: string | undefined; zaakgeometrieAdded: boolean } = await handleMigration.createZaak(row);
         if (!zaak.url) {
           this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak}. Stop and throw error to be caught`);
           throw Error('Zaak url is undefined.');
@@ -296,7 +296,7 @@ export enum JsonFileType {
  */
 export enum LogFileType {
   ERROR_LOG = 'errors.log',
-  LOGS = 'general_logs.log'
+  LOGS = 'general_logs.log',
 }
 
 

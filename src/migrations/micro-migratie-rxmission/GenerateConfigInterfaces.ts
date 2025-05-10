@@ -11,21 +11,21 @@ export interface ZgwCatalogiConfig {
   zaakTypeIdentificatie: string;// e.g. NMG-schaduwzaak
   zaakTypeUrl?: string; // url for specific zaaktype in that environment
   zaakTypeBeschrijving: string; // Description for human readability
-  statusTypen:{ url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
-  resultaatTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
-  eigenschappen: { url: string; kenmerk?: string; naam?: string; default?: boolean}[];
-  informatieObjectTypen?: { url: string; kenmerk?: string; omschrijving?: string;default?: boolean}[];
-  rolTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean}[];
+  statusTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean }[];
+  resultaatTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean }[];
+  eigenschappen: { url: string; kenmerk?: string; naam?: string; default?: boolean }[];
+  informatieObjectTypen?: { url: string; kenmerk?: string; omschrijving?: string;default?: boolean }[];
+  rolTypen: { url: string; kenmerk?: string; omschrijving?: string; default?: boolean }[];
 }
 
 export interface ZgwCatalogiZaakTypeSetup {
   beschrijving?: string;
   zaaktypeIdentificatie: string;
-  statusTypen:{kenmerk: string; omschrijving: string; default?: boolean}[];
-  resultaatTypen?: {kenmerk: string; omschrijving: string; default?: boolean}[];
-  eigenschappen?: {kenmerk: string; naam: string; default?: boolean}[];
-  informatieObjectTypen?: {kenmerk: string; omschrijving: string;default?: boolean}[];
-  rolTypen: {kenmerk: string; omschrijving: string; default?: boolean}[];
+  statusTypen: { kenmerk: string; omschrijving: string; default?: boolean }[];
+  resultaatTypen?: { kenmerk: string; omschrijving: string; default?: boolean }[];
+  eigenschappen?: { kenmerk: string; naam: string; default?: boolean }[];
+  informatieObjectTypen?: { kenmerk: string; omschrijving: string;default?: boolean }[];
+  rolTypen: { kenmerk: string; omschrijving: string; default?: boolean }[];
 }
 
 export const schaduwZaakCatalogiSetup: ZgwCatalogiZaakTypeSetup = {

@@ -385,7 +385,7 @@ export class HandleRxMissionMigration {
   /**
    * Patch omschrijving zaak
    */
-  async patchOmschrijvingZaak(url: string, omschrijving: string): Promise<{url: string; identification: string | undefined}> {
+  async patchOmschrijvingZaak(url: string, omschrijving: string): Promise<{ url: string; identification: string | undefined }> {
     const cappedOmschrijving = omschrijving.substring(0, 79);
     try {
       const patchedZaak = await this.zgwClient.callZaakApi(HttpMethod.Patch, url, { omschrijving: cappedOmschrijving });

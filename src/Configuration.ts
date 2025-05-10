@@ -52,7 +52,7 @@ export interface Configuration {
    * A list of CNAME records to register in the hosted zone
    * Note: key should be withou domain suffix (only subdomain).
    */
-  readonly cnameRecords?: {[key: string]: string};
+  readonly cnameRecords?: { [key: string]: string };
 
   /**
    * Set this boolean to setup DNSSEC
@@ -100,7 +100,7 @@ export function getConfiguration(branchName: string): Configuration {
   throw Error(`No configuration found for branch name ${branchName}`);
 }
 
-const configurations: { [name: string] : Configuration } = {
+const configurations: { [name: string]: Configuration } = {
   development: {
     branchName: 'development',
     subdomain: 'api',

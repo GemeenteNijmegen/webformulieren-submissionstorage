@@ -158,7 +158,7 @@ export class RxMissionPatchOmschrijving {
         }
         const zaakurl = foundZaak.url;
         // PATCH omschrijving
-        const zaak: {url: string; identification: string | undefined} = await handleMigration.patchOmschrijvingZaak(zaakurl, row.zaakomschrijving);
+        const zaak: { url: string; identification: string | undefined } = await handleMigration.patchOmschrijvingZaak(zaakurl, row.zaakomschrijving);
         if (!zaak.url) {
           this.appendToLogFile(LogFileType.ERROR_LOG, `zaak url is undefined ${zaak} - ${row.openwavezaaknummer}. Stop and throw error to be caught`);
           throw Error('Zaak url is undefined.');
@@ -203,7 +203,7 @@ export enum JsonFileTypePatch {
   FAILURE = 'failure.json',
   PATCHED_ZAAKURLS = 'patchedzaakurls.json',
   PROCESSED_ROWS = 'processedrows.json',
-  TO_PATCH = 'to_patch.json'
+  TO_PATCH = 'to_patch.json',
 }
 
 /**
@@ -211,7 +211,7 @@ export enum JsonFileTypePatch {
  */
 export enum LogFileType {
   ERROR_LOG = 'errors.log',
-  LOGS = 'general_logs.log'
+  LOGS = 'general_logs.log',
 }
 
 /**
