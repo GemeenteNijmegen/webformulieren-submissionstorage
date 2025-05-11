@@ -4926,6 +4926,11 @@ gensync@^1.0.0-beta.2:
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
 
+geographiclib-geodesic@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/geographiclib-geodesic/-/geographiclib-geodesic-2.1.1.tgz#5f9c02f2e0db5403055ba637f76d9e58b2215863"
+  integrity sha512-lkd8EUkPSByobWu9BPMHTdYA5AUZxOa8McmUNtBE9KrvUJEvSADnN6gTDmhXbi6NzdA16LtWLpSxLE/lIIRhyA==
+
 get-caller-file@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-2.0.5.tgz#4f94412a82db32f36e3b0b9741f8a97feb031f7e"
@@ -7000,13 +7005,14 @@ process@^0.11.10:
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
   integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
-proj4@^2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.15.0.tgz#d77c9956861c8ed516071c4208d576cebe800eb5"
-  integrity sha512-LqCNEcPdI03BrCHxPLj29vsd5afsm+0sV1H/O3nTDKrv8/LA01ea1z4QADDMjUqxSXWnrmmQDjqFm1J/uZ5RLw==
+proj4@^2.16.2:
+  version "2.16.2"
+  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.16.2.tgz#6dbf0ebf51f59b7ec21059adc7c98cd4d4fc096b"
+  integrity sha512-1IcYz7wG1kDpPEJSeBy+0v29wW3mhbqUgRReenvhjgHlGjFA9cA72nGWnikUUS/ggq3y/TcShWzR41sikFSrlQ==
   dependencies:
+    geographiclib-geodesic "^2.1.1"
     mgrs "1.0.0"
-    wkt-parser "^1.4.0"
+    wkt-parser "^1.5.1"
 
 projen@^0.91.31:
   version "0.91.31"
@@ -8456,10 +8462,10 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-wkt-parser@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.4.0.tgz#7cca07a6ee5b4baf059b723e62d7fe95bc923bf5"
-  integrity sha512-qpwO7Ihds/YYDTi1aADFTI1Sm9YC/tTe3SHD24EeIlZxy7Ik6a1b4HOz7jAi0xdUAw487duqpo8OGu+Tf4nwlQ==
+wkt-parser@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.5.1.tgz#3f0e8231be5563ff3e2ec418c30ca0bf80b4b396"
+  integrity sha512-o78jtCrTSs+qT3s9GMfrpRZHCze/fzNbAV2+rUEAjWPP08te0oPoyASrdtOHcAdEPMgSn8atjnlnAqmCvuAqSA==
 
 wmf@~1.0.1:
   version "1.0.2"
