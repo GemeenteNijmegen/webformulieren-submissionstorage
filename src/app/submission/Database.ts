@@ -13,6 +13,7 @@ export interface SubmissionData {
   dateSubmitted?: string;
   formName?: string;
   formTitle?: string;
+  submission?: any;
 }
 /**
  * Interface with expected results from a query of the secondary formNameIndex
