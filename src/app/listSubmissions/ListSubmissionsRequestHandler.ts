@@ -1,7 +1,7 @@
 import { ApiGatewayV1Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V1/Response';
 import { environmentVariables, S3Storage, Storage } from '@gemeentenijmegen/utils';
-import { Database, DynamoDBDatabase } from '../submission/Database';
 import { EventParameters } from './parsedEvent';
+import { Database, DynamoDBDatabase } from '../submission/Database';
 
 export class ListSubmissionsRequestHandler {
 
@@ -10,7 +10,7 @@ export class ListSubmissionsRequestHandler {
   private env = ['BUCKET_NAME', 'TABLE_NAME'];
   constructor() {
     const environment = environmentVariables(this.env);
-    [this.database, this.storage] = this.setup(environment.table, environment.bucket);
+    [this.database, this.storage] = this.setup(environment.TABLE_NAME, environment.BUCKET_NAME);
   }
 
 
@@ -31,7 +31,7 @@ export class ListSubmissionsRequestHandler {
       results = await this.database.getSubmission({ userId: parameters.userId, userType: parameters.userType, key: parameters.key });
       if (parameters.fullSubmission && results) {
         const submission = await this.storage.get(`${parameters.key}/submission.json`);
-        if(submission?.Body) {
+        if (submission?.Body) {
           results.submission = JSON.parse(await submission.Body.transformToString('utf-8'));
         }
       }

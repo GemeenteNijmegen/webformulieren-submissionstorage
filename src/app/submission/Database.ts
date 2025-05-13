@@ -76,6 +76,7 @@ export class DynamoDBDatabase implements Database {
   private client: DynamoDBClient;
 
   constructor(tableName: string, config?: { dynamoDBClient?: DynamoDBClient }) {
+
     this.table = tableName;
     this.client = config?.dynamoDBClient ?? new DynamoDBClient({});
   }

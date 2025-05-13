@@ -5,7 +5,7 @@ const EventParametersSchema = z.object({
   userId: z.string(),
   userType: z.enum(['organisation', 'person']), // Cannot retrieve anonymous submissions due to this restriction
   key: z.string().optional(),
-  fullSubmission: z.enum(['true', 'false']).transform((value) => value === 'true').optional(),
+  fullSubmission: z.boolean(),
 });
 
 export type EventParameters = z.infer<typeof EventParametersSchema>;
@@ -15,7 +15,7 @@ export function parsedEvent(event: APIGatewayProxyEvent): EventParameters {
     userId: event.queryStringParameters?.user_id,
     userType: event.queryStringParameters?.user_type,
     key: event.pathParameters?.key,
-    fullSubmission: event.queryStringParameters?.full_submission,
+    fullSubmission: event.queryStringParameters?.full_submission == 'true',
   });
 }
 
