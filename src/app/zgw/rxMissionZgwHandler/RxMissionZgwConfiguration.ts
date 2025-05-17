@@ -152,7 +152,7 @@ export function getSubmissionPropsFromAppIdOrFormName(
 }
 
 
-const rxMissionConfigurations: { [name: string] : RxMissionZgwConfiguration } = {
+const rxMissionConfigurations: { [name: string]: RxMissionZgwConfiguration } = {
   development: {
     branchName: 'development',
     submissionZaakProperties: [

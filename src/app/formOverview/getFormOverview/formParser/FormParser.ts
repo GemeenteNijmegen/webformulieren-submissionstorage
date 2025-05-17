@@ -102,7 +102,7 @@ export class FormParser {
     // Process select_boxes that have object values
     if (typeof value === 'object' && component.type === 'selectboxes_nijmegen') {
       let selectBoxStringValue = '';
-      component.values?.forEach((v: { label: string; value: string; shortcut?: string}) => {
+      component.values?.forEach((v: { label: string; value: string; shortcut?: string }) => {
         // Check each checkbox value and add to the string
         // value example { "a": true, "b": true } --> from submitted form
         // Form Definition component has values which maps the answer values to labels
