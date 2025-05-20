@@ -13,7 +13,7 @@ export interface FormOverviewData {
 
 export interface FormOverviewDatabase {
   storeFormOverview(formOverview: FormOverviewData): Promise<boolean>;
-  getFormOverviews(filters: {[key:string]:string} | undefined): Promise<FormOverviewData[]>;
+  getFormOverviews(filters: { [key:string]: string } | undefined): Promise<FormOverviewData[]>;
 }
 
 export class DDBFormOverviewDatabase implements FormOverviewDatabase {
@@ -54,7 +54,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
       return false;
     }
   }
-  async getFormOverviews(filters: {[key:string]:string} | undefined = undefined): Promise<FormOverviewData[]> {
+  async getFormOverviews(filters: { [key:string]: string } | undefined = undefined): Promise<FormOverviewData[]> {
 
     const queryInput: QueryCommandInput = {
       TableName: this.tableName,

@@ -13,6 +13,7 @@ export interface SubmissionData {
   dateSubmitted?: string;
   formName?: string;
   formTitle?: string;
+  submission?: any;
 }
 /**
  * Interface with expected results from a query of the secondary formNameIndex
@@ -75,6 +76,7 @@ export class DynamoDBDatabase implements Database {
   private client: DynamoDBClient;
 
   constructor(tableName: string, config?: { dynamoDBClient?: DynamoDBClient }) {
+
     this.table = tableName;
     this.client = config?.dynamoDBClient ?? new DynamoDBClient({});
   }

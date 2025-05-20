@@ -31,6 +31,11 @@ const getResult = {
   ],
 };
 
+const submissionSample = {
+  this: 'is',
+  a: 'submission',
+};
+
 jest.mock('../../submission/Database', () => {
 
   return {
@@ -41,6 +46,25 @@ jest.mock('../../submission/Database', () => {
         },
         getSubmission: async () => {
           return getResult;
+        },
+      };
+    }),
+  };
+});
+
+jest.mock('@gemeentenijmegen/utils', () => {
+  const original = jest.requireActual('@gemeentenijmegen/utils');
+  return {
+    ...original,
+    S3Storage: jest.fn(() => {
+      return {
+        get: async () => {
+          return Promise.resolve({
+            Body: {
+              // Stringify the file to simulate the AWS getObject response
+              transformToString: () => Promise.resolve(JSON.stringify(submissionSample)),
+            },
+          });
         },
       };
     }),
@@ -61,13 +85,22 @@ beforeAll(() => {
 describe('Request Handler', () => {
 
   test('Handler correctly returns', async() => {
-    const result = await handler.handleRequest({ userId: '900222670', userType: 'person' });
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', fullSubmission: false });
     expect(result.body).toBe(JSON.stringify(expectedListResults));
   });
 
   test('Handler correctly returns getSubmission', async() => {
-    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey' });
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey', fullSubmission: false });
     expect(result.body).toBe(JSON.stringify(getResult));
+  });
+
+  test('Returning full works', async() => {
+    const result = await handler.handleRequest({ userId: '900222670', userType: 'person', key: 'submissionkey', fullSubmission: true });
+    const compare = {
+      ...getResult,
+      submission: submissionSample,
+    };
+    expect(result.body).toBe(JSON.stringify(compare));
   });
 
 });
