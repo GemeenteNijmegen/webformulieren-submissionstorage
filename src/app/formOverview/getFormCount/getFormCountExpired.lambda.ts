@@ -68,7 +68,7 @@ function getEvironmentVariables() {
   };
 }
 
-function setup(environment: {tableName: string; downloadBucketName: string; formOverviewTableName: string} ):
+function setup(environment: { tableName: string; downloadBucketName: string; formOverviewTableName: string } ):
 [Database, Storage, FormOverviewDatabase] {
   const database = new DynamoDBDatabase(environment.tableName);
   const downloadStorage = new S3Storage(environment.downloadBucketName);
