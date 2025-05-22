@@ -1,4 +1,4 @@
-import { Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { Response } from '@gemeentenijmegen/apigateway-http/lib/V1/Response';
 import { S3Storage } from '@gemeentenijmegen/utils';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { parsedEvent } from './parsedEvent';

@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 export interface FormConnector {
   definition(formName: string): Promise<any>;
 }
@@ -13,7 +13,7 @@ export class MockFormConnector implements FormConnector {
 }
 
 export class FormIoFormConnector implements FormConnector {
-  private axios: Axios;
+  private axios: AxiosInstance;
 
   constructor(baseUrl: URL, apiKey: string, axiosInstance?: AxiosInstance) {
     this.axios = this.initAxios({ axiosInstance, apiKey, baseUrl });
@@ -27,7 +27,7 @@ export class FormIoFormConnector implements FormConnector {
     axiosInstance?: AxiosInstance | undefined;
     apiKey: string;
     baseUrl: URL;
-  }) {
+  }): AxiosInstance {
     if (config.axiosInstance) {
       return config.axiosInstance;
     } else {

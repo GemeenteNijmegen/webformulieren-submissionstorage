@@ -7,7 +7,7 @@ describe('GeometryTransformer utility tests', () => {
   const workbook = readFile(file);
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
-  const rows: {openwavezaaknummer: string; zaakgeometrie: string}[] = utils.sheet_to_json(worksheet);
+  const rows: { openwavezaaknummer: string; zaakgeometrie: string }[] = utils.sheet_to_json(worksheet);
 
 
   test('transform multipoint', async () => {
@@ -43,7 +43,7 @@ describe('GeometryTransformer utility tests', () => {
   test('geometries seen as bad input in api call', async () => {
     const transformer = new GeometrieTransformer();
 
-    let geometries: {[key:string]: any}[] = [];
+    let geometries: { [key:string]: any }[] = [];
     for (const row of rows) {
       if (parseInt(row.openwavezaaknummer) > 13) {
         try {

@@ -30,7 +30,7 @@ export class FormOverviewRequestHandler {
     };
   }
 
-  private setup(environment: {tableName: string; bucketName: string; downloadBucketName: string; formOverviewTableName: string} ):
+  private setup(environment: { tableName: string; bucketName: string; downloadBucketName: string; formOverviewTableName: string } ):
   [Database, Storage, Storage, FormOverviewDatabase] {
     const database = new DynamoDBDatabase(environment.tableName);
     const storage = new S3Storage(environment.bucketName);
@@ -108,7 +108,7 @@ export class FormOverviewRequestHandler {
     return Response.ok(200, `Csv has been saved in bucket as ${csvFileName}`);
   }
 
-  async getFormSubmissionsDatabase(params: EventParameters): Promise<{submissions:string[]; formdefinition: string}> {
+  async getFormSubmissionsDatabase(params: EventParameters): Promise<{ submissions: string[]; formdefinition: string }> {
     const databaseResult = await this.database.getSubmissionsByFormName({
       formName: params.formuliernaam,
       startDate: params.startdatum,
@@ -149,7 +149,7 @@ export class FormOverviewRequestHandler {
    * @param data
    * @returns
    */
-  async convertToJSON(data: string[][]): Promise<{[key: string]: string}[]> {
+  async convertToJSON(data: string[][]): Promise<{ [key: string]: string }[]> {
     if (data.length === 0) return []; // Handle empty data case
 
     const [headers, ...rows] = data;

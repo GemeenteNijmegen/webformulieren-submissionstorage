@@ -1,42 +1,40 @@
-import { ApiGatewayV2Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V2/Response';
+import { ApiGatewayV1Response, Response } from '@gemeentenijmegen/apigateway-http/lib/V1/Response';
+import { environmentVariables, S3Storage, Storage } from '@gemeentenijmegen/utils';
 import { EventParameters } from './parsedEvent';
 import { Database, DynamoDBDatabase } from '../submission/Database';
 
 export class ListSubmissionsRequestHandler {
 
   private database: Database;
+  private storage: Storage;
+  private env = ['BUCKET_NAME', 'TABLE_NAME'];
   constructor() {
-    const environment = this.getEvironmentVariables();
-    [this.database] = this.setup(environment);
+    const environment = environmentVariables(this.env);
+    [this.database, this.storage] = this.setup(environment.TABLE_NAME, environment.BUCKET_NAME);
   }
 
-  private getEvironmentVariables() {
-    if (process.env.TABLE_NAME == undefined) {
-      throw Error('No table NAME provided, retrieving submissions will fail.');
-    }
-    if (process.env.BUCKET_NAME == undefined) {
-      throw Error('No bucket NAME provided, retrieving submissions will fail.');
-    }
-    return {
-      tableName: process.env.TABLE_NAME,
-      bucketName: process.env.BUCKET_NAME,
-    };
-  }
 
   /**
    * Check for required environment variables, and create
    * storage and database objects to pass to handler.
    */
-  private setup(environment: { tableName: string }): [Database] {
+  private setup(table: string, bucket: string): [Database, Storage] {
     return [
-      new DynamoDBDatabase(environment.tableName),
+      new DynamoDBDatabase(table),
+      new S3Storage(bucket),
     ];
   }
 
-  async handleRequest(parameters: EventParameters): Promise<ApiGatewayV2Response> {
+  async handleRequest(parameters: EventParameters): Promise<ApiGatewayV1Response> {
     let results;
     if (parameters.key) {
       results = await this.database.getSubmission({ userId: parameters.userId, userType: parameters.userType, key: parameters.key });
+      if (parameters.fullSubmission && results) {
+        const submission = await this.storage.get(`${parameters.key}/submission.json`);
+        if (submission?.Body) {
+          results.submission = JSON.parse(await submission.Body.transformToString('utf-8'));
+        }
+      }
     } else {
       results = await this.database.listSubmissions({ userId: parameters.userId, userType: parameters.userType });
     }
