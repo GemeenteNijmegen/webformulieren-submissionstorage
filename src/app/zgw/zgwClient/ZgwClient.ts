@@ -276,9 +276,11 @@ export class ZgwClient {
 
   // Not needed anymore after using the ZgwHttpClient for all calls
   private createToken(clientId: string, userId: string, secret: string) {
+    const exp = Math.floor(Date.now() + (12 * 60 * 60))/1000; // 12 uur
     const token = jwt.sign({
       iss: clientId,
       iat: Date.now(),
+      exp,
       client_id: clientId,
       user_id: userId,
       user_representation: userId,
