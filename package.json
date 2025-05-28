@@ -68,13 +68,13 @@
     "aws-cdk": "^2",
     "aws-sdk-client-mock": "^3.1.0",
     "commit-and-tag-version": "^12",
-    "esbuild": "^0.25.4",
+    "esbuild": "^0.25.5",
     "eslint": "^9",
     "eslint-import-resolver-typescript": "^3.10.1",
     "eslint-plugin-import": "^2.31.0",
     "jest": "^29.7.0",
     "jest-junit": "^16",
-    "projen": "^0.92.7",
+    "projen": "^0.92.8",
     "testcontainers": "^10.28.0",
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
@@ -103,7 +103,7 @@
     "sns-validator": "^0.3.5",
     "ts-node": "^10.9.2",
     "xlsx": "0.18.5",
-    "zod": "^3.25.30"
+    "zod": "^3.25.31"
   },
   "license": "EUPL-1.2",
   "publishConfig": {
