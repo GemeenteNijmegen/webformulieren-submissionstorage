@@ -54,7 +54,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.825.0",
+    "@aws-sdk/client-secrets-manager": "^3.826.0",
     "@gemeentenijmegen/projen-project-type": "^1.10.5",
     "@stylistic/eslint-plugin": "^2",
     "@testcontainers/localstack": "^10.28.0",
@@ -82,11 +82,11 @@
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.21.0",
-    "@aws-sdk/client-dynamodb": "^3.825.0",
-    "@aws-sdk/client-eventbridge": "^3.825.0",
-    "@aws-sdk/client-s3": "^3.825.0",
-    "@aws-sdk/client-ssm": "^3.825.0",
-    "@aws-sdk/s3-request-presigner": "^3.825.0",
+    "@aws-sdk/client-dynamodb": "^3.826.0",
+    "@aws-sdk/client-eventbridge": "^3.826.0",
+    "@aws-sdk/client-s3": "^3.826.0",
+    "@aws-sdk/client-ssm": "^3.826.0",
+    "@aws-sdk/s3-request-presigner": "^3.826.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.26",
     "@gemeentenijmegen/aws-constructs": "^0.0.36",
     "@gemeentenijmegen/dnssec-record": "^0.0.32",
@@ -103,7 +103,7 @@
     "sns-validator": "^0.3.5",
     "ts-node": "^10.9.2",
     "xlsx": "0.18.5",
-    "zod": "^3.25.52"
+    "zod": "^3.25.56"
   },
   "license": "EUPL-1.2",
   "publishConfig": {
