@@ -47,7 +47,22 @@
       "description": "Prepare assets",
       "steps": [
         {
+          "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
+        },
+        {
+          "spawn": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda"
+        },
+        {
+          "spawn": "bundle:migrations/migration-2024-11-18-add-userType.lambda"
+        },
+        {
           "spawn": "bundle:app/download/download.lambda"
+        },
+        {
+          "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
+        },
+        {
+          "spawn": "bundle:app/submission/submission.lambda"
         },
         {
           "spawn": "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda"
@@ -65,25 +80,10 @@
           "spawn": "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda"
         },
         {
-          "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
-        },
-        {
-          "spawn": "bundle:app/submission/submission.lambda"
-        },
-        {
           "spawn": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda"
         },
         {
           "spawn": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda"
-        },
-        {
-          "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
-        },
-        {
-          "spawn": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda"
-        },
-        {
-          "spawn": "bundle:migrations/migration-2024-11-18-add-userType.lambda"
         }
       ]
     },
