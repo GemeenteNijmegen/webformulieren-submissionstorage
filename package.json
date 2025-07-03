@@ -81,14 +81,14 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^2.22.0",
+    "@aws-lambda-powertools/logger": "^2.23.0",
     "@aws-sdk/client-dynamodb": "^3.840.0",
     "@aws-sdk/client-eventbridge": "^3.840.0",
-    "@aws-sdk/client-s3": "^3.840.0",
+    "@aws-sdk/client-s3": "^3.842.0",
     "@aws-sdk/client-ssm": "^3.840.0",
-    "@aws-sdk/s3-request-presigner": "^3.840.0",
+    "@aws-sdk/s3-request-presigner": "^3.842.0",
     "@gemeentenijmegen/apigateway-http": "^0.0.27",
-    "@gemeentenijmegen/aws-constructs": "^0.0.37",
+    "@gemeentenijmegen/aws-constructs": "^0.0.38",
     "@gemeentenijmegen/dnssec-record": "^0.0.33",
     "@gemeentenijmegen/utils": "^0.0.33",
     "@types/aws-lambda": "^8.10.150",
@@ -103,7 +103,7 @@
     "sns-validator": "^0.3.5",
     "ts-node": "^10.9.2",
     "xlsx": "0.18.5",
-    "zod": "^3.25.67"
+    "zod": "^3.25.69"
   },
   "license": "EUPL-1.2",
   "publishConfig": {
