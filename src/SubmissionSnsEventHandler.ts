@@ -1,7 +1,7 @@
 import { Duration } from 'aws-cdk-lib';
 import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { EventBus } from 'aws-cdk-lib/aws-events';
-import { PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Function } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -106,9 +106,9 @@ export class SubmissionSnsEventHandler extends Construct {
         roleName: 'submissionhandler-lambda-role',
         assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
         description: 'Role for submission handler lambda, custom role so role name is predictable',
-        managedPolicies: [{
-          managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
-        }],
+        managedPolicies: [
+          ManagedPolicy.fromManagedPolicyArn(this, 'lambdarole', 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'),
+        ],
       });
     }
     return this.role;
