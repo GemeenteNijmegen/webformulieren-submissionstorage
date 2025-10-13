@@ -1,6 +1,5 @@
 import { PermissionsBoundaryAspect } from '@gemeentenijmegen/aws-constructs';
 import { Stack, StackProps, Tags, pipelines, Aspects, CfnParameter } from 'aws-cdk-lib';
-import { ComputeType, LinuxArmLambdaBuildImage } from 'aws-cdk-lib/aws-codebuild';
 import { Construct } from 'constructs';
 import { ApiStage } from './ApiStage';
 import { Configurable, Configuration } from './Configuration';
@@ -35,6 +34,7 @@ export class PipelineStack extends Stack {
         BRANCH_NAME: this.configuration.branchName,
       },
       commands: [
+        'n lts',
         'node -v',
         'yarn install --frozen-lockfile',
         'npx projen build',
@@ -46,12 +46,6 @@ export class PipelineStack extends Stack {
       pipelineName: `${Statics.projectName}-${this.configuration.branchName}`,
       crossAccountKeys: true,
       synth: synthStep,
-      codeBuildDefaults: {
-        buildEnvironment: {
-          buildImage: LinuxArmLambdaBuildImage.AMAZON_LINUX_2023_NODE_22,
-          computeType: ComputeType.LAMBDA_1GB,
-        },
-      },
     });
     return pipeline;
   }
