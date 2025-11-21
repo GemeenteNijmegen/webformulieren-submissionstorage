@@ -47,7 +47,22 @@
       "description": "Prepare assets",
       "steps": [
         {
+          "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
+        },
+        {
+          "spawn": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda"
+        },
+        {
+          "spawn": "bundle:migrations/migration-2024-11-18-add-userType.lambda"
+        },
+        {
           "spawn": "bundle:app/download/download.lambda"
+        },
+        {
+          "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
+        },
+        {
+          "spawn": "bundle:app/submission/submission.lambda"
         },
         {
           "spawn": "bundle:app/formOverview/authorizer/JwtAuthorizer.lambda"
@@ -65,25 +80,10 @@
           "spawn": "bundle:app/formOverview/submittedFormOverview/submittedFormOverview.lambda"
         },
         {
-          "spawn": "bundle:app/listSubmissions/listSubmissions.lambda"
-        },
-        {
-          "spawn": "bundle:app/submission/submission.lambda"
-        },
-        {
           "spawn": "bundle:app/zgw/rxMissionZgwHandler/rxmission-zgw.lambda"
         },
         {
           "spawn": "bundle:app/zgw/zgwForwardingHandler/zgw.lambda"
-        },
-        {
-          "spawn": "bundle:migrations/migration-2024-02-06-enrich-table.lambda"
-        },
-        {
-          "spawn": "bundle:migrations/migration-2024-11-06-fix-kvk.lambda"
-        },
-        {
-          "spawn": "bundle:migrations/migration-2024-11-18-add-userType.lambda"
         }
       ]
     },
@@ -411,7 +411,8 @@
       "name": "eslint",
       "description": "Runs eslint against the codebase",
       "env": {
-        "ESLINT_USE_FLAT_CONFIG": "false"
+        "ESLINT_USE_FLAT_CONFIG": "false",
+        "NODE_NO_WARNINGS": "1"
       },
       "steps": [
         {
@@ -565,7 +566,7 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --no-deprecated --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/node,@types/proj4,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-lambda-powertools/logger,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/client-ssm,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,proj4,sns-validator,zod"
+          "exec": "npx npm-check-updates@18 --upgrade --target=minor --peer --no-deprecated --dep=dev,peer,prod,optional --filter=@aws-sdk/client-secrets-manager,@gemeentenijmegen/projen-project-type,@testcontainers/localstack,@types/jest,@types/jsonwebtoken,@types/node,@types/proj4,@types/sns-validator,aws-sdk-client-mock,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,jest,projen,testcontainers,ts-jest,ts-node,typescript,@aws-lambda-powertools/logger,@aws-sdk/client-dynamodb,@aws-sdk/client-eventbridge,@aws-sdk/client-s3,@aws-sdk/client-ssm,@aws-sdk/s3-request-presigner,@gemeentenijmegen/apigateway-http,@gemeentenijmegen/aws-constructs,@gemeentenijmegen/dnssec-record,@gemeentenijmegen/utils,@types/aws-lambda,axios,cdk-remote-stack,dotenv,jose,jsonwebtoken,proj4,sns-validator,zod"
         },
         {
           "exec": "yarn install --check-files"
