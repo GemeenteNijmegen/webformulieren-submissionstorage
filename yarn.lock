@@ -1511,10 +1511,10 @@
     "@aws-sdk/client-sts" "^3.917.0"
     "@types/aws-lambda" "^8.10.156"
 
-"@gemeentenijmegen/projen-project-type@^1.11.8":
-  version "1.11.8"
-  resolved "https://registry.yarnpkg.com/@gemeentenijmegen/projen-project-type/-/projen-project-type-1.11.8.tgz#b2505252da6816338df5b92fbc51f6b435ea628d"
-  integrity sha512-SfSLInSig8X5I7xyCrCiZSuwgk8Lw+9q7GuaNrtuNnGCScxnEe5cLcPZYd73usJUkB8isN/OcN0OppUXrx9cug==
+"@gemeentenijmegen/projen-project-type@^1.11.10":
+  version "1.11.10"
+  resolved "https://registry.yarnpkg.com/@gemeentenijmegen/projen-project-type/-/projen-project-type-1.11.10.tgz#d06643d09b1239c995550f69d15a36991a020b9b"
+  integrity sha512-O9jzKIB2QvbkKAUqW9GUb1DmDT7dIeGl/h8qsIIFH3MjacEqWPTrgfCrJae+N9hr/SbSS6cJjy8jgSY20NqJrw==
 
 "@gemeentenijmegen/utils@^0.0.38":
   version "0.0.38"
@@ -3369,9 +3369,9 @@ bare-events@^2.5.4, bare-events@^2.7.0:
   integrity sha512-riJjyv1/mHLIPX4RwiK+oW9/4c3TEUeORHKefKAKnZ5kyslbN+HXowtbaVEqt4IMUB7OXlfixcs6gsFeo/jhiQ==
 
 bare-fs@^4.0.1:
-  version "4.5.1"
-  resolved "https://registry.yarnpkg.com/bare-fs/-/bare-fs-4.5.1.tgz#498a20a332d4a7f0b310eb89b8d2319041aa1eef"
-  integrity sha512-zGUCsm3yv/ePt2PHNbVxjjn0nNB1MkIaR4wOCxJ2ig5pCf5cCVAYJXVhQg/3OhhJV6DB1ts7Hv0oUaElc2TPQg==
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/bare-fs/-/bare-fs-4.5.2.tgz#d80ff8a9177e0db4818e7ba44b9302c0cf0788af"
+  integrity sha512-veTnRzkb6aPHOvSKIOy60KzURfBdUflr5VReI+NSaPL6xf+XLdONQgZgpYvUuZLVQ8dCqxpBAudaOM1+KpAUxw==
   dependencies:
     bare-events "^2.5.4"
     bare-path "^3.0.0"
