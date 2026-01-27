@@ -1,9 +1,9 @@
+import { RemoteParameters } from '@gemeentenijmegen/cross-region-parameters';
 import { DnssecRecordStruct } from '@gemeentenijmegen/dnssec-record';
 import { Duration, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { CfnDNSSEC, CfnKeySigningKey, HostedZone, HostedZoneAttributes, IHostedZone, NsRecord } from 'aws-cdk-lib/aws-route53';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
-import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { Statics } from './statics';
 

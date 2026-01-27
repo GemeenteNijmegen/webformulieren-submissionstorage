@@ -4,7 +4,6 @@ const project = new GemeenteNijmegenCdkApp({
   cdkVersion: '2.1.0',
   defaultReleaseBranch: 'main',
   devDeps: [
-    '@gemeentenijmegen/projen-project-type',
     '@aws-sdk/client-secrets-manager',
     '@types/sns-validator',
     'aws-sdk-client-mock',
@@ -14,10 +13,12 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/proj4',
   ],
   deps: [
+    '@gemeentenijmegen/projen-project-type',
     '@gemeentenijmegen/aws-constructs',
     '@gemeentenijmegen/dnssec-record',
     '@gemeentenijmegen/utils',
     '@gemeentenijmegen/apigateway-http',
+    '@gemeentenijmegen/cross-region-parameters',
     '@types/aws-lambda',
     'sns-validator',
     'zod',
@@ -29,7 +30,6 @@ const project = new GemeenteNijmegenCdkApp({
     '@aws-lambda-powertools/logger',
     'axios',
     'dotenv',
-    'cdk-remote-stack',
     'jose', // 🌮
     'jsonwebtoken',
     'xlsx@0.18.5',
@@ -51,6 +51,11 @@ const project = new GemeenteNijmegenCdkApp({
     workflowOptions: {
       branches: ['development'],
       labels: ['auto-merge'],
+    },
+  },
+  tsconfig: {
+    compilerOptions: {
+      isolatedModules: true,
     },
   },
   // deps: [],                /* Runtime dependencies of this module. */
