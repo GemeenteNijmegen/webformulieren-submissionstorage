@@ -1,3 +1,4 @@
+import { RemoteParameters } from '@gemeentenijmegen/cross-region-parameters';
 import { Duration } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi, DomainNameOptions, EndpointType, SecurityPolicy, IdentitySource, RequestAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
@@ -9,7 +10,6 @@ import { ARecord, HostedZone, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-
 import { ApiGateway } from 'aws-cdk-lib/aws-route53-targets';
 import { Bucket, IBucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
-import { RemoteParameters } from 'cdk-remote-stack';
 import { Construct } from 'constructs';
 import { DownloadFunction } from './app/download/download-function';
 import { JwtAuthorizerFunction } from './app/formOverview/authorizer/JwtAuthorizer-function';
