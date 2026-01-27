@@ -42,6 +42,7 @@ const project = new GemeenteNijmegenCdkApp({
       roots: ['test', 'src'],
     },
   },
+  enableCfnLintOnGithub: false, // TODO 2026-01-27 weer aanzetten na fix python 3.9 package
   gitignore: [
     'src/app/submission/test/docker/',
     '**/output/',
