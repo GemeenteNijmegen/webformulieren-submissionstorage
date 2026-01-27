@@ -4,6 +4,8 @@ import { Construct } from 'constructs';
 import { ApiStage } from './ApiStage';
 import { Configurable, Configuration } from './Configuration';
 import { Statics } from './statics';
+import { PipelineType } from 'aws-cdk-lib/aws-codepipeline';
+import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 
 export interface PipelineStackProps extends StackProps, Configurable {}
 
@@ -34,8 +36,6 @@ export class PipelineStack extends Stack {
         BRANCH_NAME: this.configuration.branchName,
       },
       commands: [
-        'n lts',
-        'node -v',
         'yarn install --frozen-lockfile',
         'npx projen build',
         'npx projen synth',
@@ -46,6 +46,18 @@ export class PipelineStack extends Stack {
       pipelineName: `${Statics.projectName}-${this.configuration.branchName}`,
       crossAccountKeys: true,
       synth: synthStep,
+      pipelineType: PipelineType.V1,
+      synthCodeBuildDefaults: {
+        partialBuildSpec: BuildSpec.fromObject({
+          phases: {
+            install: {
+              'runtime-versions': {
+                nodejs: getNodeVersion(),
+              },
+            },
+          },
+        }),
+      },
     });
     return pipeline;
   }
@@ -56,3 +68,7 @@ export class PipelineStack extends Stack {
     });
   }
 }
+function getNodeVersion() {
+  throw new Error('Function not implemented.');
+}
+
