@@ -4,7 +4,6 @@ const project = new GemeenteNijmegenCdkApp({
   cdkVersion: '2.1.0',
   defaultReleaseBranch: 'main',
   devDeps: [
-    '@gemeentenijmegen/projen-project-type',
     '@aws-sdk/client-secrets-manager',
     '@types/sns-validator',
     'aws-sdk-client-mock',
@@ -14,6 +13,7 @@ const project = new GemeenteNijmegenCdkApp({
     '@types/proj4',
   ],
   deps: [
+    '@gemeentenijmegen/projen-project-type',
     '@gemeentenijmegen/aws-constructs',
     '@gemeentenijmegen/dnssec-record',
     '@gemeentenijmegen/utils',

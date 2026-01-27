@@ -1,11 +1,12 @@
 import { PermissionsBoundaryAspect } from '@gemeentenijmegen/aws-constructs';
+import { getNodeVersion } from '@gemeentenijmegen/projen-project-type';
 import { Stack, StackProps, Tags, pipelines, Aspects, CfnParameter } from 'aws-cdk-lib';
+import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
+import { PipelineType } from 'aws-cdk-lib/aws-codepipeline';
 import { Construct } from 'constructs';
 import { ApiStage } from './ApiStage';
 import { Configurable, Configuration } from './Configuration';
 import { Statics } from './statics';
-import { PipelineType } from 'aws-cdk-lib/aws-codepipeline';
-import { BuildSpec } from 'aws-cdk-lib/aws-codebuild';
 
 export interface PipelineStackProps extends StackProps, Configurable {}
 
@@ -67,8 +68,5 @@ export class PipelineStack extends Stack {
       connectionArn: connectionArn.valueAsString,
     });
   }
-}
-function getNodeVersion() {
-  throw new Error('Function not implemented.');
 }
 
