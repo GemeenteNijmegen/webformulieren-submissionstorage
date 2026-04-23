@@ -65,7 +65,7 @@ export class ZgwHttpClient {
       isJson = true;
       console.debug('is json', body);
     } catch (error) {
-      console.debug('not json', body);
+      console.debug('not json', { body: body, error: error });
       isJson = false;
     }
     return isJson;

@@ -218,6 +218,7 @@ function getNewItemCommandAnon(tableName: string, itemKey: string) {
 }
 
 // Be able to fill up the db with enough data to have the scan be paginated (1MB per page)
+/* eslint-disable @typescript-eslint/no-unused-vars */
 async function prefillDatabase(database: DynamoDBDatabase, _items: number, startAt?: number) {
   startAt = startAt ?? 0;
   // for (let index = startAt; index < items + startAt; index++) {

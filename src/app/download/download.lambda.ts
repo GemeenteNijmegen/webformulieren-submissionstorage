@@ -17,6 +17,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<any> {
     console.debug(response);
     return response;
   } catch (error: any) {
+    console.error(`Download presigned url :${error}`);
     return {
       statusCode: 500,
     };
