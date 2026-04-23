@@ -109,6 +109,7 @@ export class DDBFormOverviewDatabase implements FormOverviewDatabase {
         return items;
       } else {return [];}
     } catch (error) {
+      console.error(`getFormOverview :${error}`);
       throw Error('Listing formOverviews from database failed');
     }
   }

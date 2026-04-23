@@ -108,7 +108,7 @@ export class HandleRxMissionMigration {
     } catch (error: any) {
       if (!retryWithoutGeometry) {
         retryWithoutGeometry = true;
-        console.error(`Retry create zaak without zaakgeometrie ${row.openwavezaaknummer}`);
+        console.error(`Retry create zaak without zaakgeometrie ${row.openwavezaaknummer}- ${error}`);
         return this.callCreateZaak({ ...zaakParams, zaakgeometrie: undefined, toelichting: `GEEN LOCATIE OP KAART MOGELIJK. ${toelichting}` }, row);
       } else {
         throw Error(`CREATING ZAAK ON RETRY FAILED: ${row.openwavezaaknummer}`);
@@ -284,7 +284,7 @@ export class HandleRxMissionMigration {
       return createdRol.url ?? undefined;
     } catch (error: any) {
       console.error(
-        `No Rol added because api call failed ${row.openwavezaaknummer}`,
+        `No Rol added because api call failed ${row.openwavezaaknummer} - ${error}`,
       );
       return undefined;
     }
@@ -352,7 +352,7 @@ export class HandleRxMissionMigration {
       return resultaat.url ?? undefined;
     } catch (error: any) {
       console.error(
-        `No resultaat added because api call failed ${row.openwavezaaknummer} - ${row.zaakresultaat}`,
+        `No resultaat added because api call failed ${row.openwavezaaknummer} - ${row.zaakresultaat}- ${error}`,
       );
       return undefined;
     }
@@ -377,7 +377,7 @@ export class HandleRxMissionMigration {
       await this.zgwClient.callZaakApi(HttpMethod.Delete, url);
       console.log(`DELETE ${type}:  ${url} success}`);
     } catch (error: any) {
-      console.error(`DELETING ${type} FAILED: ${url}`);
+      console.error(`DELETING ${type} FAILED: ${url} - ${error}`);
       throw Error(`DELETING ${type} FAILED: ${url}`);
     }
   }
@@ -392,7 +392,7 @@ export class HandleRxMissionMigration {
       console.log(`PATCH:  ${url} success ${omschrijving}`);
       return { url: patchedZaak.url, identification: patchedZaak.identificatie };
     } catch (error: any) {
-      console.error(`PATCH FAILED: ${url} ${omschrijving}`);
+      console.error(`PATCH FAILED: ${url} ${omschrijving} - ${error}`);
       throw Error(`PATCH FAILED: ${url} ${omschrijving}`);
     }
   }

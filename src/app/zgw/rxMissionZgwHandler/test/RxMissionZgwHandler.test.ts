@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
-// @ts-ignore: Ignoring unused import
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-// @ts-ignore: Ignoring unused import
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   AWS,
   Bsn,
@@ -12,7 +13,7 @@ import {
 } from '@gemeentenijmegen/utils';
 import { mockClient } from 'aws-sdk-client-mock';
 import { MockRxMissionSubmission } from './mocks/RxMissionSubmission.mock';
-// @ts-ignore: Ignoring unused import
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DynamoDBDatabase } from '../../../submission/Database';
 import { getFetchMockResponse } from '../../zgwClient/test/testUtils';
 import {
@@ -231,7 +232,7 @@ function writeOutputToFile(name: string, data: any) {
       if (Array.isArray(item) && item[1]?.body) {
         try {
           item[1].body = JSON.parse(item[1].body);
-        } catch (e) {}
+        } catch (e) { console.log(e);}
       }
       return item;
     });
