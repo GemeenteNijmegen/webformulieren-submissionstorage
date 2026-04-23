@@ -83,7 +83,7 @@ export class RXMissionDocument {
         throw Error('Error adding bestandsdeel');
       }
     } catch (error) {
-      console.error('Could not upload bestandsdeel, retry?', { bestandsdeel: bestandsDeelUrl, lock: this.lock });
+      console.error('Could not upload bestandsdeel, retry?', { bestandsdeel: bestandsDeelUrl, lock: this.lock, error: error });
       throw Error('Error adding bestandsdeel');
     }
     await this.unlock();

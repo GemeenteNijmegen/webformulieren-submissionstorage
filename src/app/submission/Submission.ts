@@ -128,7 +128,7 @@ export class Submission {
     try {
       dateSubmitted = dateArrayToDate(this.parsedSubmission.metadata.timestamp);
     } catch (error) {
-      console.error('Could not get submission date from submission, continueing');
+      console.error(`Could not get submission date from submission, continueing ${error}`);
     }
     const parsedDefinition = FormDefinitionSchema.parse(formDefinition);
     // Store in dynamodb
