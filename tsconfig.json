@@ -26,6 +26,14 @@
     "strictPropertyInitialization": false,
     "stripInternal": true,
     "target": "ES2022",
+    "types": [
+      "jest",
+      "jsonwebtoken",
+      "node",
+      "proj4",
+      "sns-validator",
+      "aws-lambda"
+    ],
     "moduleResolution": "nodenext",
     "typeRoots": [
       "./node_modules/@types"
