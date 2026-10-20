@@ -107,12 +107,6 @@ const configurations: { [name: string]: Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appDevEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [
-      Statics.acceptanceWebformulierenAccountId,
-    ],
-    subscribeToTopicArns: [
-      'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
-    ],
     useGatewayAuthorizer: false,
     forwardToZgw: true,
     enableRxMissionZwgHandler: true,
@@ -125,12 +119,6 @@ const configurations: { [name: string]: Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appAccpEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [
-      Statics.acceptanceWebformulierenAccountId,
-    ],
-    subscribeToTopicArns: [
-      'arn:aws:sns:eu-central-1:338472043295:eform-submissions',
-    ],
     useGatewayAuthorizer: false,
     enableRxMissionZwgHandler: false,
     criticality: new Criticality('low'),
@@ -141,12 +129,6 @@ const configurations: { [name: string]: Configuration } = {
     deployFromEnvironment: Statics.gnBuildEnvironment,
     deployToEnvironment: Statics.appProdEnvironment,
     includePipelineValidationChecks: false,
-    allowedAccountIdsToPublishToSNS: [
-      Statics.productionWebformulierenAccountId,
-    ],
-    subscribeToTopicArns: [
-      'arn:aws:sns:eu-central-1:147064197580:eform-submissions',
-    ],
     useDnsSec: true,
     useGatewayAuthorizer: false,
     enableRxMissionZwgHandler: true,
